@@ -1,6 +1,8 @@
 # TODO: pin nixpkgs, probably via nixpkgs submodule, or at least current stable
 # TODO: remove cruft we do not need: nixos-install, ZFS, etc.
 # TODO: enable interaction via UART.
+# TODO: add a document header to this file, explaining that this is a modified installer env.
+# TODO: change hostname, replace nixos user with root
 
 { pkgs, lib, ... }: {
   imports = [
@@ -37,4 +39,37 @@
 
   # Enables us to inspect core dumps in a centralized manner (incl. timestamps)
   systemd.coredump.enable = true;
+
+  services.sshd.enabled = true;
+  # sshd has an empty `wantedBy` in the installer derivation, but we need it;
+  # override the override.
+  systemd.services.sshd.wantedBy = lib.mkOverride 40 [ "multi-user.target" ];
+  environment.etc."id_rsa" = {
+    source = ./id_rsa;
+    user = "nixos";
+    mode = "0600";
+  };
+  users.extraUsers.nixos.openssh.authorizedKeys.keys = with (import ./ssh-keys.nix); [
+    tmplt
+  ];
+  systemd.services.ssh-port-forward = {
+    description = "forwarding reverse SSH connection to a known bastion";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" "nss-lookup.target" ];
+    serviceConfig = {
+      ExecStart = ''
+        ${pkgs.openssh}/bin/ssh -o StrictHostKeyChecking=no \
+          -TNR ${(import ./common.nix).socketPath}:localhost:22 bastion@tmplt.dev \
+          -i /etc/id_rsa
+      '';
+      
+      StandardError = "journal";
+      Type = "simple";
+
+      # Upon exit, try to establish a new connection every 5s.
+      Restart = "always";
+      RestartSec = "5s";
+      StartLimitIntervalSec = "0";
+    };
+  };
 }
