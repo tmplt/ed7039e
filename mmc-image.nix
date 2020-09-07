@@ -56,10 +56,10 @@
     description = "forwarding reverse SSH connection to a known bastion";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" "nss-lookup.target" ];
-    serviceConfig = {
+    serviceConfig = let bastion = (import ./config.nix).bastion; in {
       ExecStart = ''
         ${pkgs.openssh}/bin/ssh -o StrictHostKeyChecking=no \
-          -TNR ${(import ./common.nix).socketPath}:localhost:22 bastion@tmplt.dev \
+          -TNR ${bastion.socketPath}:localhost:22 ${bastion.user}@${bastion.host} \
           -i /etc/id_rsa
       '';
       

@@ -1,7 +1,9 @@
 # TODO: document
+# TODO: mention that this file is written with NixOS 20.03 (Markhor) in mind.
+# TODO: write a config for `ssh -o StrictHostKeyChecking=no -p 21013 nixos@tmplt.dev`, or force a SSH host fingerprint
 
 let
-  vars = import ../common.nix;
+  cfg = import ../config.nix;
 in
 { pkgs, ... }: {
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
@@ -20,15 +22,15 @@ in
   };
 
   # Export socket via socat(1)
-  networking.firewall.allowedTCPPorts = [ vars.sshPort ];
+  networking.firewall.allowedTCPPorts = [ cfg.bastion.sshPort ];
   systemd.services.expose-ed7039e-socket = {
-    description = "export of ed7039e's domain socket to port ${toString vars.sshPort}";
+    description = "export of ed7039e's domain socket to port ${toString cfg.bastion.sshPort}";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" "nss-lookup.target" ];
     serviceConfig = {
       ExecStart = ''
-        ${pkgs.socat}/bin/socat -dd TCP4-LISTEN:${toString vars.sshPort},fork \
-           UNIX-CONNECT:${vars.socketPath}
+        ${pkgs.socat}/bin/socat -dd TCP4-LISTEN:${toString cfg.bastion.sshPort},fork \
+           UNIX-CONNECT:${cfg.bastion.socketPath}
       '';
 
       StandardError = "journal";
