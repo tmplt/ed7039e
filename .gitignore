@@ -1,3 +1,4 @@
 report/*
 !report/master.tex
+!report/sections
 local-secrets.nix

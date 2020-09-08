@@ -1,0 +1,32 @@
+\section{Introduction}
+\subsection{Background}
+% TODO: Mention the final goal of automating whole factories.
+% Present Arrowhead and what its aims are.
+
+\subsection{Problem description}
+% Wait for an Arrowhead event, locate the object, pick it up, place elsewhere.
+The problem this project aims to solve is that of automatically moving an object from a designated pick-up point to a designated drop-off point on a system-external signal.
+In practise, the problem space aims to mimic the environment of a factory floor where an object under manufacture has been fully processed in a station and it to be moved to the next station.
+
+Described in different terms, the problem is the automatic displacement of an object from a origin point $(x_0, y_0, z_0)$ to a destination point $(x, y, z)$,
+where $(x, y)$ denote a position on the factory floor and $y, y \geq 0$, an elevation above the floor.
+
+Additionally, the station signals a fully processed object via the Arrowhead Framework in a local cloud.
+Upon this signal, the task of moving the object is to be delegated to the system this project aims to develop.
+
+% TODO: insert an image of the conveyor belt with measures.
+
+\subsection{Limitations}
+The problem space is vast and infinite configurations can mimic a factory floor:
+\begin{inline-enum}
+    \item different placement/rotations of one or more stations
+    \item obstacles of multiple kinds; static and dynamic (e.g. other robots)
+    \item recovery/discard of a dropped object.
+\end{inline-enum}
+Support for more configurations require a more complex system.
+
+For the above reason the project is thus limited to one or two stations,
+an environment without any other obstacles and no recovery/discard of a dropped object.
+If an object is dropped, the displacement procedure ends and is considered to have failed.
+
+%\subsection{Similar projects}
