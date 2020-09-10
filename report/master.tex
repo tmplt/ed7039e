@@ -19,8 +19,9 @@
 \usepackage{sectsty}
 \usepackage{hyperref}
 \usepackage{csquotes}
-\usepackage{biblatex}
+\usepackage[style=authoryear]{biblatex}
 \usepackage[inline]{enumitem}
+
 
 \newlist{inline-enum}{enumerate*}{1}
 \setlist[inline-enum]{label=(\roman*)}
@@ -51,22 +52,22 @@
 \setlist[itemize]{itemsep=-0mm}
 
 
-\sectionfont{\color{CERNblue}}
-\subsectionfont{\color{CERNblue}}
-\subsubsectionfont{\color{CERNblue}}
+% \sectionfont{\color{CERNblue}}
+% \subsectionfont{\color{CERNblue}}
+% \subsubsectionfont{\color{CERNblue}}
 
 \newcommand{\hypermail}[1]{\href{mailto:#1}{\texttt{<#1>}}}
 
-% TODO: change footnote style
+\addbibresource{ref.bib}
 
 % TODO: add a link to the repository somewhere
 
-\title{D7039E/E7032E --- Project: Model, Simulation and Implementation of a Mechatronical System for Use in a Mimicked Industrial Environment}
+\title{
+D7039E/E7032E\footnote{Codes of courses taken by team members at Luleå Technical University}
+--- Project: Model, Simulation and Implementation of a Mechatronical System for Use in a Mimicked Industrial Environment
+}
 \author{
-As authored by:
-\footnote{In no particular order.}
-\footnote{All team members can be contacted via
-\href{mailto:vikson-6@student.ltu.se;lukkar-4@student.ltu.se;sansim-6@student.ltu.se;olemis-6@student.ltu.se;rubasp-6@student.ltu.se;alinou-6@student.ltu.se;alikhar-6@student.ltu.se}{this hyperlink}.} \\
+As authored by:\footnote{In no particular order; All team members can be contacted via \href{mailto:vikson-6@student.ltu.se;lukkar-4@student.ltu.se;sansim-6@student.ltu.se;olemis-6@student.ltu.se;rubasp-6@student.ltu.se;alinou-6@student.ltu.se;alikhar-6@student.ltu.se}{this hyperlink}.} \\
 Viktor Sonesten \hypermail{vikson-6@student.ltu.se} \\
 Lukas Karlsson \hypermail{lukkar-4@student.ltu.se} \\
 Simon Sandberg \hypermail{sansim-6@student.ltu.se} \\
@@ -96,5 +97,7 @@ Ali Khademi \hypermail{alikha-6@student.ltu.se}
 \subsection{Structure of work}
 \subsubsection{Milestones}
 \subsubsection{Tecchnical solutions in the project}
+
+\printbibliography
 
 \end{document}

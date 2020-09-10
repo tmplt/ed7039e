@@ -1,4 +1,5 @@
 report/*
 !report/master.tex
 !report/sections
+!report/ref.bib
 local-secrets.nix

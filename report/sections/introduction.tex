@@ -1,32 +1,56 @@
 \section{Introduction}
 \subsection{Background}
-% TODO: Mention the final goal of automating whole factories.
-% Present Arrowhead and what its aims are.
+% Introduce ARTEMIS and the Arrowhead project
+The ARTEMIS\footnote{\textbf{A}dvanced \textbf{R}esearch \& \textbf{T}echnology for \textbf{EM}bedded \textbf{I}ntelligent \textbf{S}ystems} Industry Association is an organisation with the goal of innovating the embedded intelligent systems sector in Europe.~\parencite{artemis}
+One of the approaches to reach this goal was the 2013 start of the ARROWHEAD project which ``[address] the efficiency and flexibility at the global scale by means of collaborative automation for five application verticals; [one of which being] production (manufacturing, process, energy).''~\parencite{arrowhead-project-call}
 
+% Summarize the result of the project
+The project concluded 2017 and yielded the Arrowhead Framework which enable interoperability between Internet of Things (IoT) devices by providing guarantees for:
+\begin{inline-enum}
+    \item real-time data handling;
+    \item data and system security;
+    \item automation system engineering; and
+    \item scalability of automation systems.
+\end{inline-enum}
+\parencite{arrowhead-project-about}
+With the above guarantees provided by Arrowhead, resources otherwise required for developing a new framework (ad-hoc or not) may instead be allotted to the system the framework ultimately will interact with.
+
+% Describe the reason for this project.
+% TODO: extend/rewrite; describe that the process of moving an object from a to b by use of robots have not been solved yet (mentioned during the second lecture).
+The reason for this project is then to verify that Arrowhead can indeed be used to resolve a common industry problem: production; specifically the act of moving a object from one station to another,
+which is a common procedure in product pipelines.
+
+% TODO: mention that Arrowhead aims to create de-facto standards for European industrialization efforts?
+
+% XXX: Currently disjointed from the background section: background has large focus on Arrowhead. This section does not.
 \subsection{Problem description}
-% Wait for an Arrowhead event, locate the object, pick it up, place elsewhere.
+% Summarize the problem and describe that we're simulating a factory settings.
 The problem this project aims to solve is that of automatically moving an object from a designated pick-up point to a designated drop-off point on a system-external signal.
-In practise, the problem space aims to mimic the environment of a factory floor where an object under manufacture has been fully processed in a station and it to be moved to the next station.
+In practise, the problem space aims to mimic the environment of a factory floor where an object under manufacture has been fully processed in a station and should be moved to the next.
 
+% Boil the issue down to simple mathematical terms.
 Described in different terms, the problem is the automatic displacement of an object from a origin point $(x_0, y_0, z_0)$ to a destination point $(x, y, z)$,
 where $(x, y)$ denote a position on the factory floor and $y, y \geq 0$, an elevation above the floor.
 
-Additionally, the station signals a fully processed object via the Arrowhead Framework in a local cloud.
+% Mention the inclusion of Arrowhead in the problem.
+Additionally, a station signals a fully processed object via the Arrowhead Framework in a local cloud.
 Upon this signal, the task of moving the object is to be delegated to the system this project aims to develop.
 
 % TODO: insert an image of the conveyor belt with measures.
 
 \subsection{Limitations}
-The problem space is vast and infinite configurations can mimic a factory floor:
+% Note and expound on the very large problem domain.
+The problem domain is vast and infinite configurations can mimic the wanted factory setting:
 \begin{inline-enum}
-    \item different placement/rotations of one or more stations
-    \item obstacles of multiple kinds; static and dynamic (e.g. other robots)
-    \item recovery/discard of a dropped object.
+    \item different placement/rotations of one or more stations;
+    \item obstacles of multiple types; static and dynamic (e.g. humans, other robots);
+    \item recovery/discard of a dropped object; and
+    \item conditional and/or time-dependent origin/destination points.
 \end{inline-enum}
-Support for more configurations require a more complex system.
+Support for more configurations require a more complex system design, simulation and implementation;
+and more complexity requires more development time.
 
-For the above reason the project is thus limited to one or two stations,
-an environment without any other obstacles and no recovery/discard of a dropped object.
-If an object is dropped, the displacement procedure ends and is considered to have failed.
-
-%\subsection{Similar projects}
+The system developed in this project is to be thoroughly modelled, simulated, and implemented in the time span of twelve weeks (weeks 36--48).
+For that reason (and those stated in the previous paragraph), this project is thus limited to one station:
+a single designated pick-up point (elevated) and a single designated drop-off point (not elevated) --- both static.
+Furthermore, the system environment will contain no other obstacles, and if an object is dropped, the displacement procedure ends and is considered to have failed.
