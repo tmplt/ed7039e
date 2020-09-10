@@ -13,4 +13,30 @@ The system is modelled in two parts: the moving base and the\ldots
 
 \subsection{Software}
 \subsubsection{Reproducible system image generation}
-% Talk about Nix here and all the repository's *.nix files.
+% Explain the repo's *.nix files and what they do
+The system image of the Raspberry Pi is generated via the repository's \texttt{mmc-image.nix} file ---
+an auxiliary \texttt{build.sh} script is available to generate and subsequently flash a target storage device in a single command execution.
+\texttt{mmc-image.nix} contains an expression of the Nix language.
+Together with the usage of \texttt{nixpkgs} --- an extensive library of build and package declarations,
+\texttt{mmc-image.nix} allows us to reliably and reproducibly build a bootable image of the complete software environment the project requires.
+To then boot the generated image, it only needs to be flashed on a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, or a memory card.} and slotted into the MMC-slot on the Raspberry Pi.
+
+% Explain the pros of Nix
+When building derivations (nomenclature for anything built with Nix: an executable binary, shared library file, a system environment, etc.) their dependencies are in complete isolation with each other, which effectively allows the avoidance of dependency hell.\footnote{Colloquial term referring to the frustration often generated when dealing with version-specific dependencies.
+See \href{https://en.wikipedia.org/wiki/Dependency_hell}{Wikipedia}.}
+
+% Explain the rollback functionality git provide us.
+In combination with git, one may trivially roll back to previous derivations that are known to work by checking out a commit and rebuilding.
+
+% Explain why treating the MMC as volatile is a good idea (MMCs have a tendency to just stop working).
+In addition, by preferring a work flow where the target storage is considered volatile, any deficiencies of the target medium are mitigated.
+
+% TODO: improve
+\subsubsection{System-external services}
+The software environment generated for the Raspberry Pi automatically connects to Eduroam if credentials are available.
+Eduroam places some limitations on connected clients: firewall, e.g.
+To enable easy remote access to the system, a reverse SSH proxy is established with a known bastion host which has a static IP address.
+By exposing this proxy via a known port on the bastion, any system connected to the Internet may trivially access the Raspberry Pi remotely via a static endpoint.
+While not a necessity for the project itself, this external service is a great convenience for ad-hoc experiments and general system debugging.
+
+% Explain the content of contrib/bastion.nix
