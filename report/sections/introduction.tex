@@ -50,7 +50,17 @@ The problem domain is vast and infinite configurations can mimic the wanted fact
 Support for more configurations require a more complex system design, simulation and implementation;
 and more complexity requires more development time.
 
+% Note time limitation and the smaller problem space we aim to tackle.
 The system developed in this project is to be thoroughly modelled, simulated, and implemented in the time span of twelve weeks (weeks 36--48).
-For that reason (and those stated in the previous paragraph), this project is thus limited to one station:
-a single designated pick-up point (elevated) and a single designated drop-off point (not elevated) --- both static.
-Furthermore, the system environment will contain no other obstacles, and if an object is dropped, the displacement procedure ends and is considered to have failed.
+For that reason (and those stated in the previous paragraph), this project is thus limited to two stations:
+a single designated pick-up point and a single designated drop-off point  --- both static and elevated (however, $z_0 = z$).
+Furthermore, the system environment will contain no other obstacles, and if an object is dropped, the displacement procedure ends and is considered to have failed;
+this project aims to implement a proof-of-concept solution for the stated problem, not a readily available product ready for industry integration.
+If an object is successfully displaced automatically to its destination once, the project is considered a success.
+
+% Note that the system has no real-time requirement
+% XXX: unless we require the system to not overshoot its 2D destionations, then we need to process location data with known delay.
+% TODO: find a reference on this statement.
+Because the above defined problem domain lacks any time component (as would be the case if the system would need to dodge moving obstacles, respond to time-dependent destinations, etc.)
+and because the object need only be moved to its destination eventually (as this is only a proof of concept), the implementation is under no real-time requirement.
+This greatly lessens the requirement of the system model and software implementation.
