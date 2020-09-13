@@ -48,6 +48,16 @@
     bgcolor=CodeBg,
 }
 
+\usetikzlibrary{automata, positioning, arrows, shapes}
+\tikzset{
+  ->, % make edges directed
+  >=stealth, % make the arrow heads bold
+  node distance=5.5cm, % minimum distance
+  every state/.style={thick, fill=gray!10, ellipse}, % properties of state nodes
+  initial text=Start, % text that aappears on the start arrow
+  every text node part/.style={align=center}, % allow multiline node descriptions
+}
+
 \setlist[enumerate]{itemsep=0mm}
 \setlist[itemize]{itemsep=-0mm}
 
