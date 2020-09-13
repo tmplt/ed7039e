@@ -29,11 +29,11 @@ The problem this project aims to solve is that of automatically moving an object
 In practise, the problem space aims to mimic the environment of a factory floor where an object under manufacture has been fully processed in a station and should be moved to the next.
 
 % Boil the issue down to simple mathematical terms.
-Described in different terms, the problem is the automatic displacement of an object from a origin point $(x_0, y_0, z_0)$ to a destination point $(x, y, z)$,
-where $(x, y)$ denote a position on the factory floor and $y, y \geq 0$, an elevation above the floor.
+Described in different terms, the problem is the automatic displacement of an object from an origin point $(x_0, y_0, z_0)$ to a destination point $(x, y, z)$,
+where $(x, y)$ denote a position on the factory floor and $z, z \geq 0$, an elevation above the floor.
 
 % Mention the inclusion of Arrowhead in the problem.
-Additionally, a station signals a fully processed object via the Arrowhead Framework in a local cloud.
+A station signals a fully processed object via the Arrowhead Framework in a defined local cloud.
 Upon this signal, the task of moving the object is to be delegated to the system this project aims to develop.
 
 % TODO: insert an image of the conveyor belt with measures.
@@ -47,7 +47,7 @@ The problem domain is vast and infinite configurations can mimic the wanted fact
     \item recovery/discard of a dropped object; and
     \item conditional and/or time-dependent origin/destination points.
 \end{inline-enum}
-Support for more configurations require a more complex system design, simulation and implementation;
+Support for more configurations require a more complex system model, simulation and implementation;
 and more complexity requires more development time.
 
 % Note time limitation and the smaller problem space we aim to tackle.

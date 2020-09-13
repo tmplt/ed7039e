@@ -50,7 +50,7 @@ an auxiliary \texttt{build.sh} script is available to generate and subsequently 
 \texttt{mmc-image.nix} contains an expression of the Nix language.
 Together with the usage of \texttt{nixpkgs} --- an extensive library of build and package declarations,
 \texttt{mmc-image.nix} allows us to reliably and reproducibly build a bootable image of the complete software environment the project requires.
-To then boot the generated image, it only needs to be flashed on a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, or a memory card.} and slotted into the MMC-slot on the Raspberry Pi.
+To then boot the generated image, it only needs to be flashed on a MultiMediaCard (MMC\footnote{Commonly referred to as: SD card, memory card.}) and slotted into the MMC-slot on the Raspberry Pi.
 
 % Explain the pros of Nix
 When building derivations (nomenclature for anything built with Nix: an executable binary, shared library file, a system environment, etc.) their dependencies are in complete isolation with each other, which effectively allows the avoidance of dependency hell.\footnote{Colloquial term referring to the frustration often generated when dealing with version-specific dependencies.
