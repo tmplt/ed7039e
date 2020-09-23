@@ -18,3 +18,24 @@ The project is divided into four milestones:
   Note that this milestone is a permutation of the combination of the previous milestones: the same phases should be done in the same order,
   but the system is to move to the second station instead and execute the pickup-process in reverse.
 \end{enumerate}
+
+\subsection{Prototyping}
+% Here we describe the prototyping stages of the system's components if anything
+% out of the ordinary pops up.
+\subsubsection{Decawave}
+% (X, Y, Z, Q); how is Q calculated?
+% What should we do if we cannot connect to 4 anchors at once, a wait?
+% Mention that:
+% - we have to account for the fact when we tag cannot connect to at least 3 anchors.
+% - Qualitative data depends a lot on the positioning of the anchors
+% - Built-in 3-axis accelerometer
+% - Raspberry Pi compatible GPIO header. Communication via UART.
+% - How should we interpset data? It is random proccess? Can we consider noise gaussian?
+
+\subsubsection{BrickPi3}
+% Talk about the confusing installation scipt(s) that most likely installs a
+% lot of unecessary components.
+% Mention that they were boiled down into `brickpi.nix`
+
+\subsubsection{NixOS}
+% Problems with SPI on the Raspberry Pi.
