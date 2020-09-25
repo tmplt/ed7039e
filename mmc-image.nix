@@ -80,4 +80,15 @@
       StartLimitIntervalSec = "0";
     };
   };
+
+  # Image minification
+  # documentation.enable = lib.mkForce false;
+  # documentation.nixos.enable = lib.mkForce false;
+  environment.noXlibs = lib.mkForce true;
+  services.xserver.enable = false;
+  services.xserver.desktopManager.xterm.enable = lib.mkForce false;
+  services.udisks2.enable = lib.mkForce false;
+  security.polkit.enable = lib.mkForce false;
+  boot.supportedFilesystems = lib.mkForce [ "vfat" ];
+  i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
 }
