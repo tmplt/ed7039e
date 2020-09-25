@@ -7,7 +7,8 @@ set -eou pipefail
 #[[ ! -w ${1} ]] && echo "Target ${1} is not writable. Do you have permissions?" && exit 2
 
 echo "Building image..."
-image=$(nixos-generate -f sd-aarch64-installer --system aarch64-linux -c mmc-image.nix)
+image=$(nixos-generate -I nixpkgs=modules/nixpkgs \
+            -f sd-aarch64-installer --system aarch64-linux -c mmc-image.nix)
 echo "Flashing ${1}..."
 sudo dd if=${image} of=${1} bs=64k conv=fdatasync
 

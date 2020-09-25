@@ -1,12 +1,14 @@
-# TODO: pin nixpkgs, probably via nixpkgs submodule, or at least current stable
 # TODO: remove cruft we do not need: nixos-install, ZFS, etc.
 # TODO: enable interaction via UART.
 # TODO: add a document header to this file, explaining that this is a modified installer env.
 # TODO: change hostname, replace nixos user with root
 
-{ pkgs, lib, ... }: {
+{ pkgs, lib, config, ... }:
+
+{
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
+    ./modules/brickpi3.nix
   ];
 
   # We can only flash an uncompressed image.
@@ -31,7 +33,7 @@
       phase2="auth-MSCHAPV2"
     '';
   };
-  systemd.services.wpa_supplicant.wantedBy = lib.mkOverride 10 [ "default.target" ];
+  systemd.services.wpa_supplicant.wantedBy = lib.mkForce [ "default.target" ];
 
   # Ensure a correct system clock.
   services.timesyncd.enable = true;
@@ -40,10 +42,9 @@
   # Enables us to inspect core dumps in a centralized manner (incl. timestamps)
   systemd.coredump.enable = true;
 
-  services.sshd.enabled = true;
-  # sshd has an empty `wantedBy` in the installer derivation, but we need it;
-  # override the override.
-  systemd.services.sshd.wantedBy = lib.mkOverride 40 [ "multi-user.target" ];
+  services.openssh.enable = true;
+  # sshd has an empty `wantedBy` in the installer derivation, but we need it.
+  systemd.services.sshd.wantedBy = lib.mkForce [ "multi-user.target" ];
   environment.etc."id_rsa" = {
     source = ./id_rsa;
     user = "nixos";
