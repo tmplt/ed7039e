@@ -1,7 +1,5 @@
 # TODO: remove cruft we do not need: nixos-install, ZFS, etc.
-# TODO: enable interaction via UART.
 # TODO: add a document header to this file, explaining that this is a modified installer env.
-# TODO: change hostname, replace nixos user with root
 
 { pkgs, lib, config, ... }:
 
@@ -19,6 +17,8 @@
   # Relase 4.19 is stable and "battle-tested".
   # See <https://github.com/NixOS/nixpkgs/issues/82455>.
   boot.kernelPackages = pkgs.linuxPackages_4_19;
+
+  networking.hostName = "ed7039e";
 
   # Automatically connect to eduroam via wlan0 for remote access.
   networking.wireless = let es = (import ./local-secrets.nix).eduroam; in {
@@ -42,17 +42,24 @@
   # Enables us to inspect core dumps in a centralized manner (incl. timestamps)
   systemd.coredump.enable = true;
 
-  services.openssh.enable = true;
-  # sshd has an empty `wantedBy` in the installer derivation, but we need it.
+  # Automatically log in as root, require no passphrase.
+  users.users.root.initialHashedPassword = "";
+  services.mingetty.autologinUser = lib.mkForce "root";
+
+  # Automatically start SSH server after boot, and establish a reverse proxy
+  # with a known bastion. This allows us to access the system from any system
+  # with Internet access (and allows this system to live behind NAT:ed networks).
+  services.openssh = {
+    enable = true;
+    permitRootLogin = "yes";
+  };
   systemd.services.sshd.wantedBy = lib.mkForce [ "multi-user.target" ];
   environment.etc."id_rsa" = {
     source = ./id_rsa;
     user = "nixos";
     mode = "0600";
   };
-  users.extraUsers.nixos.openssh.authorizedKeys.keys = with (import ./ssh-keys.nix); [
-    tmplt
-  ];
+  users.extraUsers.root.openssh.authorizedKeys.keys = lib.attrValues (import ./ssh-keys.nix);
   systemd.services.ssh-port-forward = {
     description = "forwarding reverse SSH connection to a known bastion";
     wantedBy = [ "multi-user.target" ];
