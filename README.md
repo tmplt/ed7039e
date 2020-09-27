@@ -8,11 +8,12 @@ automatically picks up a processed object at the end of a conveyor belt and move
 The deadline for this project is December 1st, 2020.
 
 Throughout the development of this project, the report under `report/` will continuously be updated.
+The report can be build my running `./report.nix`; the path to the compiled report will be printed.
+A symbolic link to it is also be created under `result/`.
 
 ## Building and project setup
-The boot image of the Raspberry Pi 3 can be built via
+The bootable image for the Raspberry Pi can be built by executing `./mmc-image.nix`.
+A convenience script is available for flashing a target block device:
 ```bash
-$ # TODO: explain how to setup aarch64-linux emulation for cross-compilation
-$ # TODO: explain how to write a local-secrets.nix
 $ ./build.sh /dev/mmcblk0 # or your equivalent
 ```
