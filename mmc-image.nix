@@ -1,5 +1,21 @@
+# This file contains a Nix expression that generates an aarch64-linux bootable DOS/MBR
+# image when built with
+#
+#   $ nixos-generate -I nixpkgs=modules/nixpkgs -f sd-aarch64-installer \
+#       --system aarch64-linux -c mmc-image.nix
+#
+# (TODO: change the above into a shebang)
+# The supported target platform is a Raspberry Pi 3 Model B. But other revisions and models
+# may boot and operate as expected.
+#
+# Upon boot the system will establish a reverse SSH proxy to your configured bastion as
+# specifed in `config.nix` and start the required services needed for proper operation.
+# For convenience, the Nix expression in `contrib/bastion.nix` may be included in the system
+# configuration that yields the host pointed to by `config.nix` to automatically setup all
+# system-external services that are expected (Arrowhead, etc.)
+# (TODO: rewrite the above paragarph)
+
 # TODO: remove cruft we do not need: nixos-install, ZFS, etc.
-# TODO: add a document header to this file, explaining that this is a modified installer env.
 
 { pkgs, lib, config, ... }:
 
