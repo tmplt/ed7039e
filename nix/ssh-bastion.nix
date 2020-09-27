@@ -3,7 +3,7 @@
 # TODO: write a config for `ssh -o StrictHostKeyChecking=no -p 21013 nixos@tmplt.dev`, or force a SSH host fingerprint
 
 let
-  cfg = import ../config.nix;
+  cfg = import ./config.nix;
 in
 { pkgs, ... }: {
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];

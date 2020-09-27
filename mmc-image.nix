@@ -80,7 +80,7 @@
     description = "forwarding reverse SSH connection to a known bastion";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" "nss-lookup.target" ];
-    serviceConfig = let bastion = (import ./config.nix).bastion; in {
+    serviceConfig = let bastion = (import ./nix/config.nix).bastion; in {
       ExecStart = ''
         ${pkgs.openssh}/bin/ssh -o StrictHostKeyChecking=no \
           -TNR ${bastion.socketPath}:localhost:22 ${bastion.user}@${bastion.host} \
