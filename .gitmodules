@@ -1,4 +1,4 @@
-[submodule "modules/nixpkgs"]
-	path = modules/nixpkgs
+[submodule "nix/nixpkgs"]
+	path = nix/nixpkgs
 	url = https://github.com/tmplt/nixpkgs.git
 	branch = ed7039e

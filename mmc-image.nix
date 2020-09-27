@@ -10,7 +10,7 @@
 #
 # Upon boot the system will establish a reverse SSH proxy to your configured bastion as
 # specifed in `config.nix` and start the required services needed for proper operation.
-# For convenience, the Nix expression in `contrib/bastion.nix` may be included in the system
+# For convenience, the Nix expression in `nix/ssh-bastion.nix` may be included in the system
 # configuration that yields the host pointed to by `config.nix` to automatically setup all
 # system-external services that are expected (Arrowhead, etc.)
 # (TODO: rewrite the above paragarph)
@@ -22,7 +22,7 @@
 {
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
-    ./modules/brickpi3.nix
+    ./nix/brickpi3.nix
   ];
 
   # We can only flash an uncompressed image.
