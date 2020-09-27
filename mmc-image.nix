@@ -75,7 +75,7 @@
     user = "nixos";
     mode = "0600";
   };
-  users.extraUsers.root.openssh.authorizedKeys.keys = lib.attrValues (import ./ssh-keys.nix);
+  users.extraUsers.root.openssh.authorizedKeys.keys = lib.attrValues (import ./nix/ssh-keys.nix);
   systemd.services.ssh-port-forward = {
     description = "forwarding reverse SSH connection to a known bastion";
     wantedBy = [ "multi-user.target" ];
