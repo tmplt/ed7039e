@@ -42,6 +42,34 @@ The project is divided into four milestones:
 % Note: only the brickpi3 library is required. Remainder unused.
 
 \subsubsection{NixOS}
+% Summarize what NixOS is and what it aims to provide
+NixOS is a Linux-distribution with the ability to declare a certain system in a functional manner.
+It is buit upon the Nix package manager that, in summary, aims to be
+\begin{inline-enum}
+\item reproducible:
+  ``packages [are built] in isolation from each other. [\ldots] they are reproducible and don't have any undeclared dependencies.''\footnote{A positive side-effect of this feature is the complete mitigation of ``dependency hell''.};
+  so if a package works on one machine, it will work on any machine.
+  Also, when building a package on multiple machine, all machines will yield the exact same ouput file tree.
+\item declarative:
+  packages are described in expressions that are trivially shared and combined with other package declarations.
+\item reliable:
+  ``installing or upgrading one package cannot break other packages''.
+\end{inline-enum}~\parencite{nixos.org}
+
+% How does NixOS enable the above funtionality?
+To enable the preceeding features, everything provided to and by Nix is stored on a Nix-enabled system under \texttt{/nix/store/<hash>-<pkg>},
+where \texttt{<hash>} is a SHA256 checksum that provides a unique identifier to the package with name \texttt{<pkg>}.
+If any dependency for the package (or if the build procedure) is in any way changed, a wholly new checksum is generated.
+This Nix store is mounted as read-only to make its content immutable.
+A usage of any package in the Nix store is manifested in the system's file system as a symbolic link.
+
+% How does NixOS differ from conventional distros?
+Because all files that are built and ultimately used are stored under \texttt{/nix/store}, NixOS breaks the filesystem hierarchy standard (FHS).
+% TODO: what does this entail?
+
 % Problems with SPI on the Raspberry Pi.
 % Link to <https://github.com/NixOS/nixpkgs/pull/79370> for credit.
 % Compare approach with Raspbian: mention that only a raspbian fork is officially supported for the BrickPi3.
+On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and system reboot enables SPI and thus the ability to communicate with the BrickPi3.
+On NixOS however, this file (nor any equivalent) exists, because of the wholly different design philosophies with the Debian-based Raspbian.
+The ``Nix-appoach'' is instead...
