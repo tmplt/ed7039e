@@ -36,16 +36,24 @@ The relation between these five states are visually described in the state machi
   \label{fig:state_machine}
 \end{figure*}
 \subsubsection{Mobile platform}
-The model used in this case is the unicycle model, due to the difrential steering. This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angel to it's wheels. The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side. With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform. I.e. the robot is able to spin while the right-hand sidewheels have the same velocity as the left-hand side wheels, in opposite direction. 
+The model used in this case is the unicycle model, due to the differential steering. 
+This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angle to its wheels. 
+The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side. 
+With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform. 
+I.e. the robot is able to spin while the right-hand sidewheels have the same velocity as the left-hand side wheels, in opposite direction. 
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/car-unicycle.png}
-\caption{Unicycle model of a car-like robot. $v_L$ and $v_R$ represent the left- and right-hand side wheels' velocity respectively. The robot follows a path around the instantaneous center of rotation (ICR) where $R_L$ and $R_R$ are the distances from left and right wheels to ICR respectively and $w$ is the distance between them.}
+\caption{Unicycle model of a car-like robot. 
+$v_L$ and $v_R$ represent the left- and right-hand side wheels' velocities respectively. 
+The robot follows a path around the instantaneous center of rotation (ICR) where $R_L$ and $R_R$ are the distances from left and right wheels to ICR respectively and $w$ is the distance between them.}
 \label{fig:UnicycleModel}
 \end{figure} 
 
-As shown in Fig. \ref{fig:UnicycleModel} The robot follows a curved path with the instantaneous center of rotation at its center. The left-hand side wheels have velocity $v_L$ and moves along an arc with radius $R_L$ during the time that right-hand side wheels moves along another arc with radius $R_R$ at the speed of $v_R$.The turning rate of the body is
+As shown in Fig.~\ref{fig:UnicycleModel} The robot follows a curved path with the instantaneous center of rotation at its center. 
+The left-hand side wheels have velocity $v_L$ and moves along an arc with radius $R_L$ during the time that right-hand side wheels moves along another arc with radius $R_R$ at the speed of $v_R$. 
+The turning rate of the body is
         \begin{equation*}
             \dot{\theta}= \frac{v_L}{R_L} = \frac{v_R}{R_R}
         \end{equation*}
@@ -53,7 +61,7 @@ As shown in Fig. \ref{fig:UnicycleModel} The robot follows a curved path with th
         \begin{equation}
             \dot{\theta}= \frac{v_R - v_L}{W} = \frac{v_\Delta}{W}\label{eq:ThetaDot3}
         \end{equation}
-        The equations of motion for this model are
+        the equations of motion for this model are
         \begin{eqnarray}
             \begin{aligned}
                 \dot{x} &= v\,cos(\theta)\\
@@ -62,7 +70,7 @@ As shown in Fig. \ref{fig:UnicycleModel} The robot follows a curved path with th
             \end{aligned}
             \label{eq:MotionEq3}
         \end{eqnarray}
-        where the average velocity\cite{Corke2011} is given by
+        where the average velocity\parencite{Corke2011} is given by
         \begin{equation}
             v = \frac{v_R + v_L}{2} 
             \label{eq:av_velocity}
