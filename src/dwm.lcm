@@ -1,0 +1,9 @@
+package dwm;
+
+struct position_t
+{
+        float x;
+        float y;
+        float z;
+        int8_t q;
+}
