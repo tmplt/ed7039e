@@ -1,9 +1,11 @@
 package dwm;
 
+// TODO: refer to DWM documentation
 struct position_t
 {
-        float x;
-        float y;
-        float z;
+        int64_t timestamp; // in milliseconds
+        int32_t x;
+        int32_t y;
+        int32_t z;
         int8_t q;
 }
