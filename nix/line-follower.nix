@@ -42,7 +42,10 @@ let
   };
 in
 {
+  # XXX: can we install gpiozero here externally from brickpi.nix?
   environment.systemPackages = [
-    gpiozero
+    (pkgs.python3.buildEnv.override (old: {
+      extraLibs = old.extraLibs ++ [ gpiozero ];
+    }))
   ];
 }

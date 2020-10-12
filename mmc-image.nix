@@ -22,7 +22,8 @@
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
     ./nix/brickpi3.nix
     ./nix/dwm1001-dev.nix
-    ./nix/line-follower.nix
+    #    ./nix/line-follower.nix
+    ./nix/python.nix
   ];
 
   # We can only flash an uncompressed image.
