@@ -1,12 +1,3 @@
-// Build with:
-//   $ lcm-gen -c dwm.lcm
-//   $ gcc -d -O0 -o send send.c dwm_position_t.c -llcm
-
-// TODO:
-// * Add a timestamp to the struct (check LCM struct docs if there is a recommended data type)
-
-#define _POSIX_C_SOURCE 200809L
-
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
