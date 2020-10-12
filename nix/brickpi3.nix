@@ -1,7 +1,7 @@
 { pkgs, lib, ... }:
 
 let
-    smbus-cffi = pkgs.python3Packages.buildPythonPackage rec {
+  smbus-cffi = pkgs.python3Packages.buildPythonPackage rec {
     name = "${pname}-${version}";
     pname = "smbus-cffi";
     version = "0.5.1";
