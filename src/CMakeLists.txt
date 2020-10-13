@@ -27,4 +27,4 @@ install(TARGETS lcmtypes dwm_send
   ARCHIVE DESTINATION lib${LIB_SUFFIX}
   INCLUDES DESTINATION include)
 lcm_install_python(${python_sources})
-install(PROGRAMS dwm_recv.py DESTINATION bin)
+#install(PROGRAMS dwm_recv.py DESTINATION bin)
