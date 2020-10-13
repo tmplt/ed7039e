@@ -41,6 +41,8 @@ The project is divided into four milestones:
 % Mention that they were boiled down into `brickpi.nix`.
 % Note: only the brickpi3 library is required. Remainder unused.
 
+% What need to be done to be able to stack BrickPi3s?
+
 \subsubsection{NixOS}
 % Summarize what NixOS is and what it aims to provide
 NixOS is a Linux-distribution with the ability to declare a certain system in a functional manner.
@@ -73,3 +75,9 @@ Because all files that are built and ultimately used are stored under \texttt{/n
 On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and system reboot enables SPI and thus the ability to communicate with the BrickPi3.
 On NixOS however, this file (nor any equivalent) exists, because of the wholly different design philosophies with the Debian-based Raspbian.
 The ``Nix-appoach'' is instead...
+
+\subsubsection{RobotOS}
+% While a prime platform to package a framework that depends on specific software version,
+% it seems to complex to package for NixOS.
+
+\subsubsection{LCM}
