@@ -17,21 +17,31 @@ let
     propagatedBuildInputs = [ python3 ];
   };
 
-  cNodesAndPythonLib = stdenv.mkDerivation {
-    name = "ed7039e-nodes";
+  lcmPythonDeps = stdenv.mkDerivation {
+    name = "lcm-python";
     src = ../src;
-
     buildInputs  = [ cmake lcm ];
+    propagatedBuildInputs = [ lcm ];
+    cmakeFlags = [ "-DINSTALL_PYTHON_DEPS=ON" ];
   };
 
-  pythonNodes = python3Packages.buildPythonPackage {
-    name = "dwm_recv.py";
-    src = ../src;
-    propagatedBuildInputs = [ lcm cNodesAndPythonLib ];
+  nodes = {
+    scripts = python3Packages.buildPythonPackage {
+      name = "dwm_recv.py";
+      src = ../src;
+      propagatedBuildInputs = [ lcmPythonDeps ];
+    };
+
+    binaries = stdenv.mkDerivation {
+      name = "dwm_send";
+      src = ../src;
+      buildInputs = [ cmake lcm ];
+      cmakeFlags = [ "-DINSTALL_BINARY_NODES=ON" ];
+    };
   };
 in {
   # Required for the LCM UDP multicast provider
   networking.firewall.allowedUDPPorts = [ 7667 ];
 
-  environment.systemPackages = [ cNodesAndPythonLib pythonNodes ];
+  environment.systemPackages = with nodes; [ binaries scripts ];
 }

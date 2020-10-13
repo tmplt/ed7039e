@@ -16,6 +16,13 @@ let
     nativeBuildInputs = [ cmake glib python3 ];
     propagatedBuildInputs = [ python3 ];
   };
+
+  pythonNodeDeps = stdenv.mkDerivation rec {
+    name = "lcm-python";
+    src = ./.;
+    buildInputs = [ cmake lcm ];
+    cmakeFlags = [ "-DINSTALL_PYTHON_DEPS=ON" ];
+  };
 in mkShell {
-  buildInputs = [ lcm ];
+  buildInputs = [ lcm pythonNodeDeps ];
 }
