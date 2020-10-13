@@ -24,6 +24,7 @@
     ./nix/dwm1001-dev.nix
     #    ./nix/line-follower.nix
     ./nix/python.nix
+    ./nix/software-nodes.nix
   ];
 
   # We can only flash an uncompressed image.
