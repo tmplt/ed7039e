@@ -3,3 +3,5 @@ report/*
 !report/sections
 !report/ref.bib
 local-secrets.nix
+id_rsa
+id_rsa.pub

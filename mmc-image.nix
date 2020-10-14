@@ -27,9 +27,7 @@
     ./nix/software-nodes.nix
   ];
 
-  # We can only flash an uncompressed image.
-  # Additionally, compression whilst emulating the platform takes a looong time.
-  sdImage.compressImage = false;
+  sdImage.compressImage = true; # ./build.sh expects a zstd-compress image
 
   # Latest release of major 5 doesn't always play ball with the hardware.
   # Relase 4.19 is stable and "battle-tested".
@@ -39,17 +37,10 @@
   networking.hostName = "ed7039e";
 
   # Automatically connect to eduroam via wlan0 for remote access.
-  networking.wireless = let es = (import ./local-secrets.nix).eduroam; in {
+  networking.wireless = {
     enable = true;
     interfaces = [ "wlan0" ];
-    networks."eduroam".auth = ''
-      key_mgmt=WPA-EAP
-      eap=PEAP
-      proto=RSN
-      identity="${es.identity}"
-      password="${es.password}"
-      phase2="auth-MSCHAPV2"
-    '';
+    networks = (import ./local-secrets.nix).networks;
   };
   systemd.services.wpa_supplicant.wantedBy = lib.mkForce [ "default.target" ];
 
