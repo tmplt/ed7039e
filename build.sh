@@ -1,5 +1,5 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i bash -p coreutils pv zstd bc
+#! nix-shell -i bash -p coreutils pv zstd bc sudo
 set -eou pipefail
 
 [[ $# -ne 1 ]] && echo "usage: ${0} <target to flash>" && exit 1
@@ -7,7 +7,7 @@ set -eou pipefail
 [[ ! -w ${1} ]] && echo "Target ${1} is not writable. Do you have permissions?" && exit 2
 
 echo "Building image..."
-image=$(./mmc-image.nix)
+image=$(sudo -u "${SUDO_USER}" ./mmc-image.nix) # cannot always be run as root; TODO: bug report
 
 echo "Flashing ${1}..."
 comp_size=$(stat --printf=%s ${image})
