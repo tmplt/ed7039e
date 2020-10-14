@@ -39,17 +39,10 @@
   networking.hostName = "ed7039e";
 
   # Automatically connect to eduroam via wlan0 for remote access.
-  networking.wireless = let es = (import ./local-secrets.nix).eduroam; in {
+  networking.wireless = {
     enable = true;
     interfaces = [ "wlan0" ];
-    networks."eduroam".auth = ''
-      key_mgmt=WPA-EAP
-      eap=PEAP
-      proto=RSN
-      identity="${es.identity}"
-      password="${es.password}"
-      phase2="auth-MSCHAPV2"
-    '';
+    networks = (import ./local-secrets.nix).networks;
   };
   systemd.services.wpa_supplicant.wantedBy = lib.mkForce [ "default.target" ];
 
