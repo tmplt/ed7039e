@@ -14,8 +14,16 @@ A symbolic link to it is also be created under `result/`.
 ## Building and project setup
 ### Prerequisite manual steps
 1. Modify `nix/config.nix` to your environment.
-2. Generate a SSH key pair via `ssh-keygen -f id_rsa -N ""`.
-3. Include `nix/ssh-bastion.nix` in your NixOS SSH bastion imports and rebuild (or configure your Non-NixOS equivalent).
+2. Describe your network access points that have Internet access:
+   ```sh
+   cat << EOF > local-secrets.nix
+   {
+     networks."YourSSID".psk = "hunter2";
+   }
+   EOF
+   ```
+3. Generate a SSH key pair via `ssh-keygen -f id_rsa -N ""`.
+4. Include `nix/ssh-bastion.nix` in your NixOS SSH bastion imports and rebuild (or configure your Non-NixOS equivalent).
 
 ### Bootable image generation
 The bootable image for the Raspberry Pi 3 can be built by executing `./mmc-image.nix`.

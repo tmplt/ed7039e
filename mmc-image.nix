@@ -27,9 +27,7 @@
     ./nix/software-nodes.nix
   ];
 
-  # We can only flash an uncompressed image.
-  # Additionally, compression whilst emulating the platform takes a looong time.
-  sdImage.compressImage = true;
+  sdImage.compressImage = true; # ./build.sh expects a zstd-compress image
 
   # Latest release of major 5 doesn't always play ball with the hardware.
   # Relase 4.19 is stable and "battle-tested".
