@@ -76,6 +76,43 @@ On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and sys
 On NixOS however, this file (nor any equivalent) exists, because of the wholly different design philosophies with the Debian-based Raspbian.
 The ``Nix-appoach'' is instead...
 
+
+\subsubsection{BrickPi3}
+The BrickPi3 is a peripheral that allows a Raspberry Pi to work with LEGO Mindstorms hardware.
+It works by communicating via the SPI function pins of the Raspberry Pi.
+The recommended way to install all necessary components is via a \texttt{curl -k | bash}.
+There are a few issues with this approach:
+\begin{inline-enum}
+\item \texttt{-k} is an alias for \texttt{--insecure};
+  the recommended approach is thus to not verify the server certificate ---
+  this allows a bad actor to feed you malicious code if they have access to your DNS or the target domain.
+\item A \texttt{curl | bash} is bad practise for installation purposes as it commonly installs files that are disconnected from the system's package manager.
+\item A \texttt{curl | bash} can be detected server-side and thus can conditionally feed a user malicious code.
+  A dowload of the code first may thus pass a manual inspection before execution. \parencite{curl-bash}
+\end{inline-enum}
+
+Because we use NixOS, the content of the script had to be inspected so that an equivalent Nix expression could be written ---
+see \texttt{nix/brickpi3.nix} for the final result.
+Upon inspection, a few oddities stood out. The script:
+\begin{enumerate}
+\item expects and requires the script to be run by the user \texttt{pi}\footnote{Not all users of the peripheral is \texttt{pi}. For example, we use it as \texttt{root} while prototyping.};
+\item changes the ownership of a directory with \texttt{sudo(8)} on files under \texttt{/home/pi}, to \texttt{pi}\footnote{In this context, the operations could all have been done as \texttt{pi}.};
+\item insecurely downloads multiple scripts and executes them silently --- the downloaded scrips do the same;
+\item configures an \texttt{apt(8)} repository (and thus requires to be run on a Debian derivative) for \texttt{npm(1)},
+  the Node JavaScript package manager, but never installs or executes any JavaScript packages;
+\item installs a C++ source file under \texttt{/usr/local/include}\footnote{A proper installation would be to build a shared library which can then be dynamically linked to when using the C++ drivers.};
+\item downloads a precompiled version of \texttt{openocd(1)}, a on-chip debugger and programmer,
+  and copies the files into system directories\footnote{No changes are made to the software, according to the mirror's documentation. An installation should instead then be made with the package manager, which is otherwise used in the scripts to install other components}, and then never uses it;
+\item runs \texttt{git(1)} as a privileged user, sometimes.
+\end{enumerate}
+The above list is truncated for sake of brevity.
+
+After a thorough manual inspection of all scripts it was found that only a single Python library (with a single dependency) had to be installed.
+The final Nix expression is thus a combination of two \texttt{python3Packages.buildPythonPackage} where both sources are securely downloaded from official mirrors and verified with a known checksum.
+We conclude that the usage of this Nix expression leaves the system in a proper state (which the official installation script does not, by oddity 5 and 6\footnote{we consider a proper state of system one in which all installed software components are tracked by the package manager(s).}) and greatly decreases the number of attack vectors with which to run malicious code on our system.
+
+% What need to be done to be able to stack BrickPi3s?
+
 \subsubsection{RobotOS}
 % While a prime platform to package a framework that depends on specific software version,
 % it seems to complex to package for NixOS.
