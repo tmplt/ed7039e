@@ -25,23 +25,6 @@ The project is divided into four milestones:
 \subsection{Prototyping}
 % Here we describe the prototyping stages of the system's components if anything
 % out of the ordinary pops up.
-\subsubsection{Decawave}
-% (X, Y, Z, Q); how is Q calculated?
-% What should we do if we cannot connect to 4 anchors at once, a wait?
-% Mention that:
-% - we have to account for the fact when we tag cannot connect to at least 3 anchors.
-% - Qualitative data depends a lot on the positioning of the anchors
-% - Built-in 3-axis accelerometer
-% - Raspberry Pi compatible GPIO header. Communication via UART.
-% - How should we interpset data? It is random proccess? Can we consider noise gaussian?
-
-\subsubsection{BrickPi3}
-% Talk about the confusing installation scipt(s) that most likely installs a
-% lot of unecessary components.
-% Mention that they were boiled down into `brickpi.nix`.
-% Note: only the brickpi3 library is required. Remainder unused.
-
-% What need to be done to be able to stack BrickPi3s?
 
 \subsubsection{NixOS}
 % Summarize what NixOS is and what it aims to provide
@@ -76,6 +59,36 @@ On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and sys
 On NixOS however, this file (nor any equivalent) exists, because of the wholly different design philosophies with the Debian-based Raspbian.
 The ``Nix-appoach'' is instead...
 
+\subsubsection{Decawave}
+This project uses Decawave (or more specifically: a DWM1001 development board) for two-dimensional positioning.
+The development board constitutes of the ultra wide-band module itself, the DWM1001C, an accelerometer,
+and a Raspberry Pi-compatible GPIO-header.
+Via communication over UART, we are able to query its measured position as reported by help of the Decawave anchor nodes\footnote{An anchor is another development board configured for static installation at a known coordinate, used for position calculation. A non-static device with unknown coordinates (as is used in our system) is known as a tag.},
+and use this data to figure out where our system is located in the mimicked factory.
+
+Over UART the device exposes a type-lengh-value (TLV) API which we query to recieve the tuple of
+$(x, y, z, q)$, where
+\begin{description}
+\item[$(x, y, z)$] is the reported coordinate in millimeters in three-dimensional space, and
+\item[$q$] is the quality factor: a measure of how sure the device is of the coordinates.
+\end{description}
+
+Of note is that the decive cannot approximate its position unless it can connect to at least three anchors.
+Additionally, the quality factor, $q$, is higher when connected to four anchors.
+During measurements, and if there are more than four anchors available, it will chose the best four anchors to calculate its position. % What does "best" mean here? Refer to documentation.
+Because of this, we will then have to consider that our system may suddenly no longer be able fo find its position,
+and decide what should be done in order to establish a connection with the disconnected anchors.
+
+% (X, Y, Z, Q); how is Q calculated?
+% What should we do if we cannot connect to 4 anchors at once, a wait?
+% Mention that:
+% - we have to account for the fact when we tag cannot connect to at least 3 anchors.
+% - Qualitative data depends a lot on the positioning of the anchors
+% - Built-in 3-axis accelerometer
+% - Raspberry Pi compatible GPIO header. Communication via UART.
+% - How should we interpset data? It is random proccess? Can we consider noise gaussian?
+
+% RPi UART problems
 
 \subsubsection{BrickPi3}
 The BrickPi3 is a peripheral that allows a Raspberry Pi to work with LEGO Mindstorms hardware.
