@@ -2,6 +2,11 @@
 The git repository used throughout this project is publicly available at \href{https://github.com/tmplt/ed7039e}{Github/tmplt/ed7039e} \parencite{repo}.
 If not otherwise specified, any references to a repository shall mean this repository.
 
+% We chose to implement our System on a Raspberry Pi.
+% This means our system is not in real-time (Linux too complex, other reasons)
+% Allows people not versed in embedded systems to write implementations
+% A proper implementation would be on a micro-controller that allows code to be run bare-metal, without having to fight with the Linux kernel.
+
 \subsection{Milestones}
 The project is divided into four milestones:
 \begin{enumerate}
@@ -29,6 +34,14 @@ The project is divided into four milestones:
 % out of the ordinary pops up.
 
 \subsubsection{NixOS}
+% NixOS is unconventional
+NixOS is an unconventional Linux distibution (henceforth following the common vernacular of ``distro'').
+
+% Non-NixOS mutate global system state. Multi-version is thus tricky.
+
+% Nix makes no assumption about global system state. No dependency hell. /nix/store/hash-name immutable.
+% Nix lets you compose software ad build-time with maximum flexibility.
+
 % Summarize what NixOS is and what it aims to provide
 NixOS is a Linux-distribution with the ability to declare a certain system in a functional manner.
 It is buit upon the Nix package manager that, in summary, aims to be
@@ -54,7 +67,9 @@ A usage of any package in the Nix store is manifested in the system's file syste
 Because all files that are built and ultimately used are stored under \texttt{/nix/store}, NixOS breaks the filesystem hierarchy standard (FHS).
 % TODO: what does this entail?
 
-% Problems with SPI on the Raspberry Pi.
+% Problems with hardware features on the Raspberry Pi. Simply not provided out of the box.
+% A study of Raspbian would likely answer all questions in due time. But time consuming.
+
 % Link to <https://github.com/NixOS/nixpkgs/pull/79370> for credit.
 % Compare approach with Raspbian: mention that only a raspbian fork is officially supported for the BrickPi3.
 On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and system reboot enables SPI and thus the ability to communicate with the BrickPi3.
@@ -80,6 +95,8 @@ Additionally, the quality factor, $q$, is higher when connected to four anchors.
 During measurements, and if there are more than four anchors available, it will chose the best four anchors to calculate its position. % What does "best" mean here? Refer to documentation.
 Because of this, we will then have to consider that our system may suddenly no longer be able fo find its position,
 and decide what should be done in order to establish a connection with the disconnected anchors.
+
+% The data can be considered a random process.
 
 % (X, Y, Z, Q); how is Q calculated?
 % What should we do if we cannot connect to 4 anchors at once, a wait?
