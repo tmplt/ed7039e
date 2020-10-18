@@ -129,7 +129,31 @@ We conclude that the usage of this Nix expression leaves the system in a proper 
 % What need to be done to be able to stack BrickPi3s?
 
 \subsubsection{RobotOS}
-% While a prime platform to package a framework that depends on specific software version,
-% it seems to complex to package for NixOS.
+% We wanted to use ROS as it was very common to the problem space, and had a lot of readily available solutions for common robot problems.
+It was initially decided that the robot system would be implemented with RobotOS (ROS), ``a set of software libraries and tools that help you build robot applications.''\footnote{See \href{https://www.ros.org/}{https://www.ros.org/}.}
+The chief reason was its common application in the problem space, its API for communicating different types of messages between different programs\footnote{Known as inter-process communication (IPC).} (in this context known as ``nodes''), and the many readily available solutions to problems we were likely to stumble upon.
+% Only officially supports very specific Ubuntu versions, and while probably very applicable to use Nix in this case, it was deemed
+% composing ROS on Nix would take too long. (the dependency tree is HUGE)
+However, ROS is only officially supported on very specific versions of Ubuntu (at this time of writing), a disto we were not using and a disto that had a very different design philosophies from NixOS;
+using ROS on NixOS would thus require a Nix expression to be written that correctly packages the software.
+At this point, it was surmised that ROS made several assumption about the global system state that had to be adressed during packaging.
+This reason alone would likely require a lot of prototyping time for a simple proof-of-concept execution.
+A consultation from another effort to port ROS to an unofficial repository showed that a full desktop installation is constituted of up to 460 packages.\footnote{See \href{https://github.com/ros-noetic-arch}{https://github.com/ros-noetic-arch}, which packages RobotOS to Arch Linux, a distro that is not officially supported by the RobotOS project. Each repository corresponds to a ROS package.}
+It was thus decided to find an alternative to RobotOS due to time constrains.
 
 \subsubsection{LCM}
+% Trivial to package: just a simple mkDerivation. Nodes are similarly easily packaged. See `nix/software-nodes.nix`.
+Lightweight Communications and Marshalling (LCM) ``is a set of libraries and tools for message passing and data marshalling [\ldots] It provides a publish/subscribe message passing model and automatic marshalling/unmarshalling code generation with bindings for applications''.
+LCM effectively provides a set of simple functions that enable IPC with the benefit of not requiring a special-purpose daemon (as is required when running ROS).
+In difference to ROS, LCM supports any GNU/Linux system (and thus NixOS) and relies on UDP multicasting for broadcasting purposes.
+Its short list of dependencies made LCM trivial to package to NixOS: the final expression in \texttt{nix/software-nodes.nix} can be summarized as a \texttt{stdenv.mkDerivation} and the whitelisting of an UDP port in the system firewall.
+
+% Support for C and Python which we have decided to use thus far.
+% The core component of ROS we wanted was the message-passing (IPC) component, which this library provides for ANY POSIX-compliant system.
+Thus, as LCM:
+\begin{inline-enum}
+\item enables us to trivially utilize IPC with different message types;
+\item has bindings for C and Python; and
+\item is trivially packaged,
+\end{inline-enum}
+it was decided that our robot system would be implemented with help of it in place of ROS.
