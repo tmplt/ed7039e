@@ -47,7 +47,7 @@ static int configure_tty(int fd)
  */
 int readn(int fd, unsigned char *buf, size_t count)
 {
-        int rdlen = 0;
+        size_t rdlen = 0;
         while (rdlen < count) {
                 int rd = read(fd, buf + rdlen, count - rdlen);
                 if (rd <= 0) {
