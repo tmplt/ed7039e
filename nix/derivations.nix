@@ -55,13 +55,13 @@ rec {
 
   systemNodes = {
     scripts = python3Packages.buildPythonPackage {
-      name = "dwm_recv.py";
+      name = "system-nodes-python";
       src = ../src;
       propagatedBuildInputs = [ pythonLibs.lcmPythonDeps ];
     };
 
     binaries = stdenv.mkDerivation {
-      name = "dwm_send";
+      name = "system-nodes-binary";
       src = ../src;
       buildInputs = [ cmake lcm ];
       cmakeFlags = [ "-DINSTALL_BINARY_NODES=ON" ];

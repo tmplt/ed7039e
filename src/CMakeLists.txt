@@ -28,10 +28,10 @@ target_include_directories(lcmtypes INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 if(INSTALL_BINARY_NODES)
-  add_executable(dwm_send dwm_send.c)
-  target_link_libraries(dwm_send lcmtypes m)
+  add_executable(lcm-source-dwm-pos dwm_send.c)
+  target_link_libraries(lcm-source-dwm-pos lcmtypes m)
 
-  install(TARGETS dwm_send
+  install(TARGETS lcm-source-dwm-pos
     EXPORT ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib${LIB_SUFFIX}
