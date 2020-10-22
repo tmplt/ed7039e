@@ -10,8 +10,8 @@
 #include <time.h>
 #include <math.h>
 
-#include <lcm/lcm.h>
-#include "dwm_position_t.h"
+#include <zcm/zcm.h>
+#include "dwm/dwm_position_t.h"
 
 #define TL_HEADER_LEN 0x2
 
@@ -97,14 +97,14 @@ int tlv_rpc(int fd, char fun, unsigned char *buf)
 int main(int argc, char **argv)
 {
         if (argc < 2) {
-                printf("usage: %s <serial-device> [lcm-provider]\n", argv[0]);
+                printf("usage: %s <serial-device> [zcm-provider]\n", argv[0]);
                 return 1;
         }
 
         /* Initialize LCM. */
-        lcm_t *lcm = lcm_create(argc >= 3 ? argv[2] : NULL);
-        if (!lcm) {
-                puts("failed to initialize LCM");
+        zcm_t *zcm = zcm_create(argc >= 3 ? argv[2] : "udpm://239.255.76.67:7667?ttl=0");
+        if (!zcm) {
+                puts("failed to initialize ZCM");
                 return 1;
         }
 
@@ -146,9 +146,9 @@ int main(int argc, char **argv)
                 memcpy(&pos.x, buf + TL_HEADER_LEN, tlv_len);
 
                 /* Publish payload on appropriate channel. */
-                dwm_position_t_publish(lcm, "POSITION", &pos);
+                dwm_position_t_publish(zcm, "POSITION", &pos);
 
-                nanosleep(&sleep_duration, NULL);  
+                nanosleep(&sleep_duration, NULL);
         }
 
         goto cleanup;
@@ -160,6 +160,6 @@ cleanup:
         if (fd != -1) {
                 close(fd);
         }
-        lcm_destroy(lcm);
+        zcm_destroy(zcm);
         return 0;
 }
