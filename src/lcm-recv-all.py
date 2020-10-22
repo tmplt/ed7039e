@@ -12,12 +12,13 @@ def wpos_handler(channel, data):
     timestamp = datetime.datetime.fromtimestamp(msg.timestamp // 1e3).time()
     print(f"{timestamp}: new move order to ({msg.x}, {msg.y})");
 
-lc = lcm.LCM()
-lc.subscribe("POSITION", pos_handler)
-lc.subscribe("WANTED_POSITION", wpos_handler)
+if __name__ == "__main__":
+    lc = lcm.LCM()
+    lc.subscribe("POSITION", pos_handler)
+    lc.subscribe("WANTED_POSITION", wpos_handler)
 
-try:
-    while True:
-        lc.handle()
-except KeyboardInterrupt:
-    pass
+    try:
+        while True:
+            lc.handle()
+    except KeyboardInterrupt:
+        pass
