@@ -96,6 +96,11 @@ int tlv_rpc(int fd, char fun, unsigned char *buf)
 
 int main(int argc, char **argv)
 {
+        if (argc != 2) {
+                printf("usage: %s <serial-device>\n", argv[0]);
+                return 1;
+        }
+
         /* Initialize LCM. */
         lcm_t *lcm = lcm_create(NULL);
         if (!lcm) {
@@ -103,8 +108,7 @@ int main(int argc, char **argv)
         }
 
         /* Open a serial connection with the DWM. */
-        char *portname = "/dev/serial/by-id/usb-SEGGER_J-Link_000760109125-if00";
-        int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
+        int fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC);
         if (fd < 0 || configure_tty(fd) < 0) {
                 goto error;
         }
