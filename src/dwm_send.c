@@ -96,14 +96,15 @@ int tlv_rpc(int fd, char fun, unsigned char *buf)
 
 int main(int argc, char **argv)
 {
-        if (argc != 2) {
-                printf("usage: %s <serial-device>\n", argv[0]);
+        if (argc < 2) {
+                printf("usage: %s <serial-device> [lcm-provider]\n", argv[0]);
                 return 1;
         }
 
         /* Initialize LCM. */
-        lcm_t *lcm = lcm_create(NULL);
+        lcm_t *lcm = lcm_create(argc >= 3 ? argv[2] : NULL);
         if (!lcm) {
+                puts("failed to initialize LCM");
                 return 1;
         }
 
