@@ -1,11 +1,18 @@
-package dwm;
+package robot;
 
 // TODO: refer to DWM documentation
-struct position_t
+struct dwm_position_t
 {
         int64_t timestamp; // in milliseconds
         int32_t x;
         int32_t y;
         int32_t z;
         int8_t q;
+}
+
+struct vector2d_t
+{
+        int32_t x;
+        int32_t y;
+        double rad;
 }

@@ -11,7 +11,7 @@
 #include <math.h>
 
 #include <lcm/lcm.h>
-#include "dwm_position_t.h"
+#include "robot_dwm_position_t.h"
 
 #define TL_HEADER_LEN 0x2
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
                 .tv_nsec = 100 * 1e6,
         };
         struct timespec ts;
-        dwm_position_t pos;
+        robot_dwm_position_t pos;
         memset(&pos, 0, sizeof(pos));
         for (;;) {
                 /* Query measured position. */
@@ -139,14 +139,14 @@ int main(int argc, char **argv)
                 pos.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
                 
                 /* Copy payload into struct.
-                 * XXX: `dwm_position_t` is padded with 3B,
+                 * XXX: `robot_dwm_position_t` is padded with 3B,
                  * but the below works in this case.
                  */
                 assert(tlv_len == 13);
                 memcpy(&pos.x, buf + TL_HEADER_LEN, tlv_len);
 
                 /* Publish payload on appropriate channel. */
-                dwm_position_t_publish(lcm, "POSITION", &pos);
+                robot_dwm_position_t_publish(lcm, "POSITION", &pos);
 
                 nanosleep(&sleep_duration, NULL);  
         }

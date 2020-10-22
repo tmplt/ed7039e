@@ -2,7 +2,7 @@
 import sys
 import lcm
 import datetime, time
-from dwm import position_t
+from robot import dwm_position_t
 
 def parse_coord(c):
     try:
@@ -22,7 +22,7 @@ if __name__ == "__main__":
         print("\twhere coord. is a coordinate in centimeters")
         sys.exit(1)
 
-    p = position_t()
+    p = dwm_position_t()
     (p.x, p.y) = parse_coord(sys.argv[1]), parse_coord(sys.argv[2])
     if not p.x or not p.y:
         sys.exit(1)
