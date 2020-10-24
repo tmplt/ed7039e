@@ -11,6 +11,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <sys/select.h>
+#include <errno.h>
 
 #include <lcm/lcm.h>
 #include "dwm_position_t.h"
@@ -37,6 +38,29 @@ typedef struct {
 
 int read_until(int fd, char *str, char *buf);
 int set_serial_mode(int fd, enum serial_modes mode);
+int readt(int fd, void* buf, size_t count);
+
+/* read(2) wrapper with a pre-configured timeout. */
+int readt(int fd, void* buf, size_t count)
+{
+        fd_set read_fds, write_fds, except_fds;
+        FD_ZERO(&read_fds);
+        FD_ZERO(&write_fds);
+        FD_ZERO(&except_fds);
+        FD_SET(fd, &read_fds);
+
+        struct timeval timeout = {
+                .tv_sec = 0,
+                .tv_usec = 500 * 1e3, /* 500ms */
+        };
+
+        if (select(fd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) {
+                errno = ETIMEDOUT;
+                return -ETIMEDOUT;
+        }
+
+        return read(fd, buf, count);
+}
 
 int set_serial_mode(int fd, enum serial_modes mode)
 {
@@ -44,13 +68,16 @@ int set_serial_mode(int fd, enum serial_modes mode)
         
         char b = 0x0;
         char check[] = { 0x0D };
+retry:
         if (write(fd, check, sizeof(check)) != sizeof(check) ||
-            read(fd, &b, 1) < 0) {
-                printf("failed to probe serial mode");
+            readt(fd, &b, 1) < 0) {
+                puts("failed to probe serial mode");
                 return -1;
         }
-        
+
+        int changing = 0;
         if (b != 0x0D) {
+                changing = 1;
                 puts("DWM not in shell mode. Requesting change...");
 
                 char cmd[] = { 0x0D, 0x0D };
@@ -62,7 +89,13 @@ int set_serial_mode(int fd, enum serial_modes mode)
         }
 
         /* Ensure an expected serial state after this function.  */
-        while (read_until(fd, "dwm> ", NULL) < 0);
+        while (read_until(fd, "dwm> ", NULL) < 0) {
+                goto retry;
+        }
+
+        if (changing) {
+                puts("successfully changed to shell mode");
+        }
 }
 
 static int configure_tty(int fd)
@@ -92,7 +125,7 @@ int readn(int fd, unsigned char *buf, size_t count)
 {
         size_t rdlen = 0;
         while (rdlen < count) {
-                int rd = read(fd, buf + rdlen, count - rdlen);
+                int rd = readt(fd, buf + rdlen, count - rdlen);
                 if (rd <= 0) {
                         return -1;
                 }
@@ -106,27 +139,11 @@ int readn(int fd, unsigned char *buf, size_t count)
  */
 int read_until(int fd, char *str, char *buf)
 {
-        fd_set read_fds, write_fds, except_fds;
-        FD_ZERO(&read_fds);
-        FD_ZERO(&write_fds);
-        FD_ZERO(&except_fds);
-        FD_SET(fd, &read_fds);
-
-        struct timeval timeout = {
-                .tv_sec = 1,
-                .tv_usec = 0,
-        };
-        
         size_t idx = 0, cidx = 0;
         char ch;
         while (cidx < strlen(str)) {
                 /* Read one byte at a time into a conditional buffer. */
-                if (select(fd + 1, &read_fds, &write_fds, &except_fds, &timeout) == 1) {
-                        if (read(fd, &ch, 1) < 0) {
-                                return -1;
-                        }                        
-                } else {
-                        puts("read_until: timeout");
+                if (readt(fd, &ch, 1) < 0) {
                         return -1;
                 }
 
@@ -160,13 +177,13 @@ int tlv_rpc(int fd, char fun, unsigned char *buf)
          */
         for (int i = 0; i < strlen(cmd); i++) {
                 if (write(fd, cmd + i, 1) < 0 ||
-                    read(fd, buf, 1) < 0) {
+                    readt(fd, buf, 1) < 0) {
                         return -1;
                 }
         }
 
         /* Discard useless prepending bytes. */
-        if (read_until(fd, "\x0D", NULL) < 0 || read(fd, buf, 1) < 0) {
+        if (read_until(fd, "\x0D", NULL) < 0 || readt(fd, buf, 1) < 0) {
                 return -1;
         }
 
@@ -315,9 +332,8 @@ int main(int argc, char **argv)
         }
 
         /* Change serial mode. */
-        if (set_serial_mode(ctx.fd, serial_mode_shell) < 0) {
-                puts("failed to enter shell serial mode");
-                goto cleanup;
+        while (set_serial_mode(ctx.fd, serial_mode_shell) < 0) {
+                puts("failed to enter shell serial mode; retrying...");
         }
 
         /* Spawn polling threads: one reads position, the other acceleration. */
