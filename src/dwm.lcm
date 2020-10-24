@@ -9,3 +9,11 @@ struct position_t
         int32_t z;
         int8_t q;
 }
+
+struct acceleration_t
+{
+        int64_t timestamp; // in milliseconds
+        int64_t x;
+        int64_t y;
+        int64_t z;
+}

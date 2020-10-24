@@ -29,7 +29,7 @@ target_include_directories(lcmtypes INTERFACE
 
 if(INSTALL_BINARY_NODES)
   add_executable(dwm_send dwm_send.c)
-  target_link_libraries(dwm_send lcmtypes m)
+  target_link_libraries(dwm_send lcmtypes m pthread)
 
   install(TARGETS dwm_send
     EXPORT ${PROJECT_NAME}
