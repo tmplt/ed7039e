@@ -39,6 +39,7 @@ typedef struct {
 int read_until(int fd, char *str, char *buf);
 int set_serial_mode(int fd, enum serial_modes mode);
 int readt(int fd, void* buf, size_t count);
+int tlv_rpc(int fd, char fun, char *buf, char *respbuf);
 
 /* read(2) wrapper with a pre-configured timeout. */
 int readt(int fd, void* buf, size_t count)
@@ -65,37 +66,47 @@ int readt(int fd, void* buf, size_t count)
 int set_serial_mode(int fd, enum serial_modes mode)
 {
         assert(mode == serial_mode_shell);
-        
-        char b = 0x0;
-        char check[] = { 0x0D };
+
+        /* char cmd[] = { 0x0D, 0x0D }; */
+        char respb = 0;
+        int retval;
+
 retry:
-        if (write(fd, check, sizeof(check)) != sizeof(check) ||
-            readt(fd, &b, 1) < 0) {
-                puts("failed to probe serial mode");
+        /* We need to write "\r\r" within the span of a
+         * second to enter shell mode. But if we write the
+         * bytes too fast, they will be interpreted as a TLV
+         * call instead. So we first write "\r", wait for the
+         * timeout (as configured in readt), and then write the
+         * second "\r".
+         */
+        if (write(fd, "\r", 1) < 1) {
+                return -1;
+        }
+        if ((retval = readt(fd, &respb, 1)) == -ETIMEDOUT) {
+                if (write(fd, "\r", 1) < 1 ||
+                    readt(fd, &respb, 1) < 1) {
+                        return -1;
+                }
+        }
+        
+        /* After writing "\r\r" serial may respond with:
+         *   0x0  => the device has been woken up from sleep; and
+         *   0x40 => the device has no idea what to do.
+         * On either of these bytes, just try again.
+         * When bytes are echoed back we have entered shell mode.
+         */
+        if (retval && (respb == 0x0 || respb == 0x40)) {
+                goto retry;
+        } else if (retval < 0) {
                 return -1;
         }
 
-        int changing = 0;
-        if (b != 0x0D) {
-                changing = 1;
-                puts("DWM not in shell mode. Requesting change...");
-
-                char cmd[] = { 0x0D, 0x0D };
-                if (write(fd, cmd, sizeof(cmd)) != sizeof(cmd)) {
-                        printf("failed to request serial mode");
-                        return -1;
-                }
-                tcdrain(fd);
+        if (read_until(fd, "dwm> ", NULL) < 0) {
+                puts("set_serial_mode: read_until failure");
+                return -1;
         }
 
-        /* Ensure an expected serial state after this function.  */
-        while (read_until(fd, "dwm> ", NULL) < 0) {
-                goto retry;
-        }
-
-        if (changing) {
-                puts("successfully changed to shell mode");
-        }
+        return 0;
 }
 
 static int configure_tty(int fd)
@@ -119,7 +130,7 @@ static int configure_tty(int fd)
 }
 
 /* Reads `count` bytes from the file descriptor `fd` into the buffer starting at `buf`.
- * Returns -1 on error.
+ * Returns -1 on error. XXX: remove; unused
  */
 int readn(int fd, unsigned char *buf, size_t count)
 {
@@ -139,24 +150,18 @@ int readn(int fd, unsigned char *buf, size_t count)
  */
 int read_until(int fd, char *str, char *buf)
 {
-        size_t idx = 0, cidx = 0;
-        char ch;
-        while (cidx < strlen(str)) {
-                /* Read one byte at a time into a conditional buffer. */
-                if (readt(fd, &ch, 1) < 0) {
-                        return -1;
+        char tmpbuf[256];
+        char *b = buf != NULL ? buf : tmpbuf;
+        if (b == tmpbuf) {
+                memset(tmpbuf, 0, sizeof(tmpbuf));
+        }
+        int rdlen = 0;
+        while (!strstr(b, str)) {
+                int rd = 0;
+                if ((rd = readt(fd, b + rdlen, 256)) < 0) {
+                        return rd;
                 }
-
-                if (buf != NULL) {
-                        buf[idx++] = ch;
-                }
-
-                /* Count how much of `str` we have read. */
-                if (str[cidx] == ch) {
-                        cidx++;
-                } else {
-                        cidx = 0;
-                }
+                rdlen += rd;
         }
 
         return 0;
@@ -165,58 +170,64 @@ int read_until(int fd, char *str, char *buf)
 /* Calls the remote command `fun`, checks function validity, reads function return
  * payload into the buffer starting at `buf` and return payload length.
  */
-int tlv_rpc(int fd, char fun, unsigned char *buf)
+int tlv_rpc(int fd, char fun, char *buf, char *respbuf)
 {
         /* Call function. */
-        char format[] = "tlv %02x 00%c";
-        char cmd[sizeof(format) - 1];
-        snprintf(cmd, sizeof(cmd), format, fun, 0x0D);
+        char format[] = "tlv %02x 00\r\n";
+        char cmd[sizeof("tlv 02 00\r\n")];
+        snprintf(cmd, sizeof(cmd), format, fun);
 
         /* The interactive shell echoes back written bytes,
          * which it expects us to read before processing next incoming bytes.
          */
+        int retval = 0;
         for (int i = 0; i < strlen(cmd); i++) {
+                char b;         /* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? */
                 if (write(fd, cmd + i, 1) < 0 ||
-                    readt(fd, buf, 1) < 0) {
+                    (retval = readt(fd, &b, 1)) < 0) {
+                        printf("tlv_rpc: could not call function: %s\n", strerror(errno));
                         return -1;
                 }
         }
 
-        /* Discard useless prepending bytes. */
-        if (read_until(fd, "\x0D", NULL) < 0 || readt(fd, buf, 1) < 0) {
+        /* Read out full response. */
+        if ((retval = read_until(fd, "\r\ndwm> ", buf)) < 0) {
+                printf("tlv_rpc: could not read out full response: %s\n", strerror(errno));
                 return -1;
         }
 
-        /* Read out function response. */
-        if (read_until(fd, "\x0D", buf) < 0) {
+        if (!strstr(buf, "OUTPUT FRAME")) {
+                puts("tlv_rpc: missing expected response frame header");
                 return -1;
         }
 
-        /* Assume we made a correct function call for implementation brevity. */
+        /* Assume we made a correct function call and find the prefix location. */
         char ok_funcall_prefix[] = "40 01 00";
-        if (strncmp(buf, ok_funcall_prefix, strlen(ok_funcall_prefix)) != 0) {
+        if ((buf = strstr(buf, ok_funcall_prefix)) == NULL) {
                 puts("tlv_rpc: did not find expected OK prefix in repsonse frame");
                 return -1;
         }
-
+        buf += sizeof(ok_funcall_prefix);
+        
         /* Convert the hexadecimal payload to binary in-place. */
-        int payload_hex_len = strlen(buf + sizeof(ok_funcall_prefix) + 1);
+        int payload_hex_len = strstr(buf, "\r\ndwm> ") - buf;
+        if (payload_hex_len <= 0) {
+                puts("tlv_rpc: could not find response suffix");
+                return -1;
+        }
         int i = 0;
         for (; i * 3 < payload_hex_len; i++) {
-                /* Read the hexadecimal byte from the buffer and write it back in binary.
-                 * NOTE: We'll have a safety buffer `sizeof(ok_funcall_prefix)` between
-                 * the data being processed.
-                 */
-                sscanf(buf + sizeof(ok_funcall_prefix) + (i * 3), "%02hhx", buf + i);
-        }
-
-        /* Reset serial to a known state (no pending bytes to read). */
-        if (read_until(fd, "dwm> ", NULL) < 0) {
-                printf("failed to reset serial state");
-                return -1;
+                /* Read the hexadecimal byte from the buffer and write it back in binary. */
+                sscanf(buf + (i * 3), "%02hhx", respbuf + i);
         }
 
         return i - TL_HEADER_LEN; /* return payload length */
+}
+
+void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
+{
+        r->tv_sec = a->tv_sec - b->tv_sec;
+        r->tv_nsec = a->tv_nsec - b->tv_nsec;
 }
 
 void* poll_position_loop(void *arg)
@@ -228,20 +239,22 @@ void* poll_position_loop(void *arg)
                 .tv_sec = 0,
                 .tv_nsec = 100 * 1e6,
         };
-        struct timespec ts;
+        struct timespec ts, start, end, res;
         dwm_position_t pos;
         memset(&pos, 0, sizeof(pos));
+        char respbuf[256];      /* XXX: required? */
+                
         for (;;) {
                 /* Query measured position. */
                 pthread_mutex_lock(&ctx->lock);
+                clock_gettime(CLOCK_REALTIME, &start);
                 int tlv_len = 0;
                 int error = 0;
-                if ((tlv_len = tlv_rpc(ctx->fd, dwm_pos_get, ctx->buf)) < 0) {
-                        puts("tlv_rpc error. Trying again...");
+                if ((tlv_len = tlv_rpc(ctx->fd, dwm_pos_get, ctx->buf, respbuf)) < 0) {
                         error = 1;
                 }
-                if (ctx->buf[0] != 0x41) {
-                        printf("recvd unexpected payload type %02x\n", ctx->buf[0]);
+                if (respbuf[0] != 0x41 && !error) {
+                        printf("read unexpected payload type %02x\n", respbuf[0]);
                         error = 1;
                 }
                 pthread_mutex_unlock(&ctx->lock);
@@ -259,12 +272,18 @@ void* poll_position_loop(void *arg)
                  * TODO: dont memcpy, assign each struct member instead (or memcpy to them)
                  */
                 assert(tlv_len == 13);
-                memcpy(&pos.x, ctx->buf + TL_HEADER_LEN, tlv_len);
+                memcpy(&pos.x, respbuf + TL_HEADER_LEN, tlv_len);
 
                 /* Publish payload on appropriate channel. */
                 dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 
-                nanosleep(&sleep_duration, NULL);
+                /* Calculate how long we should sleep. */
+                clock_gettime(CLOCK_REALTIME, &end);
+                timespec_diff(&end, &start, &res);
+                timespec_diff(&sleep_duration, &res, &res);
+                printf("sleeping for %lld.%.9ld\n", (long long)res.tv_sec, res.tv_nsec);
+
+                nanosleep(&res, NULL);
         }
 
         return NULL;
@@ -272,6 +291,8 @@ void* poll_position_loop(void *arg)
 
 void* poll_acceleration_loop(void *arg)
 {
+        ctx_t *ctx = (ctx_t*)arg;
+        
         /* Configure a periodic sleep for 100ms. We poll at 10Hz */
         /* struct timespec sleep_duration = { */
         /*         .tv_sec = 0, */
@@ -337,18 +358,14 @@ int main(int argc, char **argv)
         }
 
         /* Spawn polling threads: one reads position, the other acceleration. */
-        pthread_t post; //, acct;
-        if (pthread_create(&post, NULL, poll_position_loop, &ctx) != 0) { // ||
-            /* pthread_create(&acct, NULL, poll_acceleration_loop, NULL) != 0) { */
+        pthread_t post, acct;
+        if (pthread_create(&post, NULL, poll_position_loop, &ctx) != 0 ||
+            pthread_create(&acct, NULL, poll_acceleration_loop, &ctx) != 0) {
                 printf("failed to start thread: %s\n", strerror(errno));
         }
 
         pthread_join(post, NULL);
-        /* pthread_join(acct, NULL); */
-        /* poll_position_loop(NULL); */
-        /* poll_acceleration_loop(NULL); */
-        /* poll_position_loop(NULL); */
-        /* poll_position_loop(NULL); */
+        pthread_join(acct, NULL);
 
         // TODO: call pthread_cancel if any thread fails
 
