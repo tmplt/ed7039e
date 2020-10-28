@@ -283,24 +283,8 @@ void* poll_acceleration_loop(void *arg)
 {
         ctx_t *ctx = (ctx_t*)arg;
         
-        /* Configure a periodic sleep for 100ms. We poll at 10Hz */
-        /* struct timespec sleep_duration = { */
-        /*         .tv_sec = 0, */
-        /*         .tv_nsec = 100 * 1e6, */
-        /* }; */
-        /* /\* struct timespec ts; *\/ */
-        /* dwm_acceleration_t acc; */
-        /* memset(&acc, 0, sizeof(acc)); */
         for (;;) {
-                /* Query measured acceleration. */
-                /* pthread_mutex_lock(&ctx.lock); */
-                /* clock_t t = clock(); */
-                /* t = clock() - t; */
-                /* printf("%f\n", ((double) t)/CLOCKS_PER_SEC); */
-                /* pthread_mutex_unlock(&ctx.lock); */
                 break;
-                /* nanosleep(&sleep_duration, NULL); */
-
         }
         
         return NULL;
