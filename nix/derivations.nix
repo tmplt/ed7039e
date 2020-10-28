@@ -1,7 +1,11 @@
 { pkgs, ... }:
 with pkgs;
 
-rec {
+let
+  src = builtins.filterSource (path: type:
+    baseNameOf path != "build")
+    ../src;
+in rec {
   pythonLibs = rec {
     spidev = python3Packages.buildPythonPackage rec {
       name = "${pname}-${version}";
@@ -30,8 +34,8 @@ rec {
     };
 
     lcmPythonDeps = stdenv.mkDerivation {
+      inherit src;
       name = "lcm-python";
-      src = ../src;
       buildInputs  = [ cmake lcm ];
       propagatedBuildInputs = [ lcm ];
       cmakeFlags = [ "-DINSTALL_PYTHON_DEPS=ON" ];
@@ -55,15 +59,15 @@ rec {
 
   systemNodes = {
     scripts = python3Packages.buildPythonPackage {
+      inherit src;
       name = "system-nodes-python";
-      src = ../src;
       propagatedBuildInputs = [ pythonLibs.lcmPythonDeps ];
       doCheck = false;
     };
 
     binaries = stdenv.mkDerivation {
+      inherit src;
       name = "system-nodes-binary";
-      src = ../src;
       buildInputs = [ cmake lcm ];
       cmakeFlags = [ "-DINSTALL_BINARY_NODES=ON" ];
     };
