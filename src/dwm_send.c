@@ -14,8 +14,8 @@
 #include <errno.h>
 
 #include <lcm/lcm.h>
-#include "dwm_position_t.h"
-#include "dwm_acceleration_t.h"
+#include "robot_dwm_position_t.h"
+#include "robot_dwm_acceleration_t.h"
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 #define TL_HEADER_LEN 0x2
@@ -34,7 +34,7 @@ enum serial_modes {
 typedef struct {
         pthread_mutex_t lock;
         lcm_t *lcm;
-        unsigned char buf[BUFFER_SIZE];
+        char buf[BUFFER_SIZE];
         int fd;
 } ctx_t;
 
@@ -167,7 +167,7 @@ int tlv_rpc(int fd, char fun, char *buf, char *respbuf)
          * which it expects us to read before processing next incoming bytes.
          */
         int retval = 0;
-        for (int i = 0; i < strlen(cmd); i++) {
+        for (size_t i = 0; i < strlen(cmd); i++) {
                 char b;         /* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? */
                 if (write(fd, cmd + i, 1) < 0 ||
                     (retval = readt(fd, &b, 1)) < 0) {
@@ -226,7 +226,7 @@ void* poll_position_loop(void *arg)
                 .tv_nsec = 100 * 1e6,
         };
         struct timespec ts, start, end, res;
-        dwm_position_t pos;
+        robot_dwm_position_t pos;
         memset(&pos, 0, sizeof(pos));
         char respbuf[BUFFER_SIZE];      /* XXX: required? */
                 
@@ -253,7 +253,7 @@ void* poll_position_loop(void *arg)
                 pos.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
                 
                 /* Copy payload into struct.
-                 * XXX: `dwm_position_t` is padded with 3B,
+                 * XXX: `robot_dwm_position_t` is padded with 3B,
                  * but the below works in this case.
                  * TODO: dont memcpy, assign each struct member instead (or memcpy to them)
                  */
@@ -261,7 +261,7 @@ void* poll_position_loop(void *arg)
                 memcpy(&pos.x, respbuf + TL_HEADER_LEN, tlv_len);
 
                 /* Publish payload on appropriate channel. */
-                dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
+                robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 
                 /* Calculate how long we should sleep. */
                 clock_gettime(CLOCK_REALTIME, &end);
@@ -282,6 +282,7 @@ void* poll_position_loop(void *arg)
 void* poll_acceleration_loop(void *arg)
 {
         ctx_t *ctx = (ctx_t*)arg;
+        (void)ctx;
         
         for (;;) {
                 break;
@@ -301,24 +302,22 @@ void ctx_destroy(ctx_t *ctx)
 
 int main(int argc, char **argv)
 {
-        if (argc != 2) {
-                printf("usage: %s <serial-file>\n", argv[0]);
+        if (argc < 2) {
+                printf("usage: %s <serial-device> [lcm-provider]\n", argv[0]);
                 return 1;
         }
 
+        /* Initialize context */
         ctx_t ctx;
-
+        ctx.lcm = lcm_create(argc >= 3 ? argv[2] : NULL);
+        if (!ctx.lcm) {
+                puts("failed to initialize LCM");
+                return 1;
+        }
         if (pthread_mutex_init(&ctx.lock, NULL) != 0) {
                 printf("failed to init context mutex: %s", strerror(errno));
                 return 1;
         }
-
-        /* Initialize LCM. */
-        ctx.lcm = lcm_create(NULL);
-        if (!ctx.lcm) {
-                return 1;
-        }
-
         /* Open a serial connection to the DWM. */
         ctx.fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC);
         if (ctx.fd < 0 || configure_tty(ctx.fd) < 0) {

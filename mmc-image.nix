@@ -17,14 +17,12 @@
 
 { pkgs, lib, config, ... }:
 
-{
+let
+  derivations = pkgs.callPackage ./nix/derivations.nix {};
+in {
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
     ./nix/brickpi3.nix
-    ./nix/dwm1001-dev.nix
-    #    ./nix/line-follower.nix
-    ./nix/python.nix
-    ./nix/software-nodes.nix
   ];
 
   sdImage.compressImage = true; # ./build.sh expects a zstd-compress image
@@ -100,4 +98,23 @@
   security.polkit.enable = lib.mkForce false;
   boot.supportedFilesystems = lib.mkForce [ "vfat" ];
   i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
+
+  # TODO: properly document
+  environment.systemPackages = with pkgs; [
+    screen # for decawave debugging
+
+    # Required libs for Python
+    (python3.buildEnv.override {
+      extraLibs = (lib.attrValues derivations.pythonLibs) ++ (with pkgs.python3Packages; [
+        numpy
+      ]);
+    })
+    
+  ] ++ (with derivations.systemNodes; [
+    binaries
+    scripts
+  ]);
+
+  # Required for the LCM UDP multicast transport implementation
+  networking.firewall.allowedUDPPorts = [ 7667 ];
 }

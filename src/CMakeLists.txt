@@ -12,7 +12,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic -pedantic-er
 if(INSTALL_PYTHON_DEPS)
   find_package(PythonInterp REQUIRED)
   set(python_args PYTHON_SOURCES python_sources)
-  lcm_wrap_types(${python_args} dwm.lcm)
+  lcm_wrap_types(${python_args} messages.lcm)
   lcm_install_python(${python_sources})
 endif()
 
@@ -21,17 +21,17 @@ lcm_wrap_types(
   C_SOURCES c_sources
   C_HEADERS c_headers
   ${python_args}
-  dwm.lcm) # TODO: GLOB all *.lcm and build common lib
+  messages.lcm) # TODO: GLOB all *.lcm and build common lib
 lcm_add_library(lcmtypes C STATIC ${c_sources} ${c_headers})
 # don't leak source files into install
 target_include_directories(lcmtypes INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 if(INSTALL_BINARY_NODES)
-  add_executable(dwm_send dwm_send.c)
-  target_link_libraries(dwm_send lcmtypes m pthread)
+  add_executable(lcm-source-dwm-pos dwm_send.c)
+  target_link_libraries(lcm-source-dwm-pos lcmtypes m pthread)
 
-  install(TARGETS dwm_send
+  install(TARGETS lcm-source-dwm-pos
     EXPORT ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib${LIB_SUFFIX}
