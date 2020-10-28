@@ -18,6 +18,7 @@
 #include "dwm_acceleration_t.h"
 
 #define TL_HEADER_LEN 0x2
+#define BUFFER_SIZE 256
 
 enum dwm_functions {
         dwm_pos_get = 0x02, // 18B long
@@ -32,7 +33,7 @@ enum serial_modes {
 typedef struct {
         pthread_mutex_t lock;
         lcm_t *lcm;
-        unsigned char buf[256];
+        unsigned char buf[BUFFER_SIZE];
         int fd;
 } ctx_t;
 
@@ -129,28 +130,12 @@ static int configure_tty(int fd)
         return 0;
 }
 
-/* Reads `count` bytes from the file descriptor `fd` into the buffer starting at `buf`.
- * Returns -1 on error. XXX: remove; unused
- */
-int readn(int fd, unsigned char *buf, size_t count)
-{
-        size_t rdlen = 0;
-        while (rdlen < count) {
-                int rd = readt(fd, buf + rdlen, count - rdlen);
-                if (rd <= 0) {
-                        return -1;
-                }
-                rdlen += rd;
-        }
-        return rdlen;
-}
-
 /* Reads bytes from the file descriptor `fd` into the buffer starting at `buf` until
  * the string `str` is read. `buf` can be NULL. Returns -1 on error.
  */
 int read_until(int fd, char *str, char *buf)
 {
-        char tmpbuf[256];
+        char tmpbuf[BUFFER_SIZE];
         char *b = buf != NULL ? buf : tmpbuf;
         if (b == tmpbuf) {
                 memset(tmpbuf, 0, sizeof(tmpbuf));
@@ -158,7 +143,7 @@ int read_until(int fd, char *str, char *buf)
         int rdlen = 0;
         while (!strstr(b, str)) {
                 int rd = 0;
-                if ((rd = readt(fd, b + rdlen, 256)) < 0) {
+                if ((rd = readt(fd, b + rdlen, BUFFER_SIZE)) < 0) {
                         return rd;
                 }
                 rdlen += rd;
@@ -242,7 +227,7 @@ void* poll_position_loop(void *arg)
         struct timespec ts, start, end, res;
         dwm_position_t pos;
         memset(&pos, 0, sizeof(pos));
-        char respbuf[256];      /* XXX: required? */
+        char respbuf[BUFFER_SIZE];      /* XXX: required? */
                 
         for (;;) {
                 /* Query measured position. */
