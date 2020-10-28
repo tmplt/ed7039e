@@ -105,7 +105,9 @@ in {
 
     # Required libs for Python
     (python3.buildEnv.override {
-      extraLibs = lib.attrValues derivations.pythonLibs;
+      extraLibs = (lib.attrValues derivations.pythonLibs) ++ (with pkgs.python3Packages; [
+        numpy
+      ]);
     })
     
   ] ++ (with derivations.systemNodes; [
