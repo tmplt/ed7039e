@@ -17,6 +17,7 @@
 #include "dwm_position_t.h"
 #include "dwm_acceleration_t.h"
 
+#define MAX(a, b) ((a) >= (b) ? (a) : (b))
 #define TL_HEADER_LEN 0x2
 #define BUFFER_SIZE 256
 
@@ -211,8 +212,8 @@ int tlv_rpc(int fd, char fun, char *buf, char *respbuf)
 
 void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 {
-        r->tv_sec = a->tv_sec - b->tv_sec;
-        r->tv_nsec = a->tv_nsec - b->tv_nsec;
+        r->tv_sec = MAX(a->tv_sec - b->tv_sec, 0);
+        r->tv_nsec = MAX(a->tv_nsec - b->tv_nsec, 0);
 }
 
 void* poll_position_loop(void *arg)
@@ -266,7 +267,11 @@ void* poll_position_loop(void *arg)
                 clock_gettime(CLOCK_REALTIME, &end);
                 timespec_diff(&end, &start, &res);
                 timespec_diff(&sleep_duration, &res, &res);
-                printf("sleeping for %lld.%.9ld\n", (long long)res.tv_sec, res.tv_nsec);
+
+                /* Warn if we are close to breaking our 10Hz requirement. */
+                if (!res.tv_nsec) {
+                        puts("poll_position_loop: 10Hz req. break!");
+                }
 
                 nanosleep(&res, NULL);
         }
