@@ -141,15 +141,22 @@ int read_until(int fd, char *str, char *buf)
                 memset(tmpbuf, 0, sizeof(tmpbuf));
         }
         int rdlen = 0;
-        while (!strstr(b, str)) {
+        do {
                 int rd = 0;
                 if ((rd = readt(fd, b + rdlen, BUFFER_SIZE)) < 0) {
                         return rd;
                 }
                 rdlen += rd;
-        }
+        } while (!strstr(b, str));
 
-        return 0;
+        /* This function only reads strings and we do not null the buffer.
+         * Terminating the read string ensures that this function does not
+         * prematurely return because the wanted string is available after
+         * rdlen butes in the dirty buffer.
+         */
+        b[rdlen + 1] = '\0';
+
+        return rdlen;
 }
 
 /* Calls the remote command `fun`, checks function validity, reads function return
@@ -289,7 +296,6 @@ void* poll_acceleration_loop(void *arg)
         };
         struct timespec ts, start, end, res;
         robot_dwm_acceleration_t acc;
-        memset(&acc, 0, sizeof(acc));
         
         for (;;) {
                 /* Query measured acceleration. */
@@ -370,6 +376,7 @@ int main(int argc, char **argv)
 
         /* Initialize context */
         ctx_t ctx;
+        memset(ctx.buf, 0, sizeof(ctx.buf));
         ctx.lcm = lcm_create(argc >= 3 ? argv[2] : NULL);
         if (!ctx.lcm) {
                 puts("failed to initialize LCM");
