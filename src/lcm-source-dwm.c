@@ -69,7 +69,6 @@ int set_serial_mode(int fd, enum serial_modes mode)
 {
         assert(mode == serial_mode_shell);
 
-        /* char cmd[] = { 0x0D, 0x0D }; */
         char respb = 0;
         int retval;
 
@@ -282,10 +281,72 @@ void* poll_position_loop(void *arg)
 void* poll_acceleration_loop(void *arg)
 {
         ctx_t *ctx = (ctx_t*)arg;
-        (void)ctx;
+
+        /* Configure a periodic sleep for 100ms. We poll at 10Hz */
+        struct timespec sleep_duration = {
+                .tv_sec = 0,
+                .tv_nsec = 100 * 1e6,
+        };
+        struct timespec ts, start, end, res;
+        robot_dwm_acceleration_t acc;
+        memset(&acc, 0, sizeof(acc));
         
         for (;;) {
-                break;
+                /* Query measured acceleration. */
+                clock_gettime(CLOCK_REALTIME, &start);
+                pthread_mutex_lock(&ctx->lock);
+
+                char cmd[] = "av\r";
+                memset(ctx->buf, 0, sizeof(ctx->buf)); /* XXX: why must we do this? */
+
+                /* The interactive shell echoes back written bytes,
+                 * which it expects us to read before processing next incoming bytes.
+                 */
+                int retval = 0;
+                for (size_t i = 0; i < strlen(cmd); i++) {
+                        /* char b;         /\* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? *\/ */
+                        if (write(ctx->fd, cmd + i, 1) < 0 ||
+                            (retval = readt(ctx->fd, ctx->buf + i, 1)) < 0) {
+                                printf("tlv_rpc: could not call function: %s\n", strerror(errno));
+                                goto sleep;
+                        }
+                }
+
+                /* Read out full response. */
+                if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf + strlen(cmd))) < 0) {
+                        printf("could not read out full response: %s\n", strerror(errno));
+                        goto sleep;
+                }
+
+                pthread_mutex_unlock(&ctx->lock);
+
+                char *buf;
+                if ((buf = strstr(ctx->buf, "acc:")) == NULL) {
+                        puts("could not find substring \"acc:\"");
+                        goto sleep;
+                }
+                if ((retval = sscanf(buf, "acc: x = %ld, y = %ld, z = %ld\r\n", &acc.x, &acc.y, &acc.z)) < 3) {
+                        printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
+                        goto sleep;
+                }
+
+                /* Check the time. */
+                clock_gettime(CLOCK_REALTIME, &ts);
+                acc.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
+
+                robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
+
+                /* Calculate how long we should sleep. */
+                clock_gettime(CLOCK_REALTIME, &end);
+                timespec_diff(&end, &start, &res);
+                timespec_diff(&sleep_duration, &res, &res);
+
+                if (!res.tv_nsec) {
+                        puts("poll_acceleration_loop: 10Hz req. break!");
+                }
+
+        sleep:
+                nanosleep(&res, NULL);
         }
         
         return NULL;
