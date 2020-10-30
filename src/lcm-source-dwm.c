@@ -220,7 +220,7 @@ void query(ctx_t *ctx, char *fun, void (*pap)(ctx_t*, int64_t))
         clock_gettime(CLOCK_REALTIME, &ts);
 
         /* Forward response and timestamp (in milliseconds) to the parser and publisher. */
-        pap(ctx, (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f));
+        pap(ctx, (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e6f));
 }
 
 int main(int argc, char **argv)
