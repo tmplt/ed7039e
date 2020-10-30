@@ -160,15 +160,10 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 
 void publish_pos(ctx_t *ctx, int64_t timestamp)
 {
-        char *buf;
-        if ((buf = strstr(ctx->buf, "apg:")) == NULL) {
-                puts("could not find substring \"apg:\"");
-                return;
-        }
-
         int retval;
         robot_dwm_position_t pos;
-        if ((retval = sscanf(buf, "apg: x:%ld y:%ld z:%ld qf:%d\r\n", &pos.x, &pos.y, &pos.z, &pos.q)) < 4) {
+        if ((retval = sscanf(ctx->buf, "%*s\napg: x:%ld y:%ld z:%ld qf:%d\r\n",
+                             &pos.x, &pos.y, &pos.z, &pos.q)) != 4) {
                 printf("pos: failed to sscanf buffer: %d fields correctly read out\n", retval);
                 return;
         }
@@ -179,15 +174,10 @@ void publish_pos(ctx_t *ctx, int64_t timestamp)
 
 void publish_acc(ctx_t *ctx, int64_t timestamp)
 {
-        char *buf;
-        if ((buf = strstr(ctx->buf, "acc:")) == NULL) {
-                puts("could not find substring \"acc:\"");
-                return;
-        }
-
         int retval;
         robot_dwm_acceleration_t acc;
-        if ((retval = sscanf(buf, "acc: x = %ld, y = %ld, z = %ld\r\n", &acc.x, &acc.y, &acc.z)) < 3) {
+        if ((retval = sscanf(ctx->buf, "%*s\nacc: x = %ld, y = %ld, z = %ld\r\n",
+                             &acc.x, &acc.y, &acc.z)) != 3) {
                 printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
                 return;
         }
