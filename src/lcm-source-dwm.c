@@ -145,6 +145,13 @@ static int configure_tty(int fd)
  */
 int read_until(int fd, char *str, char *buf)
 {
+        /* Because of the strstr below, and the possibility of readt returning
+         * fewer bytes than the total sum read on the last read_until call,
+         * the buffer is conveniently zeroed so the function doesn't
+         * prematurely return, having strstr-matched with outdated data.
+         */
+        memset(buf, 0, BUFFER_SIZE);
+
         int rdlen = 0;
         do {
                 int rd = 0;
@@ -193,8 +200,6 @@ int publish_acc(ctx_t *ctx, int64_t timestamp)
 
 int query(ctx_t *ctx, char *fun, int (*pap)(ctx_t*, int64_t))
 {
-        memset(ctx->buf, 0, sizeof(ctx->buf)); /* XXX: Required, but why? */
-
         /* Execute the function on the DWM. */
         if (write(ctx->fd, fun, strlen(fun)) < strlen(fun)) {
                 ERROR("failed to query \"%s\"", fun);
