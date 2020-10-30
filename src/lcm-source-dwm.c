@@ -34,7 +34,6 @@ enum serial_modes {
 };
 
 typedef struct {
-        pthread_mutex_t lock;
         lcm_t *lcm;
         char buf[BUFFER_SIZE];
         int fd;
@@ -152,14 +151,6 @@ int read_until(int fd, char *str, char *buf)
                 rdlen += rd;
         } while (!strstr(buf, str));
 
-        /* This function only reads strings and we do not null the buffer.
-         * Terminating the read string ensures that this function does not
-         * prematurely return because the wanted string is available after
-         * rdlen butes in the dirty buffer.
-         */
-        /* buf[rdlen + 1] = '\0'; */
-        /* buf[rdlen + 2] = 'X'; // XXX: debug only */
-
         return rdlen;
 }
 
@@ -229,137 +220,84 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
         r->tv_nsec = MAX(a->tv_nsec - b->tv_nsec, 0);
 }
 
-void* poll_position_loop(void *arg)
+void poll_position_loop(ctx_t *ctx)
 {
-        ctx_t *ctx = (ctx_t*)arg;
-        
-        /* Configure a periodic sleep for 100ms. We poll at 10Hz */
-        struct timespec sleep_duration = {
-                .tv_sec = 0,
-                .tv_nsec = 100 * 1e6,
-        };
-        struct timespec ts, start, end, res;
         robot_dwm_position_t pos;
         memset(&pos, 0, sizeof(pos));
         char respbuf[BUFFER_SIZE];      /* XXX: required? */
                 
-        for (;;) {
-                /* Query measured position. */
-                pthread_mutex_lock(&ctx->lock);
-                clock_gettime(CLOCK_REALTIME, &start);
-                int tlv_len = 0;
-                int error = 0;
-                if ((tlv_len = tlv_rpc(ctx->fd, dwm_pos_get, ctx->buf, respbuf)) < 0) {
-                        error = 1;
-                }
-                if (respbuf[0] != 0x41 && !error) {
-                        printf("read unexpected payload type %02x\n", respbuf[0]);
-                        error = 1;
-                }
-                pthread_mutex_unlock(&ctx->lock);
-                if (error) {
-                        continue;
-                }
-
-                /* Check the time. */
-                clock_gettime(CLOCK_REALTIME, &ts);
-                pos.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
-                
-                /* Copy payload into struct.
-                 * XXX: `robot_dwm_position_t` is padded with 3B,
-                 * but the below works in this case.
-                 * TODO: dont memcpy, assign each struct member instead (or memcpy to them)
-                 */
-                assert(tlv_len == 13);
-                memcpy(&pos.x, respbuf + TL_HEADER_LEN, tlv_len);
-
-                /* Publish payload on appropriate channel. */
-                robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
-
-                /* Calculate how long we should sleep. */
-                clock_gettime(CLOCK_REALTIME, &end);
-                timespec_diff(&end, &start, &res);
-                timespec_diff(&sleep_duration, &res, &res);
-
-                /* Warn if we are close to breaking our 10Hz requirement. */
-                if (!res.tv_nsec) {
-                        puts("poll_position_loop: 10Hz req. break!");
-                }
-                
-                return NULL;
-                /* nanosleep(&res, NULL); */
+        /* Query measured position. */
+        int tlv_len = 0;
+        int error = 0;
+        if ((tlv_len = tlv_rpc(ctx->fd, dwm_pos_get, ctx->buf, respbuf)) < 0) {
+                error = 1;
+        }
+        if (respbuf[0] != 0x41 && !error) {
+                printf("read unexpected payload type %02x\n", respbuf[0]);
+                error = 1;
+        }
+        if (error) {
+                return;
         }
 
-        return NULL;
+        /* Check the time. */
+        {
+                struct timespec ts;
+                clock_gettime(CLOCK_REALTIME, &ts);
+                pos.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
+        }
+                
+        /* Copy payload into struct.
+         * XXX: `robot_dwm_position_t` is padded with 3B,
+         * but the below works in this case.
+         * TODO: dont memcpy, assign each struct member instead (or memcpy to them)
+         */
+        assert(tlv_len == 13);
+        memcpy(&pos.x, respbuf + TL_HEADER_LEN, tlv_len);
+
+        /* Publish payload on appropriate channel. */
+        robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 }
 
-void* poll_acceleration_loop(void *arg)
+void poll_acceleration_loop(ctx_t *ctx)
 {
-        ctx_t *ctx = (ctx_t*)arg;
-
-        /* Configure a periodic sleep for 100ms. We poll at 10Hz */
-        struct timespec sleep_duration = {
-                .tv_sec = 0,
-                .tv_nsec = 100 * 1e6,
-        };
-        struct timespec ts, start, end, res;
         int retval;
         robot_dwm_acceleration_t acc;
         
-        for (;;) {
-                /* Query measured acceleration. */
-                clock_gettime(CLOCK_REALTIME, &start);
-                pthread_mutex_lock(&ctx->lock);
+        /* Query measured acceleration. */
+        memset(ctx->buf, 0, sizeof(ctx->buf));
 
-                memset(ctx->buf, 0, sizeof(ctx->buf));
+        char cmd[] = "av\r";
 
-                char cmd[] = "av\r";
+        if (write(ctx->fd, cmd, sizeof(cmd)) < sizeof(cmd)) {
+                puts("failed to write");
+                return;
+        }
 
-                if (write(ctx->fd, cmd, sizeof(cmd)) < sizeof(cmd)) {
-                        puts("failed to write");
-                        goto sleep;
-                }
+        /* Read out full response. */
+        if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf)) < 0) {
+                printf("could not read out full response: %s\n", strerror(errno));
+                return;
+        }
 
-                /* Read out full response. */
-                if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf)) < 0) {
-                        printf("could not read out full response: %s\n", strerror(errno));
-                        goto sleep;
-                }
+        char *buf;
+        if ((buf = strstr(ctx->buf, "acc:")) == NULL) {
+                puts("could not find substring \"acc:\"");
+                return;
+        }
+        if ((retval = sscanf(buf, "acc: x = %ld, y = %ld, z = %ld\r\n", &acc.x, &acc.y, &acc.z)) < 3) {
+                printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
+                return;
+        }
 
-                pthread_mutex_unlock(&ctx->lock);
-
-                char *buf;
-                if ((buf = strstr(ctx->buf, "acc:")) == NULL) {
-                        puts("could not find substring \"acc:\"");
-                        goto sleep;
-                }
-                if ((retval = sscanf(buf, "acc: x = %ld, y = %ld, z = %ld\r\n", &acc.x, &acc.y, &acc.z)) < 3) {
-                        printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
-                        goto sleep;
-                }
-
-                /* Check the time. */
+        /* Check the time. */
+        {
+                struct timespec ts;
                 clock_gettime(CLOCK_REALTIME, &ts);
                 acc.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
-
-                robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
-
-                /* Calculate how long we should sleep. */
-                clock_gettime(CLOCK_REALTIME, &end);
-                timespec_diff(&end, &start, &res);
-                timespec_diff(&sleep_duration, &res, &res);
-
-                if (!res.tv_nsec) {
-                        puts("poll_acceleration_loop: 10Hz req. break!");
-                }
-
-        sleep:
-                pthread_mutex_unlock(&ctx->lock);
-                return NULL;
-                /* nanosleep(&res, NULL); */
         }
-        
-        return NULL;
+
+        robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
 void ctx_destroy(ctx_t *ctx)
@@ -368,7 +306,6 @@ void ctx_destroy(ctx_t *ctx)
                 close(ctx->fd);
         }
         lcm_destroy(ctx->lcm);
-        pthread_mutex_destroy(&ctx->lock);
 }
 
 int main(int argc, char **argv)
@@ -386,10 +323,6 @@ int main(int argc, char **argv)
                 puts("failed to initialize LCM");
                 return 1;
         }
-        if (pthread_mutex_init(&ctx.lock, NULL) != 0) {
-                printf("failed to init context mutex: %s", strerror(errno));
-                return 1;
-        }
         /* Open a serial connection to the DWM. */
         ctx.fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC);
         if (ctx.fd < 0 || configure_tty(ctx.fd) < 0) {
@@ -401,16 +334,6 @@ int main(int argc, char **argv)
         while (set_serial_mode(ctx.fd, serial_mode_shell) < 0) {
                 puts("failed to enter shell serial mode; retrying...");
         }
-
-        /* Spawn polling threads: one reads position, the other acceleration. */
-        /* pthread_t post, acct; */
-        /* if (pthread_create(&post, NULL, poll_position_loop, &ctx) != 0 || */
-        /*     pthread_create(&acct, NULL, poll_acceleration_loop, &ctx) != 0) { */
-        /*         printf("failed to start thread: %s\n", strerror(errno)); */
-        /* } */
-
-        /* pthread_join(post, NULL); */
-        /* pthread_join(acct, NULL); */
 
         for (;;) {
                 poll_position_loop(&ctx);
