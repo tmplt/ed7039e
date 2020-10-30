@@ -160,26 +160,41 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
         r->tv_nsec = MAX(a->tv_nsec - b->tv_nsec, 0);
 }
 
-void poll_position_loop(ctx_t *ctx)
+int call_dwm_func(int fd, char *fun, char *buf)
 {
-        int retval;
-        robot_dwm_position_t pos;
-        memset(&pos, 0, sizeof(pos));
-
-        char cmd[] = "apg\r";
-
-        if (write(ctx->fd, cmd, sizeof(cmd)) < sizeof(cmd)) {
+        if (write(fd, fun, strlen(fun)) < strlen(fun)) {
                 puts("failed to write");
-                return;
+                BKPT;
+                return -1;
         }
 
         /* Read out full response. */
-        if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf)) < 0) {
+        if (read_until(fd, "\r\ndwm> ", buf) < 0) {
                 printf("could not read out full response: %s\n", strerror(errno));
+                return -1;
+        }
+
+        return 0;
+}
+
+int64_t millis()
+{
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        return (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
+}
+
+void query_position(ctx_t *ctx)
+{
+        int retval;
+        char *buf;
+        robot_dwm_position_t pos;
+        memset(&ctx->buf, 0, sizeof(ctx->buf));
+
+        if (call_dwm_func(ctx->fd, "apg\r", ctx->buf) < 0) {
                 return;
         }
 
-        char *buf;
         if ((buf = strstr(ctx->buf, "apg:")) == NULL) {
                 puts("could not find substring \"apg:\"");
                 return;
@@ -190,55 +205,34 @@ void poll_position_loop(ctx_t *ctx)
                 return;
         }
 
-        /* Check the time. */
-        {
-                struct timespec ts;
-                clock_gettime(CLOCK_REALTIME, &ts);
-                pos.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
-        }
-
         /* Publish payload on appropriate channel. */
+        pos.timestamp = millis();
         robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 }
 
-void poll_acceleration_loop(ctx_t *ctx)
+void query_acceleration(ctx_t *ctx)
 {
         int retval;
+        char *buf;
         robot_dwm_acceleration_t acc;
-        
-        /* Query measured acceleration. */
         memset(ctx->buf, 0, sizeof(ctx->buf));
 
-        char cmd[] = "av\r";
-
-        if (write(ctx->fd, cmd, sizeof(cmd)) < sizeof(cmd)) {
-                puts("failed to write");
+        if (call_dwm_func(ctx->fd, "av\r", ctx->buf) < 0) {
                 return;
         }
 
-        /* Read out full response. */
-        if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf)) < 0) {
-                printf("could not read out full response: %s\n", strerror(errno));
-                return;
-        }
 
-        char *buf;
         if ((buf = strstr(ctx->buf, "acc:")) == NULL) {
                 puts("could not find substring \"acc:\"");
                 return;
         }
+        
         if ((retval = sscanf(buf, "acc: x = %ld, y = %ld, z = %ld\r\n", &acc.x, &acc.y, &acc.z)) < 3) {
                 printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
                 return;
         }
 
-        /* Check the time. */
-        {
-                struct timespec ts;
-                clock_gettime(CLOCK_REALTIME, &ts);
-                acc.timestamp = (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e3f);
-        }
-
+        acc.timestamp = millis();
         robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
@@ -277,9 +271,22 @@ int main(int argc, char **argv)
                 puts("failed to enter shell serial mode; retrying...");
         }
 
+        struct timespec timer = {
+                .tv_sec = 0,
+                .tv_nsec = 100 * 1e6, /* 100ms; 10Hz */
+        };
+        struct timespec now = {0, 0}, last = {0, 0}, res = {0, 0};
+        
         for (;;) {
-                poll_position_loop(&ctx);
-                poll_acceleration_loop(&ctx);
+                /* Is it time to query the position? */
+                clock_gettime(CLOCK_REALTIME, &now);
+                timespec_diff(&now, &last, &res);
+                if (res.tv_sec > timer.tv_sec || res.tv_nsec > timer.tv_nsec) {
+                        query_position(&ctx);
+                        last = now;
+                }
+                
+                query_acceleration(&ctx);
         }
 
 cleanup:
