@@ -12,12 +12,14 @@
 #include <pthread.h>
 #include <sys/select.h>
 #include <errno.h>
+#include <signal.h>
 
 #include <lcm/lcm.h>
 #include "robot_dwm_position_t.h"
 #include "robot_dwm_acceleration_t.h"
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
+#define BKPT raise(SIGTRAP);
 #define TL_HEADER_LEN 0x2
 #define BUFFER_SIZE 256
 
@@ -102,10 +104,16 @@ retry:
                 return -1;
         }
 
-        if (read_until(fd, "dwm> ", NULL) < 0) {
+        char buf[BUFFER_SIZE];
+        if (read_until(fd, "dwm> ", buf) < 0) {
                 puts("set_serial_mode: read_until failure");
                 return -1;
         }
+
+        /* Ensure we are in a known state by discarding all
+         * incoming data.
+         */
+        while (readt(fd, buf, sizeof(buf)) != -ETIMEDOUT);
 
         return 0;
 }
@@ -135,26 +143,22 @@ static int configure_tty(int fd)
  */
 int read_until(int fd, char *str, char *buf)
 {
-        char tmpbuf[BUFFER_SIZE];
-        char *b = buf != NULL ? buf : tmpbuf;
-        if (b == tmpbuf) {
-                memset(tmpbuf, 0, sizeof(tmpbuf));
-        }
         int rdlen = 0;
         do {
                 int rd = 0;
-                if ((rd = readt(fd, b + rdlen, BUFFER_SIZE)) < 0) {
+                if ((rd = readt(fd, buf + rdlen, BUFFER_SIZE)) < 0) {
                         return rd;
                 }
                 rdlen += rd;
-        } while (!strstr(b, str));
+        } while (!strstr(buf, str));
 
         /* This function only reads strings and we do not null the buffer.
          * Terminating the read string ensures that this function does not
          * prematurely return because the wanted string is available after
          * rdlen butes in the dirty buffer.
          */
-        b[rdlen + 1] = '\0';
+        /* buf[rdlen + 1] = '\0'; */
+        /* buf[rdlen + 2] = 'X'; // XXX: debug only */
 
         return rdlen;
 }
@@ -165,18 +169,21 @@ int read_until(int fd, char *str, char *buf)
 int tlv_rpc(int fd, char fun, char *buf, char *respbuf)
 {
         /* Call function. */
-        char format[] = "tlv %02x 00\r\n";
-        char cmd[sizeof("tlv 02 00\r\n")];
+        char format[] = "tlv %02x 00\r";
+        char cmd[sizeof("tlv 02 00\r")];
         snprintf(cmd, sizeof(cmd), format, fun);
+
+        memset(buf, 0, BUFFER_SIZE);
+        memset(respbuf, 0, BUFFER_SIZE);
 
         /* The interactive shell echoes back written bytes,
          * which it expects us to read before processing next incoming bytes.
          */
         int retval = 0;
-        for (size_t i = 0; i < strlen(cmd); i++) {
-                char b;         /* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? */
-                if (write(fd, cmd + i, 1) < 0 ||
-                    (retval = readt(fd, &b, 1)) < 0) {
+        for (size_t i = 0; i < sizeof(cmd); i++) {
+                /* char b;         /\* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? *\/ */
+                if (write(fd, cmd + i, 1) < 1 ||
+                    (retval = readt(fd, buf + i, 1)) < 1) {
                         printf("tlv_rpc: could not call function: %s\n", strerror(errno));
                         return -1;
                 }
@@ -278,8 +285,9 @@ void* poll_position_loop(void *arg)
                 if (!res.tv_nsec) {
                         puts("poll_position_loop: 10Hz req. break!");
                 }
-
-                nanosleep(&res, NULL);
+                
+                return NULL;
+                /* nanosleep(&res, NULL); */
         }
 
         return NULL;
@@ -295,6 +303,7 @@ void* poll_acceleration_loop(void *arg)
                 .tv_nsec = 100 * 1e6,
         };
         struct timespec ts, start, end, res;
+        int retval;
         robot_dwm_acceleration_t acc;
         
         for (;;) {
@@ -302,24 +311,17 @@ void* poll_acceleration_loop(void *arg)
                 clock_gettime(CLOCK_REALTIME, &start);
                 pthread_mutex_lock(&ctx->lock);
 
-                char cmd[] = "av\r";
-                memset(ctx->buf, 0, sizeof(ctx->buf)); /* XXX: why must we do this? */
+                memset(ctx->buf, 0, sizeof(ctx->buf));
 
-                /* The interactive shell echoes back written bytes,
-                 * which it expects us to read before processing next incoming bytes.
-                 */
-                int retval = 0;
-                for (size_t i = 0; i < strlen(cmd); i++) {
-                        /* char b;         /\* XXX: required instead of buf: lest "OUTPUT FRAME" is shredded on consequent calls. Why? *\/ */
-                        if (write(ctx->fd, cmd + i, 1) < 0 ||
-                            (retval = readt(ctx->fd, ctx->buf + i, 1)) < 0) {
-                                printf("tlv_rpc: could not call function: %s\n", strerror(errno));
-                                goto sleep;
-                        }
+                char cmd[] = "av\r";
+
+                if (write(ctx->fd, cmd, sizeof(cmd)) < sizeof(cmd)) {
+                        puts("failed to write");
+                        goto sleep;
                 }
 
                 /* Read out full response. */
-                if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf + strlen(cmd))) < 0) {
+                if ((retval = read_until(ctx->fd, "\r\ndwm> ", ctx->buf)) < 0) {
                         printf("could not read out full response: %s\n", strerror(errno));
                         goto sleep;
                 }
@@ -352,7 +354,9 @@ void* poll_acceleration_loop(void *arg)
                 }
 
         sleep:
-                nanosleep(&res, NULL);
+                pthread_mutex_unlock(&ctx->lock);
+                return NULL;
+                /* nanosleep(&res, NULL); */
         }
         
         return NULL;
@@ -399,16 +403,19 @@ int main(int argc, char **argv)
         }
 
         /* Spawn polling threads: one reads position, the other acceleration. */
-        pthread_t post, acct;
-        if (pthread_create(&post, NULL, poll_position_loop, &ctx) != 0 ||
-            pthread_create(&acct, NULL, poll_acceleration_loop, &ctx) != 0) {
-                printf("failed to start thread: %s\n", strerror(errno));
+        /* pthread_t post, acct; */
+        /* if (pthread_create(&post, NULL, poll_position_loop, &ctx) != 0 || */
+        /*     pthread_create(&acct, NULL, poll_acceleration_loop, &ctx) != 0) { */
+        /*         printf("failed to start thread: %s\n", strerror(errno)); */
+        /* } */
+
+        /* pthread_join(post, NULL); */
+        /* pthread_join(acct, NULL); */
+
+        for (;;) {
+                poll_position_loop(&ctx);
+                poll_acceleration_loop(&ctx);
         }
-
-        pthread_join(post, NULL);
-        pthread_join(acct, NULL);
-
-        // TODO: call pthread_cancel if any thread fails
 
 cleanup:
         ctx_destroy(&ctx);
