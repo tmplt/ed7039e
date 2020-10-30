@@ -9,9 +9,7 @@
 #include <assert.h>
 #include <time.h>
 #include <math.h>
-#include <pthread.h>
 #include <sys/select.h>
-#include <errno.h>
 #include <signal.h>
 
 #include <lcm/lcm.h>
@@ -20,7 +18,6 @@
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 #define BKPT raise(SIGTRAP);
-#define TL_HEADER_LEN 0x2
 #define BUFFER_SIZE 256
 
 enum dwm_functions {
@@ -236,14 +233,6 @@ void query_acceleration(ctx_t *ctx)
         robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
-void ctx_destroy(ctx_t *ctx)
-{
-        if (ctx->fd != -1) {
-                close(ctx->fd);
-        }
-        lcm_destroy(ctx->lcm);
-}
-
 int main(int argc, char **argv)
 {
         if (argc < 2) {
@@ -290,6 +279,11 @@ int main(int argc, char **argv)
         }
 
 cleanup:
-        ctx_destroy(&ctx);
+        if (ctx.fd != -1) {
+                close(ctx.fd);
+        }
+        if (ctx.lcm != NULL) {
+                lcm_destroy(ctx.lcm);
+        }
         return 0;
 }
