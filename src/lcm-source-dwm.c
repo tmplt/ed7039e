@@ -25,11 +25,6 @@
 #define BKPT raise(SIGTRAP);
 #define BUFFER_SIZE 256
 
-enum dwm_functions {
-        dwm_pos_get = 0x02, // 18B long
-        dwm_cfg_get = 0x08, // 7B long
-};
-
 enum serial_modes {
         serial_mode_tlv,        /* Not implemented */
         serial_mode_shell,
