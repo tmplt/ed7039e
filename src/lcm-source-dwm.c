@@ -250,7 +250,13 @@ int main(int argc, char **argv)
 
         struct timespec timer = {
                 .tv_sec = 0,
-                .tv_nsec = 100 * 1e6, /* 100ms; 10Hz; XXX: 70 gives us true 10Hz, as acc takes ~30ms. */
+
+                /* NOTE(70): effectively gives us a 10Hz polling rate,
+                 * because query("av") takes ~33ms to run.
+                 * XXX: depended on DWM speed, host system, or both (likely).
+                 * DWM bottleneck?
+                 */
+                .tv_nsec = 70 * 1e6,
         };
         struct timespec now = {0, 0}, last = {0, 0}, res = {0, 0};
         
