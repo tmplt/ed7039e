@@ -2,14 +2,12 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <assert.h>
 #include <time.h>
 #include <math.h>
-#include <sys/select.h>
+#include <sys/poll.h>
 #include <signal.h>
 
 #include <lcm/lcm.h>
@@ -24,6 +22,7 @@
         }
 #define BKPT raise(SIGTRAP);
 #define BUFFER_SIZE 256
+#define READ_TIMEOUT 500        /* milliseconds */
 
 enum serial_modes {
         serial_mode_tlv,        /* Not implemented */
@@ -41,27 +40,27 @@ int set_serial_mode(int fd, enum serial_modes mode);
 int readt(int fd, void* buf, size_t count);
 int tlv_rpc(int fd, char fun, char *buf, char *respbuf);
 
-/* read(2) wrapper with a pre-configured timeout. */
+/* poll(2) wrapper around read(2). */
 int readt(int fd, void* buf, size_t count)
 {
-        /* TODO: do this only once. */
-        fd_set read_fds, write_fds, except_fds;
-        FD_ZERO(&read_fds);
-        FD_ZERO(&write_fds);
-        FD_ZERO(&except_fds);
-        FD_SET(fd, &read_fds);
-
-        struct timeval timeout = {
-                .tv_sec = 0,
-                .tv_usec = 500 * 1e3, /* 500ms */
+        struct pollfd fds = {
+                .fd = fd,
+                .events = POLLIN,
         };
 
-        if (select(fd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) {
+        int retval;
+        if ((retval = poll(&fds, 1, READ_TIMEOUT)) == 0) {
                 errno = ETIMEDOUT;
                 return -ETIMEDOUT;
+        } else if (retval < 0) {
+                ERROR("poll failure: %d", retval);
+                return retval;
+        } else if (retval > 0 && fds.revents & POLLIN) {
+                return read(fd, buf, count);
         }
 
-        return read(fd, buf, count);
+        ERROR("poll failure: %d", retval);
+        return retval;
 }
 
 /* Transitions the DWM accessible via file descriptor `fd` to the specifid mode. */
@@ -104,7 +103,7 @@ retry:
 
         char buf[BUFFER_SIZE];
         if ((retval = read_until(fd, "dwm> ", buf)) < 0) {
-                ERROR("read_until failure: %d", retval);
+                ERROR("read_until failure: %d, %s", retval, strerror(errno));
                 return -1;
         }
 
@@ -238,7 +237,7 @@ int main(int argc, char **argv)
                 return 1;
         }
         /* Open a serial connection to the DWM. */
-        ctx.fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC);
+        ctx.fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC | O_NONBLOCK);
         if (ctx.fd < 0 || configure_tty(ctx.fd) < 0) {
                 ERROR("failed to configure serial: %s\n", strerror(errno));
                 goto cleanup;
