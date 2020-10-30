@@ -31,7 +31,7 @@ enum dwm_functions {
 };
 
 enum serial_modes {
-        serial_mode_tlv,
+        serial_mode_tlv,        /* Not implemented */
         serial_mode_shell,
 };
 
@@ -39,7 +39,7 @@ typedef struct {
         lcm_t *lcm;
         char buf[BUFFER_SIZE];
         int fd;
-} ctx_t;
+} ctx_t;                        /* DWM context */
 
 int read_until(int fd, char *str, char *buf);
 int set_serial_mode(int fd, enum serial_modes mode);
@@ -69,6 +69,7 @@ int readt(int fd, void* buf, size_t count)
         return read(fd, buf, count);
 }
 
+/* Transitions the DWM accessible via file descriptor `fd` to the specifid mode. */
 int set_serial_mode(int fd, enum serial_modes mode)
 {
         assert(mode == serial_mode_shell);
@@ -141,7 +142,9 @@ static int configure_tty(int fd)
 }
 
 /* Reads bytes from the file descriptor `fd` into the buffer starting at `buf` until
- * the string `str` is read. `buf` can be NULL. Returns -1 on error.
+ * the string `str` is found in `buf`. May read past `str` from `fd` if bytes are
+ * available during read(2). Returns the number of byter read, or an read(2) error
+ * code.
  */
 int read_until(int fd, char *str, char *buf)
 {
@@ -164,6 +167,7 @@ int read_until(int fd, char *str, char *buf)
         return rdlen;
 }
 
+/* Computes MAX(`a` - `b`, 0) represented as timespec structs. */
 void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 {
         r->tv_sec = MAX(a->tv_sec - b->tv_sec, 0);
@@ -198,6 +202,9 @@ int publish_acc(ctx_t *ctx, int64_t timestamp)
         return robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
+/* Queries the DWM context `ctx` with the function `fun` and forwards the response
+ * to the parser and publisher `pap`.
+ */
 int query(ctx_t *ctx, char *fun, int (*pap)(ctx_t*, int64_t))
 {
         /* Execute the function on the DWM. */
