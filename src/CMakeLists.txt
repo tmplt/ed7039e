@@ -7,7 +7,7 @@ include(${LCM_USE_FILE})
 option(INSTALL_PYTHON_DEPS "Whether to build and install dependencies for Python nodes")
 option(INSTALL_BINARY_NODES "Whether to build and install binary nodes")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic -pedantic-errors -Wpedantic -Wno-unused-parameter -Wno-format -Wno-format-security -g -O0 -Wno-cpp -Wno-sign-compare")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic -pedantic-errors -Wpedantic -Wno-unused-parameter -Wno-format -Wno-format-security -g -O2 -Wno-cpp -Wno-sign-compare")
 
 if(INSTALL_PYTHON_DEPS)
   find_package(PythonInterp REQUIRED)
