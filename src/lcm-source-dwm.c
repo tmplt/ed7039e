@@ -17,6 +17,11 @@
 #include "robot_dwm_acceleration_t.h"
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
+#define ERROR(...) {                                            \
+                fprintf(stderr, "%s:%d: ", __func__, __LINE__); \
+                fprintf(stderr, __VA_ARGS__);                   \
+                fprintf(stderr, "\n");                          \
+        }
 #define BKPT raise(SIGTRAP);
 #define BUFFER_SIZE 256
 
@@ -102,8 +107,8 @@ retry:
         }
 
         char buf[BUFFER_SIZE];
-        if (read_until(fd, "dwm> ", buf) < 0) {
-                puts("set_serial_mode: read_until failure");
+        if ((retval = read_until(fd, "dwm> ", buf)) < 0) {
+                ERROR("read_until failure: %d", retval);
                 return -1;
         }
 
@@ -123,7 +128,7 @@ static int configure_tty(int fd)
                 return -1;
         }
 
-        // configure serial attributes, baud rate
+        /* Configure serial attributes, baud rate. */
         cfmakeraw(&tty);
         cfsetospeed(&tty, B115200);
         cfsetispeed(&tty, B115200);
@@ -158,51 +163,48 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
         r->tv_nsec = MAX(a->tv_nsec - b->tv_nsec, 0);
 }
 
-void publish_pos(ctx_t *ctx, int64_t timestamp)
+int publish_pos(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
         robot_dwm_position_t pos;
         if ((retval = sscanf(ctx->buf, "%*s\napg: x:%ld y:%ld z:%ld qf:%d\r\n",
                              &pos.x, &pos.y, &pos.z, &pos.q)) != 4) {
-                printf("pos: failed to sscanf buffer: %d fields correctly read out\n", retval);
-                return;
+                ERROR("sscanf failure: %d", retval);
+                return -ENOMSG;
         }
 
         pos.timestamp = timestamp;
-        robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
+        return robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 }
 
-void publish_acc(ctx_t *ctx, int64_t timestamp)
+int publish_acc(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
         robot_dwm_acceleration_t acc;
         if ((retval = sscanf(ctx->buf, "%*s\nacc: x = %ld, y = %ld, z = %ld\r\n",
                              &acc.x, &acc.y, &acc.z)) != 3) {
-                printf("failed to sscanf buffer: %d fields correctly read out\n", retval);
-                return;
+                ERROR("sscanf failure: %d", retval);
+                return -ENOMSG;
         }
 
         acc.timestamp = timestamp;
-        robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
+        return robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
-void query(ctx_t *ctx, char *fun, void (*pap)(ctx_t*, int64_t))
+int query(ctx_t *ctx, char *fun, int (*pap)(ctx_t*, int64_t))
 {
         memset(ctx->buf, 0, sizeof(ctx->buf)); /* XXX: Required, but why? */
 
         /* Execute the function on the DWM. */
         if (write(ctx->fd, fun, strlen(fun)) < strlen(fun)) {
-                puts("failed to write");
-                /* TODO: return a proper errno and handle it in main instead.
-                 * Do the same in publish_*.
-                 */
-                return;
+                ERROR("failed to query \"%s\"", fun);
+                return -EBADF;
         }
 
         /* Read the response of the DWM. */
         if (read_until(ctx->fd, "\r\ndwm> ", ctx->buf) < 0) {
-                printf("could not read out full response: %s\n", strerror(errno));
-                return;
+                ERROR("could not read query response");
+                return -EBADF;
         }
 
         /* Generate a timestamp. */
@@ -210,7 +212,7 @@ void query(ctx_t *ctx, char *fun, void (*pap)(ctx_t*, int64_t))
         clock_gettime(CLOCK_REALTIME, &ts);
 
         /* Forward response and timestamp (in milliseconds) to the parser and publisher. */
-        pap(ctx, (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e6f));
+        return pap(ctx, (ts.tv_sec * 1e3) + round(ts.tv_nsec / 1e6f));
 }
 
 int main(int argc, char **argv)
@@ -225,19 +227,19 @@ int main(int argc, char **argv)
         memset(ctx.buf, 0, sizeof(ctx.buf));
         ctx.lcm = lcm_create(argc >= 3 ? argv[2] : NULL);
         if (!ctx.lcm) {
-                puts("failed to initialize LCM");
+                ERROR("failed to initialized LCM");
                 return 1;
         }
         /* Open a serial connection to the DWM. */
         ctx.fd = open(argv[1], O_RDWR | O_NOCTTY | O_SYNC);
         if (ctx.fd < 0 || configure_tty(ctx.fd) < 0) {
-                printf("failed to configure serial: %s\n", strerror(errno));
+                ERROR("failed to configure serial: %s\n", strerror(errno));
                 goto cleanup;
         }
 
         /* Change serial mode. */
         while (set_serial_mode(ctx.fd, serial_mode_shell) < 0) {
-                puts("failed to enter shell serial mode; retrying...");
+                ERROR("failed to enter shell serial mode; retrying...");
         }
 
         struct timespec timer = {
