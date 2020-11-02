@@ -218,12 +218,21 @@ In this case a P controller, a controller which has only a proportional gain, is
 \includegraphics[width=\textwidth]{sections/assets/V_PID.PNG}
 \caption{Overview of the complete systems block diagram for the spatial position control. figure(\ref{fig:PID1}) is an overview of the "Steering" block and Eq.(\ref{eq:cart2polar}) is the mathematical definition for the block function "Cartesian- to Polar-coordinates Converter".}
 \label{fig:V_PID}
-\end{figure*} 
-Here it comes some of the results for the spacial position control simulation. If you are interested to see more plots, you can go to the Git-repository under simulation/Diff_Derive/read_me and you will find out how to generate more relative plots for this system.
+\end{figure*}
+ 
+Here it comes some of the results for the spacial position control simulation. In this case the desired position is (100, 100), the proportional gain for the angular velocity controller is $K_p = 4$ and the proportional gain for the average velocity controller is $K_p = 5$. If you are interested to see more plots, you can go to the Git-repository under simulation/Diff\_Drive/read\_me and you will find out how to generate more relative plots for this system.\\
+
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/traj.png}
-\caption{The step response for $\theta$ where the proportional gain $K_p = 4$ and the reference value is $\pi$ .}
+\caption{The drived trajectory.}
+\label{fig:Theta_Step}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.4\textwidth]{sections/assets/WV.png}
+\caption{The wheels' velocities during the drive time.}
 \label{fig:Theta_Step}
 \end{figure}
 
