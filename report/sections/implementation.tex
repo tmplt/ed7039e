@@ -83,7 +83,42 @@ and a Raspberry Pi-compatible GPIO-header.
 Via communication over UART, we are able to query its measured position as reported by help of the Decawave anchor nodes\footnote{An anchor is another development board configured for static installation at a known coordinate, used for position calculation. A non-static device with unknown coordinates (as is used in our system) is known as a tag.},
 and use this data to figure out where our system is located in the mimicked factory.
 
-Over UART the device exposes a type-lengh-value (TLV) API which we query to recieve the tuple of
+% Describe the TLV API we wanted to use.
+The device (henceforth referred to as a/the ``DWM'') exposes two modes over UART which we can use to extract data of interest.
+One of the modes is a type-length-value (TLV) API which is very suitable for automated interaction:
+to extract data using this mode, we need only write three bytes on the form \texttt{\textbf{MSB}}, \texttt{\textbf{MSB-1}}, \texttt{\textbf{MSB-2}}, \texttt{\textbf{...}} where:
+\begin{description}
+\item[\texttt{MSB}] is the \textit{type} of data we want to send. We specify \texttt{0x40} to call a function via the API.
+\item[\texttt{MSB-1}] is the value \textit{value} we want to sent. We specify (for example) \texttt{0x02} to call a function asking for the DWM position.
+\item[\texttt{MSB-2}] is the length of the data we want to send. Function \texttt{0x02} takes no payload, so we specifify \texttt{0x00} here.
+\item[\texttt{...}] would be a payload of length \texttt{\textbf{MSB-2}} had the function type taken a payload of non-zero size.
+\end{description}
+One sequece of these bytes constitute a TLV ``frame''.
+
+% Explain the TLV frames, and how nice they are to work with.
+After this frame has been written over the serial connection we receive two TLV frames in response:
+the first will denote whether the function call was successful (three bytes) and the second the function return data (at least three bytes).
+If the first frame says success, we read the next two bytes from which we will know what kind of data the remaining incoming bytes should be interpreted as,
+and how much more we should read.
+Implementation-wise, always knowing how much data to read allows for performant I/O\footnote{input/output operations: many of which require calling system functions; this is a relatively costly operation.} and easier error handling.
+It also allows easy construction of the LCM messages, because they are just a single \texttt{memcpy(3)}\footnote{\texttt{memcpy} - copy memory area: a common operation where a given amount of bytes are copied from a source adress to a destination adress.} away as the byte stream can be trivially represented as a \texttt{struct} following the API documentation.
+
+% No access to acceleration data using the TLV API; generic shell required.
+Unfortunately, the TLV API does not expose a function for reading the accelerometer data which we require do estimate the direction of our robot.
+A command is, however, readibly available via the interactive shell mode.
+This mode instead replies in a human-readable format, but without telling us how many bytes are to be read, and in what way to interpret the data we read.
+Fortunately, when the shell is ready to process new input, it writes a ``\texttt{dwm>}'' shell prompt;
+we simply read the response until this string is encountered.
+This ultimately require us to perform more I/O operations and parse the data upon reception, an operation that is slower than a mere \texttt{memcpy},
+but is nevertheless readibly available via a proper call to the \texttt{scanf(3)} family of functions.
+
+An alternative approach where both the TLV API and the shell mode was used was tested but ultimately scrapped:
+the time to transition from the TLV API to the shell mode took approximately $1$~s, which broke our $10$~Hz requirement.
+
+\textit{Why} accelerometer data can be queried in one mode but not the other is presently unknown.
+We surmise that the existance of the shell mode is for debugging purposes only (because of its human readable format --- and its insistance of using different methods of formatting for similar data types) and that accelerometer data is omitted from the TLV API because it is used by the internal localization functions to detect when the hardware is stationary, or because the developers simply did not foresee this kind of utilization, or both.
+
+Nevertheless, the data we receive when asking for the position is a tuple of
 $(x, y, z, q)$, where
 \begin{description}
 \item[$(x, y, z)$] is the reported coordinate in millimeters in three-dimensional space, and
@@ -95,6 +130,12 @@ Additionally, the quality factor, $q$, is higher when connected to four anchors.
 During measurements, and if there are more than four anchors available, it will chose the best four anchors to calculate its position. % What does "best" mean here? Refer to documentation.
 Because of this, we will then have to consider that our system may suddenly no longer be able fo find its position,
 and decide what should be done in order to establish a connection with the disconnected anchors.
+
+Additionally, the data we receive when asking for the acceleration is a tuple of $(x, y, z)$, where
+\begin{description}
+\item[$(x, y, z)$] is the reported acceleration in three-dimensional space.
+\end{description}
+% TODO: explain how the register values are calculated to m/s^2
 
 % The data can be considered a random process.
 
@@ -109,7 +150,6 @@ and decide what should be done in order to establish a connection with the disco
 
 % TODO:
 % RPi UART problems
-% No access to acceleration data using TLV API; generic shell required.
 
 \subsubsection{BrickPi3}
 The BrickPi3 is a peripheral that allows a Raspberry Pi to work with LEGO Mindstorms hardware.
