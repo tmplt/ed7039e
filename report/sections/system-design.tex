@@ -196,17 +196,29 @@ As it shown this is a stable system, it has no steady state error, no oscillatio
 In this part of the mobile platforms movement it is important to be able to control the spacial position $(x, y)$. 
 As shown in the kinematic equations Eq.(\ref{eq:MotionEq}) the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$. 
 A design of a controller for the average velocity is required to make it possible to control the spacial position. 
-Take note of the two input $AverageVelocity$, $Desired\_Theta$ and the two output $x$, $y$ in figure(\ref{fig:PID1}).\\
+Take note of the two input $AverageVelocity$, $Desired\_Theta$ and the two output $X$, $Y$ in figure(\ref{fig:PID1}).\\
 
+By redefining the spatial error from a Cartesian coordinate system to a polar coordinate system it is possible to design a controller for average velocity.\\
+In this case the error will be defined as following:
+\begin{eqnarray}
+\begin{aligned}
+\Delta x &= Desired\_X - X\\
+\Delta y &= Desired\_Y - Y\\
+Distance &= \sqrt{\Delta x^2 + \Delta y^2}\\
+Desired\_\theta &= atan2(\Delta y, \Delta x)
+\end{aligned}
+\label{eq:cart2polar}
+\end{eqnarray}
+\\
 
-
-
-
-
-
-
-
-
+Now by defining the distance as an error to a PID controller for the average velocity, it makes it possible for the mobile platform to stop at the desired position. 
+In this case a P controller, a controller which has only a proportional gain, is enough.\\
+\begin{figure*}[ht]
+\centering
+\includegraphics[width=\textwidth]{sections/assets/V_PID.PNG}
+\caption{Overview of the complete systems block diagram for the spatial position control. figure(\ref{fig:PID1}) is an overview of the "Steering" block and Eq.(\ref{eq:cart2polar}) is the mathematical definition for the block function "Cartesian- to Polar-coordinates Converter".}
+\label{fig:V_PID}
+\end{figure*} 
 
 \subsection{Hardware}
 % Explain the raspberry pi and it's attachments.
