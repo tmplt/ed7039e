@@ -70,7 +70,7 @@ Unless a program is portably written, it must be patched before it can be used o
 
 % Hardware issues
 Another problem is the distro's relative infancy to other distros, particularly when it comes to hardware support.
-NixOS ships with a generic Linux kernel.
+NixOS builds with a generic Linux kernel by default.
 A generic kernel is expected to run on a generic system.
 Because of the availability of hardware peripherals such as general-purpose input/output pins, GPIO;
 universal asynchronous receiver-transmitter, UART;
@@ -81,6 +81,12 @@ By applying a so called device-tree overlay on the Linux kernel (and thus descri
 which was required to actuate our robot's motors.
 Other components we required could be utilized by help of the Raspberry Pi's USB port (fortunately a generic peripheral).
 Had we instead opted to use a distro officially supposted by the Raspberry Pi, all of these peripherals would simply work out of the box, but we would then loose the featuses enumerated above.
+
+Some non-generic kernels are offered by NixOS that imply support for Raspberry Pis, but offer none in practise.
+The reason for these kernels' availability is presently unknown.
+
+While its certainly possible to enable proper hardware support for all peripherals in the kernel we use, we are on a tight deadline.
+As such, we are satisfied even though only SPI is properly supported.
 
 % TODO: what problems does NixOS cause?
 % * We cannot use vscode-remote
