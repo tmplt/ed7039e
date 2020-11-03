@@ -13,14 +13,16 @@ stdenv.mkDerivation {
         
         kpfonts
         libertine
-        inconsolata # TODO: fix or replace; it is not used
+        inconsolata
         amsmath
         tikzsymbols
         hyperref
         biblatex
         enumitem
+        fontspec
         biber;
     })
+    inconsolata
   ];
 
   srcs = [

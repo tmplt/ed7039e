@@ -22,8 +22,8 @@ A symbolic link to it is also be created under `result/`.
    }
    EOF
    ```
-2. Generate a SSH key pair via `ssh-keygen -f id_rsa -N ""`.
-3. Include `nix/ssh-bastion.nix` in your NixOS SSH bastion imports and rebuild (or configure your Non-NixOS equivalent).
+3. Generate a SSH key pair via `ssh-keygen -f id_rsa -N ""`.
+4. Include `nix/ssh-bastion.nix` in your NixOS SSH bastion imports and rebuild (or configure your Non-NixOS equivalent).
 
 ### Bootable image generation
 The bootable image for the Raspberry Pi 3 can be built by executing `./mmc-image.nix`.
