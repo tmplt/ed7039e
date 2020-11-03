@@ -41,7 +41,7 @@ The model used in this case is the unicycle model, due to the differential steer
 This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angle to its wheels. 
 The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side. 
 With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform. 
-I.e. the robot is able to spin while the right-hand sidewheels have the same velocity as the left-hand side wheels, in opposite direction.\\ 
+I.e. the robot is able to spin while the right-hand side wheels have the same velocity as the left-hand side wheels, in opposite direction.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/car-unicycle.png}
@@ -57,12 +57,10 @@ The turning rate of the body is
 \begin{equation*}
 \dot{\theta}= \frac{v_L}{R_L} = \frac{v_R}{R_R}
 \end{equation*}
-
 since $R_R = R_L + W$ the expression can be simplified as
 \begin{equation}
 \dot{\theta}= \frac{v_R - v_L}{W} = \frac{v_\Delta}{W}\label{eq:ThetaDot}
 \end{equation}
-
 the equations of motion for this model are
 \begin{eqnarray}
 \begin{aligned}
@@ -72,7 +70,6 @@ the equations of motion for this model are
 \end{aligned}
 \label{eq:MotionEq}
 \end{eqnarray}
-
 where the average velocity\parencite{Corke2011} is given by        
 \begin{equation}
 v = \frac{v_R + v_L}{2} 
@@ -84,11 +81,11 @@ v = \frac{v_R + v_L}{2}
 % Motivate regulation approach.
 \subsubsection{Mobile platform}
 A simulation profile is made to make sure of the unicycle mode in sub section \ref{subsubsec:unicycle} is the suitable model for this application.
-The simulation is made in discrete time domain with the sampling frequency of $10Hz$.
+The simulation is made in discrete time domain with the sampling frequency of $10$~Hz.
 This is done in the described way due to the robot is going to operate in discrete time.
 The sampling frequency is assumed to be low and that is because the designed controllers are going to be able to work fine for higher samplings frequencies but that is not guaranteed for vise-versa.\\  
 As the unicycle model describes the systems dynamics.
-The position of the robot $(x, y, \theta)$ is dependent on the two wheel velocities. Which in turn has dependencies to the average velocity $V$ and the angular velocity $\omega$. These relations are presented in Eq.(\ref{eq:ThetaDot}) - Eq.(\ref{eq:av_velocity}).\\
+The position of the robot $(x, y, \theta)$ is dependent on the two wheel velocities. Which in turn has dependencies to the average velocity $V$ and the angular velocity $\omega$. These relations are presented in Eq.~\eqref{eq:ThetaDot} -- Eq.~\eqref{eq:av_velocity}.
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/omegaCtrlr.png}
@@ -97,25 +94,22 @@ The position of the robot $(x, y, \theta)$ is dependent on the two wheel velocit
 \end{figure*} 
 
 A pole placement analyze is required for the design of a PID controller.
-This analyze is done in continues time domain, due to its simplicity.\\
-As mentioned in Eq.(\ref{eq:MotionEq})
+This analyze is done in continues time domain, due to its simplicity.
+As mentioned in Eq.~\eqref{eq:MotionEq}
 \begin{equation}
 \dot{\theta} = \omega
 \label{eq:omega}
 \end{equation}
-
-By taking the Laplace transform of Eq.(\ref{eq:omega}) gives:
+By taking the Laplace transform of Eq.~\eqref{eq:omega} gives:
 \begin{equation}
 s\cdot \Theta(s)= \Omega(s)
 \end{equation}
-
 Where $G(s)$ is the transfer function
 \begin{equation}
 \therefore G(s)=\frac{\Omega(s)}{s\cdot\Theta(s)} = 1
 \end{equation}
-
 However it is the angular position $\theta$ which is relevant in this case.
-So it is required to implement an integrator in the feedback to make the angular position controllable.\\ \\
+So it is required to implement an integrator in the feedback to make the angular position controllable.
 \tikzset{
     block/.style = {draw, rectangle, 
     minimum height=1cm, 
@@ -144,15 +138,14 @@ So it is required to implement an integrator in the feedback to make the angular
         node [near end] {} (sum);
         \end{tikzpicture}
     \end{center}
-    \caption{Closed Loop system with a integrator in the feedback.}\label{fig:closedloop}
+    \caption{Closed loop system with a integrator in the feedback.}\label{fig:closedloop}
 \end{figure}
 
-In this case the closed loop transfer function will be as shown in Eq.(\ref{eq:closedloop})
+In this case the closed loop transfer function will be as shown in Eq.\eqref{eq:closedloop}
 \begin{equation}
 G_{c}(s) = \frac{PID}{s + PID}
 \label{eq:closedloop}
 \end{equation} 
-
 As the closed loop transfer function of the system is describing a first order system, it is possible to use a P-controller. 
 I.e. the controller only has a proportional gain and doesn't require a integrative or derivative elements. 
 So the final closed loop transfer function will be 
@@ -162,14 +155,13 @@ G_{c}(s) = \frac{K_p}{s + K_p}
 \end{equation}
 
 This system will have a pole at $-K_p$.
-Any positive proportional gain will results in a stable pole and which in turn a stable system. \\
+Any positive proportional gain will results in a stable pole and which in turn a stable system.
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/Theta_PID.PNG}
 \caption{The complete control block for the angular position in discrete time domain.}
 \label{fig:PID1}
 \end{figure*}
-\\
  
 It is required to make sure that $\theta$ error, $\theta_e$ is in $(-\pi,\pi]$ span. Due to the $\theta = \theta \pm 2 \cdot n \cdot \pi$, it is possible for the error be in out of this span.
 By using a function called arctan2 or atan2 in many programming languages it is possible to accomplish this challenge.\\
@@ -178,27 +170,27 @@ By defining
 \begin{equation}
 \theta = atan2(sin(\theta),\, cos(\theta))
 \end{equation}
-$\theta$ will always be in $(-\pi,\pi]$ span.\\
+$\theta$ will always be in $(-\pi,\pi]$ span.
 
 Due to the physical limits the servos have, two saturation blocks are required.
-These blocks are shown in figure(\ref{fig:PID1}) and the assumption for their limits are (-10,10) $[cm/sec]$. 
-This assumption is done to make the simulation more alike the real application.\\
+These blocks are shown in figure(\ref{fig:PID1}) and the assumption for their limits are $(-10,10)$~[cm/s]. 
+This assumption is done to make the simulation more alike the real application.
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.4\textwidth]{sections/assets/Theta_pi_stepresponce.png}
+\includegraphics[width=0.4\textwidth]{sections/assets/Theta_pi_stepresponse.png}
 \caption{The step response for $\theta$ where the proportional gain $K_p = 4$ and the reference value is $\pi$.}
 \label{fig:Theta_Step}
 \end{figure}
 
 The result of the simulation, the step response for the angular position control system is presented in figure(\ref{fig:Theta_Step}).
-As it shown this is a stable system, it has no steady state error, no oscillation and relative fast rise-time.\\
+As it shown this is a stable system, it has no steady state error, no oscillation and relative fast rise-time.
 
 In this part of the mobile platforms movement it is important to be able to control the spacial position $(x, y)$. 
-As shown in the kinematic equations Eq.(\ref{eq:MotionEq}) the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$. 
+As shown in the kinematic equations Eq.~\eqref{eq:MotionEq} the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$. 
 A design of a controller for the average velocity is required to make it possible to control the spacial position. 
-Take note of the two input $AverageVelocity$, $Desired\_Theta$ and the two output $X$, $Y$ in figure(\ref{fig:PID1}).\\
+Take note of the two input \texttt{AverageVelocity}, \texttt{Desired\_Theta} and the two output \texttt{X}, \texttt{Y} in figure(\ref{fig:PID1}).
 
-By redefining the spatial error from a Cartesian coordinate system to a polar coordinate system it is possible to design a controller for average velocity.\\
+By redefining the spatial error from a Cartesian coordinate system to a polar coordinate system it is possible to design a controller for average velocity.
 In this case the error will be defined as following:
 \begin{eqnarray}
 \begin{aligned}
@@ -209,18 +201,17 @@ Desired\_\theta &= atan2(\Delta y, \Delta x)
 \end{aligned}
 \label{eq:cart2polar}
 \end{eqnarray}
-\\
 
 Now by defining the distance as an error to a PID controller for the average velocity, it makes it possible for the mobile platform to stop at the desired position. 
-In this case a P controller, a controller which has only a proportional gain, is enough.\\
+In this case a P controller, a controller which has only a proportional gain, is enough.
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/V_PID.PNG}
-\caption{Overview of the complete systems block diagram for the spatial position control. figure(\ref{fig:PID1}) is an overview of the "Steering" block and Eq.(\ref{eq:cart2polar}) is the mathematical definition for the block function "Cartesian- to Polar-coordinates Converter".}
+\caption{Overview of the complete systems block diagram for the spatial position control. figure(\ref{fig:PID1}) is an overview of the ``Steering´´ block and Eq.~\eqref{eq:cart2polar} is the mathematical definition for the block function ``Cartesian- to Polar-coordinates Converter´´.}
 \label{fig:V_PID}
 \end{figure*}
  
-Here it comes some of the results for the spacial position control simulation. In this case the desired position is (100, 100), the proportional gain for the angular velocity controller is $K_p = 4$ and the proportional gain for the average velocity controller is $K_p = 5$. If you are interested to see more plots, you can go to the Git-repository under simulation/Diff\_Drive/read\_me and you will find out how to generate more relative plots for this system.\\
+Here comes some of the results for the spacial position control simulation. In this case the desired position is $(100, 100)$, the proportional gain for the angular velocity controller is $K_p = 4$ and the proportional gain for the average velocity controller is $K_p = 5$. If you are interested to see more plots, you can go to the Git-repository under \texttt{simulation/Diff\_Drive/README} and you will find out how to generate more relative plots for this system.\\
 
 \begin{figure}[ht]
 \centering
