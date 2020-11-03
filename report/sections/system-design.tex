@@ -40,7 +40,7 @@ The relation between these five states are visually described in the state machi
 The model used in this case is the unicycle model, due to the differential steering. 
 This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angle to its wheels. 
 The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side. 
-With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform. 
+With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform.
 I.e. the robot is able to spin while the right-hand side wheels have the same velocity as the left-hand side wheels, in opposite direction.
 \begin{figure}[h!]
 \centering
@@ -229,27 +229,10 @@ Here comes some of the results for the spacial position control simulation. In t
 \subsection{Hardware}
 % Explain the raspberry pi and it's attachments.
 
+% TODO: remove this section; talk about software in `implementation.nix` instead.
 \subsection{Software}
-\subsubsection{Reproducible system image generation}
-% Explain the repo's *.nix files and what they do
-The system image of the Raspberry Pi is generated via the repository's \texttt{mmc-image.nix} file ---
-an auxiliary \texttt{build.sh} script is available to generate and subsequently flash a target storage device in a single command execution.
-\texttt{mmc-image.nix} contains an expression of the Nix language.
-Together with the usage of \texttt{nixpkgs} --- an extensive library of build and package declarations,
-\texttt{mmc-image.nix} allows us to reliably and reproducibly build a bootable image of the complete software environment the project requires.
-To then boot the generated image, it only needs to be flashed on a MultiMediaCard (MMC\footnote{Commonly referred to as: SD card, memory card.}) and slotted into the MMC-slot on the Raspberry Pi.
 
-% Explain the pros of Nix
-When building derivations (nomenclature for anything built with Nix: an executable binary, shared library file, a system environment, etc.) their dependencies are in complete isolation with each other, which effectively allows the avoidance of dependency hell.\footnote{Colloquial term referring to the frustration often generated when dealing with version-specific dependencies.
-See \href{https://en.wikipedia.org/wiki/Dependency_hell}{Wikipedia}.}
-
-% Explain the rollback functionality git provide us.
-In combination with git, one may trivially roll back to previous derivations that are known to work by checking out a commit and rebuilding.
-
-% Explain why treating the MMC as volatile is a good idea (MMCs have a tendency to just stop working).
-In addition, by preferring a work flow where the target storage is considered volatile, any deficiencies of the target medium are mitigated.
-
-% TODO: improve
+% TODO: rewrite/move elsewhere?
 \subsubsection{System-external services}
 The software environment generated for the Raspberry Pi automatically connects to Eduroam if credentials are available.
 Eduroam places some limitations on connected clients: firewall, e.g.

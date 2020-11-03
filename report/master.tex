@@ -6,7 +6,8 @@
 \usepackage{libertine}
 % \usepackage{placeins}
 % \usepackage{gensymb}
-\usepackage{inconsolata}
+\usepackage{fontspec}
+\setmonofont[Mapping=tex-text]{inconsolata}
 % \usepackage{subcaption}
 % \usepackage{mdframed}
 % \usepackage{caption}
@@ -31,6 +32,7 @@
     urlcolor=blue,
     linkcolor=black,
     citecolor=black,
+    breaklinks=true,
 }
 
 \definecolor{CERNblue}{HTML}{22529e}
@@ -86,7 +88,7 @@ Ruben Asplund \hypermail{rubasp-6@student.ltu.se} \\
 Ali Nouri \hypermail{alinou-6@student.ltu.se} \\
 Ali Khademi \hypermail{alikha-6@student.ltu.se}
 }
-\date{\today}
+\date{\today}                   % TODO: use latest date as reported by git
 
 \begin{document}
 \maketitle
@@ -96,6 +98,7 @@ Ali Khademi \hypermail{alikha-6@student.ltu.se}
 \input{sections/implementation.tex}
 \input{sections/results.tex}
 \input{sections/conclusion.tex}
+\input{sections/improvements.tex}
 
 \appendix
 \input{sections/team-members.tex}

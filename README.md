@@ -12,8 +12,22 @@ The report can be build my running `./report.nix`; the path to the compiled repo
 A symbolic link to it is also be created under `result/`.
 
 ## Building and project setup
-The bootable image for the Raspberry Pi can be built by executing `./mmc-image.nix`.
+### Prerequisite manual steps
+1. Modify `nix/config.nix` to your environment.
+2. Describe your network access points that have Internet access:
+   ```sh
+   cat << EOF > local-secrets.nix
+   {
+     networks."YourSSID".psk = "hunter2";
+   }
+   EOF
+   ```
+3. Generate a SSH key pair via `ssh-keygen -f id_rsa -N ""`.
+4. Include `nix/ssh-bastion.nix` in your NixOS SSH bastion imports and rebuild (or configure your Non-NixOS equivalent).
+
+### Bootable image generation
+The bootable image for the Raspberry Pi 3 can be built by executing `./mmc-image.nix`.
 A convenience script is available for flashing a target block device:
 ```bash
-$ ./build.sh /dev/mmcblk0 # or your equivalent
+$ sudo ./build.sh /dev/mmcblk0 # or your equivalent
 ```

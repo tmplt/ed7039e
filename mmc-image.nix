@@ -17,16 +17,15 @@
 
 { pkgs, lib, config, ... }:
 
-{
+let
+  derivations = pkgs.callPackage ./nix/derivations.nix {};
+in {
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
     ./nix/brickpi3.nix
-    ./nix/dwm1001-dev.nix
   ];
 
-  # We can only flash an uncompressed image.
-  # Additionally, compression whilst emulating the platform takes a looong time.
-  sdImage.compressImage = false;
+  sdImage.compressImage = true; # ./build.sh expects a zstd-compress image
 
   # Latest release of major 5 doesn't always play ball with the hardware.
   # Relase 4.19 is stable and "battle-tested".
@@ -36,17 +35,10 @@
   networking.hostName = "ed7039e";
 
   # Automatically connect to eduroam via wlan0 for remote access.
-  networking.wireless = let es = (import ./local-secrets.nix).eduroam; in {
+  networking.wireless = {
     enable = true;
     interfaces = [ "wlan0" ];
-    networks."eduroam".auth = ''
-      key_mgmt=WPA-EAP
-      eap=PEAP
-      proto=RSN
-      identity="${es.identity}"
-      password="${es.password}"
-      phase2="auth-MSCHAPV2"
-    '';
+    networks = (import ./local-secrets.nix).networks;
   };
   systemd.services.wpa_supplicant.wantedBy = lib.mkForce [ "default.target" ];
 
@@ -106,4 +98,23 @@
   security.polkit.enable = lib.mkForce false;
   boot.supportedFilesystems = lib.mkForce [ "vfat" ];
   i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
+
+  # TODO: properly document
+  environment.systemPackages = with pkgs; [
+    screen # for decawave debugging
+
+    # Required libs for Python
+    (python3.buildEnv.override {
+      extraLibs = (lib.attrValues derivations.pythonLibs) ++ (with pkgs.python3Packages; [
+        numpy
+      ]);
+    })
+    
+  ] ++ (with derivations.systemNodes; [
+    binaries
+    scripts
+  ]);
+
+  # Required for the LCM UDP multicast transport implementation
+  networking.firewall.allowedUDPPorts = [ 7667 ];
 }
