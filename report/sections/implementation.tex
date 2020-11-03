@@ -34,47 +34,58 @@ The project is divided into four milestones:
 % out of the ordinary pops up.
 
 \subsubsection{NixOS}
-% NixOS is unconventional
-NixOS is an unconventional Linux distibution (henceforth following the common vernacular of ``distro'').
-
-% Non-NixOS mutate global system state. Multi-version is thus tricky.
-
-% Nix makes no assumption about global system state. No dependency hell. /nix/store/hash-name immutable.
-% Nix lets you compose software ad build-time with maximum flexibility.
-
-% Summarize what NixOS is and what it aims to provide
-NixOS is a Linux-distribution with the ability to declare a certain system in a functional manner.
-It is buit upon the Nix package manager that, in summary, aims to be
+% Introduce NixOS and what is gives us
+In this project we have chosen to use NixOS as the operating system on which to run our software.
+NixOS is a Linux distibutiton (henceforth referred to as a ``distro'') based upon the Nix package manager (and the terms will be used interchangibly henceforth) that aims to be
 \begin{inline-enum}
 \item reproducible:
-  ``packages [are built] in isolation from each other. [\ldots] they are reproducible and don't have any undeclared dependencies.''\footnote{A positive side-effect of this feature is the complete mitigation of ``dependency hell''.};
+  ``packages [are built] in isolation from each other. [\ldots] they are reproducible and don't have any undeclared dependencies.''\footnote{A positive side-effect of this feature is the complete mitigation of ``dependency hell'': a term relating to a set of problems that commonly arise if multiple versions of a dependency are installed on a system.};
   so if a package works on one machine, it will work on any machine.
-  Also, when building a package on multiple machine, all machines will yield the exact same ouput file tree.
-\item declarative:
-  packages are described in expressions that are trivially shared and combined with other package declarations.
+  Also, when building a package on multiple machine, all machines will yield the exact same output file tree.
+\item Declarative:
+  packages are described in expressions that are trivially shared and combined with other package declarations; and
 \item reliable:
   ``installing or upgrading one package cannot break other packages''.
 \end{inline-enum}~\parencite{nixos.org}
 
-% How does NixOS enable the above funtionality?
-To enable the preceeding features, everything provided to and by Nix is stored on a Nix-enabled system under \texttt{/nix/store/<hash>-<pkg>},
-where \texttt{<hash>} is a SHA256 checksum that provides a unique identifier to the package with name \texttt{<pkg>}.
-If any dependency for the package (or if the build procedure) is in any way changed, a wholly new checksum is generated.
-This Nix store is mounted as read-only to make its content immutable.
-A usage of any package in the Nix store is manifested in the system's file system as a symbolic link.
+Effectively, NixOS allows us to functionally declare our system in a single (or multiple) expressions ---
+that is: Nix enables us to describe the software components of our system in a common manner and how they relate to eachother.
+The realization of these expressions can be seen in the repository's \texttt{*.nix} files.
+Of particular interest is \texttt{mmc-image.nix}: evaluating this expression generates a bootable image readily flashed onto a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, memory card.} that contains the full softare stack and operation instuctions of our robot system.
+With the combination of git we can thus version control not only our custom software, but all its dependencies and the complete system behavior.
 
-% How does NixOS differ from conventional distros?
-Because all files that are built and ultimately used are stored under \texttt{/nix/store}, NixOS breaks the filesystem hierarchy standard (FHS).
-% TODO: what does this entail?
+% How does it differ from a conventional disto?
+NixOS is a contrast to the conventional Linux distribution where changes are made to the system via iterative global changes to the system state:
+the installation and configuration of software piece-by-piece, for example.
+In this mode, it is common to apply ``small changes'' that eventually coalesce into a significant diversion from the originally intended system behavior ---
+changes made are not always documented which create a dependency on the ever-changing global state of the system (that is, the file system in which the system is prototyped/implemented).
+Of note within this mode is that if the file sysetm is lost, many hours of work may have been wasted if necessary precautions weren't adhered to (by all project members) from the start of the project (such as writing a script that apply all global state changes from a fresh install, for example).
+Our usage of NixOS \textit{forces} us to adhere to such precautions.
 
-% Problems with hardware features on the Raspberry Pi. Simply not provided out of the box.
-% A study of Raspbian would likely answer all questions in due time. But time consuming.
+% What are the negatives of NixOS?
+NixOS is no silver bullet, however.
+Because of its design, whenever something is to be implemented on NixOS it must be done properly the first time.
+Its non-adherence to the Filesystem Hierarchy Standard (FHS)\footnote{the existance and FHS-defined usage of \texttt{/usr}, \texttt{/lib}, \texttt{/var}, and other system directories.} breaks both the build and execution process of many programs.
+Unless a program is portably written, it must be patched before it can be used on NixOS where all system files exist under \texttt{/nix/store} which is required to enable the features enumerated in the previous paragraphs.
 
-% Link to <https://github.com/NixOS/nixpkgs/pull/79370> for credit.
-% Compare approach with Raspbian: mention that only a raspbian fork is officially supported for the BrickPi3.
-On Raspbian, a simple \texttt{echo 'dtparam=spi=on' >> /boot/config.txt} and system reboot enables SPI and thus the ability to communicate with the BrickPi3.
-On NixOS however, this file (nor any equivalent) exists, because of the wholly different design philosophies with the Debian-based Raspbian.
-The ``Nix-appoach'' is instead...
+% Hardware issues
+Another problem is the distro's relative infancy to other distros, particularly when it comes to hardware support.
+NixOS ships with a generic Linux kernel.
+A generic kernel is expected to run on a generic system.
+Because of the availability of hardware peripherals such as general-purpose input/output pins, GPIO;
+universal asynchronous receiver-transmitter, UART;
+serial peripheral interface, SPI; and other on the Raspberry Pi we use in this project, our system is not generic.
+The result of this is that these peripherals, which we all need, simply do not work.
+Fortunately, some work has already been done (and is still being done) by the NixOS community to remedy this.
+By applying a so called device-tree overlay on the Linux kernel (and thus describing how an otherwise unknown peripheral may be utilized) SPI was successfully enabled,
+which was required to actuate our robot's motors.
+Other components we required could be utilized by help of the Raspberry Pi's USB port (fortunately a generic peripheral).
+Had we instead opted to use a distro officially supposted by the Raspberry Pi, all of these peripherals would simply work out of the box, but we would then loose the featuses enumerated above.
+
+% TODO: what problems does NixOS cause?
+% * We cannot use vscode-remote
+% * We cannot nix-shell into a shell with ALL appropriate python libs (whatever + brickpi3) because the new env prepends the build one in PATH.
+% ...
 
 \subsubsection{Decawave}
 This project uses Decawave (or more specifically: a DWM1001 development board) for two-dimensional positioning.
