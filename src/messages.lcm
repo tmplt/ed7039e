@@ -1,12 +1,11 @@
 package robot;
 
-// TODO: refer to DWM documentation
 struct dwm_position_t
 {
         int64_t timestamp; // in milliseconds
-        int32_t x;
-        int32_t y;
-        int32_t z;
+        float x;
+        float y;
+        float z;
         int8_t q;
 }
 

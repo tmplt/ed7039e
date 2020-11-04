@@ -5,7 +5,7 @@ from robot import dwm_position_t, dwm_acceleration_t
 
 def pos_handler(channel, data):
     msg = dwm_position_t.decode(data)
-    print(f"POS (t, x, y, z, q) = ({msg.timestamp}, {msg.x}, {msg.y}, {msg.z}, {msg.q})")
+    print("POS (t, x, y, z, q) = (%d, %.3f, %.3f, %.3f, %d)" % (msg.timestamp, msg.x, msg.y, msg.z, msg.q))
 
 def wpos_handler(channel, data):
     msg = dwm_position_t.decode(data)

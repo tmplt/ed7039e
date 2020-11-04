@@ -172,14 +172,22 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 int publish_pos(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
-        robot_dwm_position_t pos;
+        int64_t x = 0, y = 0, z = 0;
+        int8_t q = 0;
         if ((retval = sscanf(ctx->buf, "%*s\napg: x:%ld y:%ld z:%ld qf:%d\r\n",
-                             &pos.x, &pos.y, &pos.z, &pos.q)) != 4) {
+                             &x, &y, &z, &q)) != 4) {
                 ERROR("sscanf failure: %d", retval);
                 return -ENOMSG;
         }
 
-        pos.timestamp = timestamp;
+        robot_dwm_position_t pos = {
+                .timestamp = timestamp,
+                .x = x / 1e3,
+                .y = y / 1e3,
+                .z = z / 1e3,
+                .q = q,
+
+        };
         return robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
 }
 
