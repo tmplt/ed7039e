@@ -14,7 +14,7 @@ def wpos_handler(channel, data):
 
 def acc_handler(channel, data):
     msg = dwm_acceleration_t.decode(data)
-    print(f"ACC (t, x, y, z) = ({msg.timestamp}, {msg.x}, {msg.y}, {msg.z})")
+    print("ACC (t, x, y, z) = (%d, %.3f, %.3f, %.3f)" % (msg.timestamp, msg.x, msg.y, msg.z))
 
 if __name__ == "__main__":
     lc = lcm.LCM()

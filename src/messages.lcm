@@ -13,9 +13,9 @@ struct dwm_position_t
 struct dwm_acceleration_t
 {
         int64_t timestamp; // in milliseconds
-        int64_t x;
-        int64_t y;
-        int64_t z;
+        float x;
+        float y;
+        float z;
 }
 
 struct vector2d_t
