@@ -17,9 +17,7 @@
 
 { pkgs, lib, config, ... }:
 
-let
-  derivations = pkgs.callPackage ./nix/derivations.nix {};
-in {
+{
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
     ./nix/brickpi3.nix
@@ -100,20 +98,30 @@ in {
   i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
 
   # TODO: properly document
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs; let
+    derivations = pkgs.callPackage ./nix/derivations.nix { };
+  in [
     screen # for decawave debugging
 
-    # Required libs for Python
+    # Required libs for Python nodes
     (python3.buildEnv.override {
-      extraLibs = (lib.attrValues derivations.pythonLibs) ++ (with pkgs.python3Packages; [
-        numpy
-      ]);
+      extraLibs = (with python3Packages; [
+        numpy                   # for motor controller
+      ])
+      ++ (lib.attrValues derivations.pythonLibs)
+      ++ (builtins.attrValues (import ./nix/adafruit-blinka/requirements.nix { inherit pkgs; }).packages);
     })
-    
+
   ] ++ (with derivations.systemNodes; [
     binaries
     scripts
   ]);
+
+  # TODO: document
+  environment.variables = {
+    BLINKA_FT232H = "1";
+    LD_LIBRARY_PATH = "${pkgs.libusb}/lib/";
+  };
 
   # Required for the LCM UDP multicast transport implementation
   networking.firewall.allowedUDPPorts = [ 7667 ];
