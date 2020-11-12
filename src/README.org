@@ -1,0 +1,10 @@
+This directory serves as the source directory for the nodes that constitute our system.
+
+* Entering a development environment
+=shell.nix= contains an expression that automatically installs all required dependencies that the nodes require.
+After installing Nix and executing
+#+BEGIN_SRC sh
+$ nix-shell
+#+END_SRC
+you will be dropped into a development environment.
+From here, you can readily execute the nodes in this directory.
