@@ -13,6 +13,9 @@ echo "Flashing ${1}..."
 comp_size=$(stat --printf=%s ${image})
 comp_ratio=$(zstd -l ${image} | awk 'FNR == 2 {print $7}')
 zstdcat ${image} |
+    # NOTE(bc): calculated size is smaller than actual,
+    # but close enough to give a passable progress line.
+    # TODO: parse actual file size field in zstd instead.
     pv -s $(bc <<< "($comp_size * $comp_ratio) / 1") |
     dd of=${1} obs=64k oflag=direct status=none
 sync # just in case
