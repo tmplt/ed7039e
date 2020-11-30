@@ -5,7 +5,7 @@ from robot import dwm_position_t, dwm_acceleration_t
 
 def pos_handler(channel, data):
     msg = dwm_position_t.decode(data)
-    print(f"POS (t, x, y, z, q) = ({msg.timestamp}, {msg.x}, {msg.y}, {msg.z}, {msg.q})")
+    print("POS (t, x, y, z, q) = (%d, %.3f, %.3f, %.3f, %d)" % (msg.timestamp, msg.x, msg.y, msg.z, msg.q))
 
 def wpos_handler(channel, data):
     msg = dwm_position_t.decode(data)
@@ -14,7 +14,7 @@ def wpos_handler(channel, data):
 
 def acc_handler(channel, data):
     msg = dwm_acceleration_t.decode(data)
-    print(f"ACC (t, x, y, z) = ({msg.timestamp}, {msg.x}, {msg.y}, {msg.z})")
+    print("ACC (t, x, y, z) = (%d, %.3f, %.3f, %.3f)" % (msg.timestamp, msg.x, msg.y, msg.z))
 
 if __name__ == "__main__":
     lc = lcm.LCM()

@@ -152,7 +152,7 @@ and decide what should be done in order to establish a connection with the disco
 
 Additionally, the data we receive when asking for the acceleration is a tuple of $(x, y, z)$, where
 \begin{description}
-\item[$(x, y, z)$] is the reported acceleration in three-dimensional space.
+\item[$(x, y, z)$] is the reported acceleration in three-dimensional space described as raw registers.
 \end{description}
 % TODO: explain how the register values are calculated to m/s^2
 
@@ -235,3 +235,38 @@ Thus, as LCM:
 \item is trivially packaged,
 \end{inline-enum}
 it was decided that our robot system would be implemented with help of it in place of ROS.
+
+\subsection{Line follower}
+% GPIO pins does not work. Talk about the dedicated hardware instead.
+
+\subsection{Software nodes}
+% Here we'll summarize each node
+Each node follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
+\begin{description}
+\item[\texttt{<type>}] denotes the type of three possible alternatives:
+  \texttt{source}, which denotes that the node only provides messages to the system;
+  \texttt{sink}, only receives messages from the system; and
+  \texttt{int} (for `intermediate'), both receives and generates messages.
+\item[\texttt{<desc>}] is a list of words interspaced by a \texttt{-} that provide a short description of the node's purpose.
+\item[\texttt{<ext>}] is the source file extension. It describes how the node should be built before it can be executed.
+  For example, if the extension is \texttt{c} then the node was written and C and needs to be compiled and linked with a C compiler before the resulting binary can be executed.
+  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed.
+\end{description}
+
+The source files for all nodes can be found in \texttt{src/}.
+
+\subsubsection{\texttt{lcm-source-dwm.c}}
+This node is responsible for extracting the position and acceleration data from the DWM.
+Upon execution it opens opens a serial communication to the DWM, enters the shell mode and allocates a buffer into which received data is read into.
+Afterwards it enters a loop within which the shell commands \texttt{av} is continously called.
+While spinning in this loop, the node keeps the time and ensures that the command \texttt{apg} is called with a frequenzy of $10$~Hz.
+After the execution of each command:
+\begin{enumerate}
+  \item the response is read into the buffer;
+  \item the buffer is parsed for data of interest;
+  \item data is converted to SI units --- m for position coordinates, $\text{ms}^{\text{-2}}$ for acceleration; and
+  \item an appropriate message type is constructed and published to all subscribing nodes.
+\end{enumerate}
+
+\subsubsection{\texttt{lcm-source-robot-target.py}}
+This node simply provides a target coordinate, relative to the grid established by the DWM, that the robot should move to.

@@ -23,6 +23,7 @@
 #define BKPT raise(SIGTRAP);
 #define BUFFER_SIZE 256
 #define READ_TIMEOUT 500        /* milliseconds */
+#define GRAVITY_CONSTANT 9.81   /* m/s^2 */
 
 enum serial_modes {
         serial_mode_tlv,        /* Not implemented */
@@ -88,7 +89,7 @@ retry:
                         return -1;
                 }
         }
-        
+
         /* After writing "\r\r" serial may respond with:
          *   0x0  => the device has been woken up from sleep; and
          *   0x40 => the device has no idea what to do.
@@ -171,28 +172,53 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 int publish_pos(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
-        robot_dwm_position_t pos;
+        int64_t x = 0, y = 0, z = 0;
+        int8_t q = 0;
         if ((retval = sscanf(ctx->buf, "%*s\napg: x:%ld y:%ld z:%ld qf:%d\r\n",
-                             &pos.x, &pos.y, &pos.z, &pos.q)) != 4) {
+                             &x, &y, &z, &q)) != 4) {
                 ERROR("sscanf failure: %d", retval);
                 return -ENOMSG;
         }
 
-        pos.timestamp = timestamp;
+        robot_dwm_position_t pos = {
+                .timestamp = timestamp,
+                .x = x / 1e3,
+                .y = y / 1e3,
+                .z = z / 1e3,
+                .q = q,
+
+        };
         return robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
+}
+
+/* Converts the raw LIS2DH12 acceleration register value `v` to SI unit (m/s^2). */
+float raw_acc_reg_to_si(int64_t v)
+{
+        /* XXX: reportedly correct according to
+         * <https://decaforum.decawave.com/t/dwm1001-accelerometer-readings/1202/6>.
+         * Assumes that +-2g scale is configured for.
+         * XXX: documentation says that `pow(2, 6)` should only be used when in low-power
+         * +-8g scale, but the `query("av")` data isn't in range.
+         */
+        return (v / pow(2, 6)) * 0.004 * GRAVITY_CONSTANT;
 }
 
 int publish_acc(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
-        robot_dwm_acceleration_t acc;
+        int64_t x = 0, y = 0, z = 0;
         if ((retval = sscanf(ctx->buf, "%*s\nacc: x = %ld, y = %ld, z = %ld\r\n",
-                             &acc.x, &acc.y, &acc.z)) != 3) {
+                             &x, &y, &z)) != 3) {
                 ERROR("sscanf failure: %d", retval);
                 return -ENOMSG;
         }
 
-        acc.timestamp = timestamp;
+        robot_dwm_acceleration_t acc = {
+                .timestamp = timestamp,
+                .x = raw_acc_reg_to_si(x),
+                .y = raw_acc_reg_to_si(y),
+                .z = raw_acc_reg_to_si(z),
+        };
         return robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
 }
 
@@ -259,7 +285,7 @@ int main(int argc, char **argv)
                 .tv_nsec = 70 * 1e6,
         };
         struct timespec now = {0, 0}, last = {0, 0}, res = {0, 0};
-        
+
         for (;;) {
                 /* Is it time to query the position? */
                 clock_gettime(CLOCK_REALTIME, &now);
