@@ -18,7 +18,7 @@ All software in this project (as well as the report and development environment 
 is most easily built via the Nix package manager.
 To install Nix, either run
 #+BEGIN_SRC sh
-$ curl -L https://nixos.org/nix/install | sh # as a user with sudo access to root
+$ sh <(curl -L https://nixos.org/nix/install) --daemon # as a user with sudo access to root
 #+END_SRC
 or (recommended) install Nix via your distribution's package manager.
 
