@@ -75,7 +75,7 @@
           -TNR ${bastion.socketPath}:localhost:22 ${bastion.user}@${bastion.host} \
           -i /etc/id_rsa
       '';
-      
+
       StandardError = "journal";
       Type = "simple";
 
