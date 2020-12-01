@@ -10,8 +10,8 @@ consumer_app = ar.ArrowheadHttpClient(
         system_name='lcm_consumer',
         address='127.0.0.1',
         port=5002,
-        keyfile='/home/ruben/git/ed7039e/certificates/my_cloud/lcm_consumer.key',
-        certfile='/home/ruben/git/ed7039e/certificates/my_cloud/lcm_consumer.crt',
+        keyfile='/home/ruben/git/ed7039e/certificates/lcm_consumer.key',
+        certfile='/home/ruben/git/ed7039e/certificates/lcm_consumer.crt',
 )
 
 consumer_app.add_consumed_service('post_log', 'POST')
