@@ -1,3 +1,5 @@
+# This expression describes how all code we have written (and how some
+# dependencies not packaged in nixpkgs) are to be built and installed.
 { pkgs, ... }:
 with pkgs;
 
@@ -45,7 +47,7 @@ in rec {
   lcm = stdenv.mkDerivation rec {
     name = "lcm";
     version = "1.4.0";
-      
+
     src = fetchFromGitHub {
       owner = "lcm-proj";
       repo = "lcm";
