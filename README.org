@@ -25,6 +25,10 @@ $ sh <(curl -L https://nixos.org/nix/install) --daemon # as a user with sudo acc
 #+END_SRC
 or (recommended) install Nix via your distribution's package manager.
 
+If you do not need to generate the bootable image, or configure the
+system-external services, you need not follow the remainder of these
+instructions.
+
 *** Prerequisite manual steps
 Some manual steps are required to build a readily working system image:
 1. Modify =nix/config.nix= to your environment.
