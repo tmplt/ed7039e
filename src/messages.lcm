@@ -99,3 +99,9 @@ struct adhoc_arm_t
 {
         // this comment is required to pass lcm-gen
 }
+
+struct action_t
+{
+        string action;
+        string pos;
+}
