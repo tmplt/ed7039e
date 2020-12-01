@@ -1,22 +1,25 @@
 * ED7039E - *Project in Industrial Computer Systems/Electronical Systems & Control Technology*
-This repository will eventually constitute the full model,
-any and all simulations related to,
-and implementation of the project for the D7039E and E7032E courses taken at Luleå Technical University during the first and second semester of 2020-21.
+This repository will eventually constitute the full model, any and all
+simulations related to, and implementation of the project for the
+D7039E and E7032E courses taken at Luleå Technical University during
+the first and second semester of 2020-21.
 
-The project is to model, simulate, and implement a robot that,
-via communication over the [[https://www.arrowhead.eu/arrowheadframework][Arrowhead framework]],
-automatically picks up a processed object at the end of a conveyor belt and moves it elsewhere.
+The project is to model, simulate, and implement a robot that, via
+communication over the [[https://www.arrowhead.eu/arrowheadframework][Arrowhead framework]], automatically picks up a
+processed object at the end of a conveyor belt and moves it elsewhere.
 The deadline for this project is December 1st, 2020.
 
-Throughout the development of this project, the report under =report/= will continuously be updated.
-The report can be build by running =./report.nix=.
-The path to the compiled report will be printed and will also be symbolically linked under =result=.
+Throughout the development of this project, the report under =report/=
+will continuously be updated. The report can be build by running
+=./report.nix=. The path to the compiled report will be printed and
+will also be symbolically linked under =result=.
 
 ** Building and project setup
 *** Install Nix
-All software in this project (as well as the report and development environment — see the previous paragraph and [[file:src/README.org::*Entering%20a%20development%20environment][Entering a development environment]], respectively)
-is most easily built via the Nix package manager.
-To install Nix, either run
+All software in this project (as well as the report and development
+environment — see the previous paragraph and [[file:src/README.org::*Entering%20a%20development%20environment][Entering a development
+environment]], respectively) is most easily built via the Nix package
+manager. To install Nix, either run
 #+BEGIN_SRC sh
 $ sh <(curl -L https://nixos.org/nix/install) --daemon # as a user with sudo access to root
 #+END_SRC
@@ -34,11 +37,14 @@ Some manual steps are required to build a readily working system image:
    EOF
    $ ssh-keygen -f id_rsa -N ""
    #+END_SRC
-3. Include =nix/ssh-bastion.nix= in an external NixOS system with Internet access and rebuild (or configure your Non-NixOS equivalent).
+3. Include =nix/ssh-bastion.nix= in an external NixOS system with
+   Internet access and rebuild (or configure your Non-NixOS
+   equivalent).
 
 *** Bootable image generation
-The bootable image for the Raspberry Pi 3 can be built by executing =./mmc-image.nix=.
-A convenience script is available for flashing a target block device:
+The bootable image for the Raspberry Pi 3 can be built by executing
+=./mmc-image.nix=. A convenience script is available for flashing a
+target block device:
 #+BEGIN_SRC sh
 $ sudo ./build.sh /dev/mmcblk0 # or your equivalent
 #+END_SRC
