@@ -7,8 +7,8 @@ provider_app = ar.ArrowheadHttpClient(
         system_name='lcm_provider',
         address='127.0.0.1',
         port=5000,
-        keyfile='certificates/my_cloud/lcm_provider.key',
-        certfile='certificates/my_cloud/lcm_provider.crt',
+        keyfile='certificates/provider.key',
+        certfile='certificates/provider.crt',
 )
 
 action = ''

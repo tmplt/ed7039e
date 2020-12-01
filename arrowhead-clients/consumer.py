@@ -10,8 +10,8 @@ consumer_app = ar.ArrowheadHttpClient(
         system_name='consumer',
         address='127.0.0.1',
         port=5001,
-        keyfile='certificates/my_cloud/consumer.key',
-        certfile='certificates/my_cloud/consumer.crt',
+        keyfile='certificates/consumer.key',
+        certfile='certificates/consumer.crt',
 )
 
 consumer_app.add_consumed_service('post_action', 'POST')
