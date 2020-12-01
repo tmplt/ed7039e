@@ -23,3 +23,13 @@ struct vector2d_t
         int32_t y;
         double rad;
 }
+
+struct action_t
+{
+        string action;
+}
+
+struct log_t
+{
+        string log;
+}
