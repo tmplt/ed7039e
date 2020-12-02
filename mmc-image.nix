@@ -97,7 +97,8 @@
   boot.supportedFilesystems = lib.mkForce [ "vfat" ];
   i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
 
-  # TODO: properly document
+  # Intall all nodes we have written (from under ./src/) and install
+  # all Python dependencies.
   environment.systemPackages = with pkgs; let
     derivations = pkgs.callPackage ./nix/derivations.nix { };
   in [
@@ -117,7 +118,8 @@
     scripts
   ]);
 
-  # TODO: document
+  # Describe the environment properly for the FT232H which we use for
+  # line-follwing.
   environment.variables = {
     BLINKA_FT232H = "1";
     LD_LIBRARY_PATH = "${pkgs.libusb}/lib/";
