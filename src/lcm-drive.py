@@ -3,12 +3,14 @@ from __future__ import print_function   # use python 3 syntax but make it compat
 from __future__ import division         # 
 from numpy import clip
 
+import motor-conf
 import lcm
 import math
 import brickpi3                         # import the BrickPi3 drivers
 import time
 
-BP = brickpi3.BrickPi3()    # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+
+BP = motor-conf.BOT_BP      # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 gp = [None, None]           # gp stands for the goal position and should be fed from decawave module or a lcm node,
                             # gp = [desired x, desired y]
 cp = [None, None, None]     # cp stands for the current position and should be fed from decawave module or a lcm node, 
@@ -55,8 +57,8 @@ def drive(cp, gp):
   
         #write velocities to servoes
         try:
-            BP.set_motor_power(BP.PORT_A, wv[0])        #right wheel velocity
-            BP.set_motor_power(BP.PORT_B, wv[1])        #left wheel velocity
+            BP.set_motor_power(BP.PORT_B, wv[0])        #right wheel velocity
+            BP.set_motor_power(BP.PORT_C, wv[1])        #left wheel velocity
         except IOError as error:
             print('error, Could not write velocities')
 

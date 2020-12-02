@@ -2,12 +2,13 @@ from robot import init_pos_t, dmw_position_t, encoder_data_t
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       # 
 
+import motor-conf
 import lcm
 import math
-import brickpi3 # import the BrickPi3 drivers
+import brickpi3                 # import the BrickPi3 drivers
 import time
 
-BP = brickpi3.BrickPi3()    # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+BP = motor-conf.BOT_BP          # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
 def EncoderPlant(position,TickR,TickL,Time):
   '''
@@ -33,8 +34,8 @@ return [NewX, NewY, NewTheta, velX, velY]
 
 def EncoderFeedback(cp):
     #####change all ports to correct ports!!!
-    BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)) # reset encoder A 
-    BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B   
+    BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B 
+    BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C   
 
     tic = time.time()                           #tic-toc for calculation of elapsed time
 
@@ -49,8 +50,8 @@ def EncoderFeedback(cp):
     time.sleep(0.1)                             #waiting 0.1 sec. this is how we change sampling frequency
 
     try: 
-        TickR = BP.get_motor_encoder(BP.PORT_A) #TickR = number of ticks for right servo
-        TickL = BP.get_motor_encoder(BP.PORT_B) #TickL = number of ticks for left servo during the time, theese are the diffrance 
+        TickR = BP.get_motor_encoder(BP.PORT_B) #TickR = number of ticks for right servo
+        TickL = BP.get_motor_encoder(BP.PORT_C) #TickL = number of ticks for left servo during the time, theese are the diffrance 
     except IOError as error:
     print('error, Could not read encoders data')
 
@@ -65,6 +66,19 @@ return [np, velX, velY, Time]
 
 cp = [0,0,0]                                    # current position (x, y, theta); Global variable;
 initial_enable = True
+lc = lcm.LCM()
+
+def EncoderData():
+    data = EncoderFeedback(cp)
+    msg = encoder_data_t()
+    msg.x = data][0][0]
+    msg.y = data][0][1]
+    msg.rad = data][0][2]
+    msg.vel_x = data[1]
+    msg.vel_y = data[2]
+    msg.duration_time = data[3]
+
+    return msg.encode()
 
 def GetInitPos(channel,data):
     msg = init_pos_t.decode(data)
@@ -73,6 +87,7 @@ def GetInitPos(channel,data):
         cp[0] = msg.x
         cp[1] = msg.y
         cp[2] = msg.rad
+        lc.publish("encoder_handler", EncoderData())
     else:
         pass
 
@@ -81,25 +96,12 @@ def GetKalmanPos(channel,data):
         msg = dmw_position_t.decode(data)
         cp[0] = msg.x
         cp[1] = msg.y
+        lc.publish("encoder_handler", EncoderData())
     else:
         pass
 
-def EncoderData(channel,data):
-    data = EncoderFeedback(cp)
-    msg = encoder_data_t()
-    msg.x = data][0][0]
-    msg.y = data][0][1]
-    msg.rad = data][0][2]
-    msg.vel_x = data[1]
-    msg.vel_y = data[2]
-    msg. duration_time = data[3]
-
-    msg.encode()
-
-lc = lcm.LCM()
 lc.subscribe("Init_handler", GetInitPos)
 lc.subscribe("Kalman_filter", GetKalmanPos)
-lc.publish("encoder_handler", EncoderData)
 
 try:
     while True:
