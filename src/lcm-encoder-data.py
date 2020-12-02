@@ -2,7 +2,7 @@ from robot import init_pos_t, dmw_position_t, encoder_data_t
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       # 
 
-
+import lcm
 import math
 import brickpi3 # import the BrickPi3 drivers
 import time

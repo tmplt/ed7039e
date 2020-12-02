@@ -3,6 +3,7 @@ from __future__ import print_function   # use python 3 syntax but make it compat
 from __future__ import division         # 
 from numpy import clip
 
+import lcm
 import math
 import brickpi3                         # import the BrickPi3 drivers
 import time
