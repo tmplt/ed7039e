@@ -23,3 +23,23 @@ struct vector2d_t
         int32_t y;
         double rad;
 }
+
+struct init_pos_t
+{
+        float x;
+        float y;
+        double rad;
+        boolean enable;
+}
+
+struct encoder_data_t
+{
+        float x;
+        float y;
+        double rad;
+        float vel_x;
+        float vel_y;
+        double duration_time;
+}
+ 
+
