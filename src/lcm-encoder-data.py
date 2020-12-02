@@ -1,7 +1,7 @@
 from robot import init_pos_t, dmw_position_t, encoder_data_t
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       # 
-from numpy import clip
+
 
 import math
 import brickpi3 # import the BrickPi3 drivers
@@ -32,7 +32,8 @@ def EncoderPlant(position,TickR,TickL,Time):
 return [NewX, NewY, NewTheta, velX, velY]
 
 def EncoderFeedback(cp):
-    BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)) # reset encoder A
+    #####change all ports to correct ports!!!
+    BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)) # reset encoder A 
     BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B   
 
     tic = time.time()                           #tic-toc for calculation of elapsed time
@@ -63,7 +64,7 @@ def EncoderFeedback(cp):
 return [np, velX, velY, Time]
 
 cp = [0,0,0]                                    # current position (x, y, theta); Global variable;
-initial_enable = False
+initial_enable = True
 
 def GetInitPos(channel,data):
     msg = init_pos_t.decode(data)

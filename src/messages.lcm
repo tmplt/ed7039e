@@ -17,6 +17,12 @@ struct dwm_acceleration_t
         float z;
 }
 
+struct dwm_goal_position_t
+{
+        float x;
+        float y;
+}
+
 struct vector2d_t
 {
         int32_t x;
