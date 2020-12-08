@@ -28,8 +28,3 @@ struct action_t
 {
         string action;
 }
-
-struct log_t
-{
-        string log;
-}
