@@ -12,13 +12,15 @@ def publish_action(action):
     a.action = action
     lcm.LCM().publish("ACTION", a.encode())
 
-# A get request which will publish the message: 'pick_up'
+# This function is called by a get request from the provider service pick_up,
+# which will then publish the message: 'pick_up'
 @app.route('/robot/pick_up')
 def pick_up():
     publish_action('pick_up')
     return {'msg': 'OK, picking up!'}
 
-# A get request which will publish the message: 'place'
+# This function is called by a get request from the provider service place,
+# which will then publish the message: 'place'
 @app.route('/robot/place')
 def place():
     publish_action('place')
