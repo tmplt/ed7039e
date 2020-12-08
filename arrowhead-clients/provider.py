@@ -1,16 +1,18 @@
+''' This will be running on a server '''
 import sys
 from datetime import datetime
 import time
 from sshtunnel import SSHTunnelForwarder
+import requests
+# Path to the client-library-python which the provider is using
+# https://github.com/arrowhead-f/client-library-python
 sys.path.insert(1, '/home/ruben/git/client-library-python')
 import arrowhead_client.api as ar
-import requests
 
-
-remote_host = '192.168.43.44'           # ip to the raspberry pi
-remote_port = 22                        # port for ssh
+remote_host = '192.168.43.44'               # ip to the raspberry pi
+remote_port = 22                           # port for ssh
 local_host = '127.0.0.1'
-local_port = 5005
+local_port = 5005                       
 
 # Creating ssh tunnel for the communication between robot and server
 server = SSHTunnelForwarder(

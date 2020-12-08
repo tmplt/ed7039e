@@ -1,6 +1,9 @@
+''' This is a consumer which will ask the provider for services'''
 import time
 import urllib3
 import sys
+# Path to the client-library-python which the consumer is using
+# https://github.com/arrowhead-f/client-library-python
 sys.path.insert(1, '/home/ruben/git/client-library-python')
 import arrowhead_client.api as ar
 
