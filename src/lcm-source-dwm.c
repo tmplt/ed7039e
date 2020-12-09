@@ -11,8 +11,8 @@
 #include <signal.h>
 
 #include <lcm/lcm.h>
-#include "robot_dwm_position_t.h"
-#include "robot_dwm_acceleration_t.h"
+#include "robot_io_position_t.h"
+#include "robot_io_acceleration_t.h"
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 #define ERROR(...) {                                            \
@@ -179,7 +179,7 @@ int publish_pos(ctx_t *ctx, int64_t timestamp)
                 return -ENOMSG;
         }
 
-        robot_dwm_position_t pos = {
+        robot_io_position_t pos = {
                 .timestamp = timestamp,
                 .x = x / 1e3,
                 .y = y / 1e3,
@@ -187,7 +187,7 @@ int publish_pos(ctx_t *ctx, int64_t timestamp)
                 .q = q,
 
         };
-        return robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
+        return robot_io_position_t_publish(ctx->lcm, "IO_POSITION", &pos);
 }
 
 /* Converts the raw LIS2DH12 acceleration register value `v` to SI unit (m/s^2). */
@@ -212,13 +212,13 @@ int publish_acc(ctx_t *ctx, int64_t timestamp)
                 return -ENOMSG;
         }
 
-        robot_dwm_acceleration_t acc = {
+        robot_io_acceleration_t acc = {
                 .timestamp = timestamp,
                 .x = raw_acc_reg_to_si(x),
                 .y = raw_acc_reg_to_si(y),
                 .z = raw_acc_reg_to_si(z),
         };
-        return robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
+        return robot_io_acceleration_t_publish(ctx->lcm, "IO_ACCELERATION", &acc);
 }
 
 /* Queries the DWM context `ctx` with the function `fun` and forwards the response

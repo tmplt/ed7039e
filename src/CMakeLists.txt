@@ -7,7 +7,10 @@ include(${LCM_USE_FILE})
 option(INSTALL_PYTHON_DEPS "Whether to build and install dependencies for Python nodes")
 option(INSTALL_BINARY_NODES "Whether to build and install binary nodes")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic -pedantic-errors -Wpedantic -Wno-unused-parameter -Wno-format -Wno-format-security -g -O2 -Wno-cpp -Wno-sign-compare")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic -pedantic-errors -Wpedantic -g -O2")
+
+# Disable some warning flags
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -Wno-format -Wno-format-security -Wno-cpp -Wno-sign-compare -Wno-unused-variable -Wno-pedantic")
 
 if(INSTALL_PYTHON_DEPS)
   find_package(PythonInterp REQUIRED)
