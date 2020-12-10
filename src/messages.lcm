@@ -47,6 +47,7 @@ struct io_encoder_t
 {
         brickpi_t brickpi;
         port_t port;
+        int32_t ticks;
         int64_t dt;
 }
 
