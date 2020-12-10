@@ -58,7 +58,7 @@ struct io_arrowhead_t
 }
 
 // Found on channel IO_LINE_FOLLOWER
-struct io_line_follower
+struct io_line_follower_t
 {
         int8_t detected[4];
         int64_t timestamp; // in milliseconds
