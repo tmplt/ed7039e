@@ -17,9 +17,6 @@ if __name__ == "__main__":
         mt = message_types[channel]
         msg = mt.decode(data)
 
-        # XXX: do we need to recurse when a field is a robot type? i.e.
-        # brickpi_t, port_t.
-
         # Print when message was decoded, message type and its fields
         print(f'''
 {datetime.now().strftime("%H:%M:%S.%f")}: {channel}:''')
