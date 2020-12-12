@@ -3,7 +3,6 @@ import sys
 import lcm
 import robot
 import ctypes
-import re
 
 if __name__ == "__main__":
     message_types = dict([
