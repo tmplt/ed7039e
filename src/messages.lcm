@@ -90,7 +90,7 @@ enum robot_mode_t
 // Found on channel MASTER
 struct master_t
 {
-        int8_t mode;
+        int8_t robot_mode;
 }
 
 // Found on channel ADHOC_ARM
