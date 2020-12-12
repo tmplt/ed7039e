@@ -24,14 +24,11 @@ if __name__ == "__main__":
         print(f'''
 {datetime.now().strftime("%H:%M:%S.%f")}: {channel}:''')
         for field in mt.__slots__:
-            print(f"\t{field} = {getattr(msg, field)}")
+            print(f"\t{field}\t= {getattr(msg, field)}")
 
     lc = lcm.LCM()
     for channel, _ in message_types.items():
         lc.subscribe(channel, handler)
 
-    try:
-        while True:
-            lc.handle()
-    except KeyboardInterrupt:
-        pass
+    while True:
+        lc.handle()
