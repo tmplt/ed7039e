@@ -31,16 +31,9 @@ if __name__ == "__main__":
 
     msg = message_types[channel]()
     for f, arg, typestr in zip(fields, sys.argv, msg.__typenames__):
-        # find the ctype of the field
-        ctype = getattr(sys.modules['ctypes'],
-                        'c_' + re.sub('\_t$', '', typestr))
-
-        # before we create the ctype we must know the equivalent Python
-        # class so that we convert the string argument to the correct
-        # intermediate type. E.g. ‘ctypes.int_*’ -> ‘builtins.int’,
-        # ‘ctypes.float’ -> ‘builtins.float’.
-        # XXX: how does this work with port_t, brickpi_t, etc?
-        pytype = type(ctype(0xBAADF00D).value)
+        # Figure out what intermediate type is needed to create the set
+        # the field type.
+        pytype = type(getattr(msg, f))
 
         # Finally, typecast the argument, and set the field.
         setattr(msg, f, pytype(arg))
