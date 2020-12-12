@@ -6,13 +6,17 @@ import ctypes
 
 if __name__ == "__main__":
     message_types = dict([
-        (n[:n.rfind("_t")].upper(), t)
+        (n[:n.rfind("_t")].upper(), t) # see messages.lcm
         for (n, t) in robot.__dict__.items() if callable(t)
     ])
 
     if len(sys.argv) < 2:
         print(f"usage: {sys.argv[0]} <MESSAGE_TYPE> <MESSAGE_ARGUMENTS...>")
         print(f"\t where <MESSAGE_TYPE> is one of {', '.join(message_types.keys())}")
+        print()
+        print("For example:")
+        print(f"\t{sys.argv[0]} IO_ENCODER PLATFORM PORT_A 30 1000")
+        print(f"\t{sys.argv[0]} KALMAN_POSITION 3.23 4.12")
         sys.exit(1)
     channel = sys.argv[1]
     sys.argv = sys.argv[2:]
