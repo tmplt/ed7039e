@@ -30,12 +30,20 @@ if __name__ == "__main__":
         sys.exit(1)
 
     msg = message_types[channel]()
-    for f, arg, typestr in zip(fields, sys.argv, msg.__typenames__):
-        # Figure out what intermediate type is needed to create the set
-        # the field type.
-        pytype = type(getattr(msg, f))
+    for field, arg, typestr in zip(fields, sys.argv, msg.__typenames__):
+        try:
+            # Figure out what intermediate type is needed to create the
+            # underlaying ctype of the field.
+            pytype = type(getattr(msg, field))
+            value = pytype(arg)
+        except ValueError:
+            # `arg` denotes an enum. Find its symbol.
+            try:
+                value = getattr(getattr(sys.modules['robot'], field + '_t'), arg)
+            except:
+                print(f"Argument '{arg}' for field '{field}' is not an integer or a valid enum")
+                sys.exit(1)
 
-        # Finally, typecast the argument, and set the field.
-        setattr(msg, f, pytype(arg))
+        setattr(msg, field, value)
 
     lcm.LCM().publish(channel, msg.encode())
