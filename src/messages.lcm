@@ -1,51 +1,101 @@
+// -*- mode: C; -*-
 package robot;
 
-struct dwm_position_t
+// Found on channel IO_POSITION
+struct io_position_t
 {
         int64_t timestamp; // in milliseconds
+
+        // Coordinates in meters
         float x;
         float y;
         float z;
+
+        // Quality indicator. Not linear; treat as some enum ranging
+        // from BAD to GOOD. Higher value is better.
         int8_t q;
 }
 
-struct dwm_acceleration_t
+// Found on channel IO_ACCELERATION
+struct io_acceleration_t
 {
         int64_t timestamp; // in milliseconds
+
+        // Coordinates in ms^{-2}
         float x;
         float y;
         float z;
 }
 
-struct dwm_goal_position_t
+enum brickpi_t
 {
-        float x;
-        float y;
+        PLATFORM = 1,
+        ARM = 2,
+}
+enum port_t
+{
+        PORT_1 = 1,
+        PORT_2 = 2,
+        PORT_3 = 3,
+        PORT_4 = 4,
+        PORT_A = 5,
+        PORT_B = 6,
+        PORT_C = 7,
+        PORT_D = 8,
+}
+// Found on channel IO_ENCODER
+struct io_encoder_t
+{
+        int8_t brickpi;
+        int8_t port;
+        int32_t ticks;
+        int64_t dt;
 }
 
-struct vector2d_t
+// Found on channel IO_ARROWHEAD
+struct io_arrowhead_t
 {
-        int32_t x;
-        int32_t y;
-        double rad;
+        int64_t timestamp; // in milliseconds
 }
 
-struct init_pos_t
+// Found on channel IO_LINE_FOLLOWER
+struct io_line_follower_t
 {
-        float x;
-        float y;
-        double rad;
-        boolean enable;
+        boolean detected[4];
+        int64_t timestamp; // in milliseconds
 }
 
-struct encoder_data_t
+// Found on channel KALMAN_POSITION
+struct kalman_position_t
 {
-        float x;
-        float y;
-        double rad;
-        float vel_x;
-        float vel_y;
-        double duration_time;
+        // Coordinates in meters.
+        float x, y;
 }
- 
 
+// Found on channel SYSTEM_STATE
+struct system_state_t
+{
+        // In SI units.
+        float x, y, theta;
+        float dx, dy, dtheta;
+        int64_t dt;
+}
+
+enum robot_mode_t
+{
+        DWM_MODE = 1,
+        OBJECT_MODE = 2,
+        LINEFOLLOW_MODE = 3,
+}
+// Found on channel MASTER
+struct master_t
+{
+        int8_t robot_mode;
+}
+
+// Found on channel ADHOC_ARM
+// No fields: this message means that the arm procedure is done
+struct adhoc_arm_t
+{
+        // this comment is required to pass lcm-gen
+}

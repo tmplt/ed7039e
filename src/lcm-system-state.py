@@ -17,31 +17,30 @@ def EncoderPlant(position,TickR,TickL,Time):
   position = [x, y, theta]
   Tick(R/L) = number of encoder tick respective servo R/L
   '''
-    l = 21                      #the width of the robot in [cm] 
-    r = 1.52                    #The radius of the tier [cm] = 1.52
+    l = 0.21                      #the width of the robot in [m] 
+    r = 0.0152                    #The radius of the tier in [m]; in [cm] = 1.52
     n = 360                     #number of ticks for one revolution
 
-    Dr = 2*math.pi*r*TickR/n    # The distance right wheel has traveled in [cm]
-    Dl = 2*math.pi*r*TickL/n    # The distance left wheel has traveled in [cm]
-    Dc = (Dr + Dl)/2            # The average distance body has traveled in [cm]
+    Dr = 2*math.pi*r*TickR/n    # The distance right wheel has traveled in [m]
+    Dl = 2*math.pi*r*TickL/n    # The distance left wheel has traveled in [m]
+    Dc = (Dr + Dl)/2            # The average distance body has traveled in [m]
     #print(Dr,Dl,Dc)
     NewX = position[0] + math.cos(position[2])*Dc   # new x-position
     NewY = position[1] + math.sin(position[2])*Dc   # new y-position
     NewTheta = position[2] + (Dr - Dl)/l            # new Theta
-    velX = (math.cos(position[2])*Dc) / Time        # x-axis velocity
-    velY = (math.sin(position[2])*Dc) / Time        # y-axis velocity
-return [NewX, NewY, NewTheta, velX, velY]
+    dX = (math.cos(position[2])*Dc) / Time          # x-axis velocity
+    dY = (math.sin(position[2])*Dc) / Time          # y-axis velocity
+    dTheta = (NewTheta - position[2]) / Time        # the angular velovity of the robot
+return [NewX, NewY, NewTheta, dX, dY, dTheta]
+
+TickR = 0
+TickL = 0
 
 def EncoderFeedback(cp):
-    #####change all ports to correct ports!!!
     BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B 
-    BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C   
+    BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C 
 
     tic = time.time()                           #tic-toc for calculation of elapsed time
-
-    TickR = 0
-    TickL = 0
-
     '''
     in here we need to get positions [x, y, Theta]
     we asuume that we know current position  cp = [x, y, theta]
@@ -60,48 +59,42 @@ def EncoderFeedback(cp):
     
     temp = EncoderPlant(cp, TickR, TickL, Time)
     cp = [temp[0], temp[1], temp[2]]            # New position, update the current position
-    velX = temp[3]
-    velY = temp[4]
-return [np, velX, velY, Time]
+    dX = temp[3]
+    dY = temp[4]
+    dTheta = temp[5]
+return [cp, dX, dY, dTheta, Time]
 
 cp = [0,0,0]                                    # current position (x, y, theta); Global variable;
-initial_enable = True
+#initial_enable = False
 lc = lcm.LCM()
 
 def EncoderData():
     data = EncoderFeedback(cp)
-    msg = encoder_data_t()
-    msg.x = data][0][0]
-    msg.y = data][0][1]
-    msg.rad = data][0][2]
-    msg.vel_x = data[1]
-    msg.vel_y = data[2]
-    msg.duration_time = data[3]
-
+    msg = system_state_t()
+    msg.x = data[0][0]
+    msg.y = data[0][1]
+    msg.theta = data[0][2]
+    msg.dx = data[1]
+    msg.dy = data[2]
+    msg.dtheta = data[3]
+    msg.dt= data[4]
     return msg.encode()
 
 def GetInitPos(channel,data):
-    msg = init_pos_t.decode(data)
-    initial_enable = msg.enable
-    if initial_enable:
-        cp[0] = msg.x
-        cp[1] = msg.y
-        cp[2] = msg.rad
-        lc.publish("encoder_handler", EncoderData())
-    else:
-        pass
+    msg = init_pos_t.decode(data)               ###### this node is not complitet, need to change channle name wen its done
+    cp[0] = msg.x
+    cp[1] = msg.y
+    cp[2] = msg.theta
+    lc.publish("SYSTEM_STATE", EncoderData())
 
 def GetKalmanPos(channel,data):
-    if not initial_enable:
-        msg = dmw_position_t.decode(data)
-        cp[0] = msg.x
-        cp[1] = msg.y
-        lc.publish("encoder_handler", EncoderData())
-    else:
-        pass
+    msg = kalman_position_t.decode(data)
+    cp[0] = msg.x
+    cp[1] = msg.y
+    lc.publish("SYSTEM_STATE", EncoderData())
 
 lc.subscribe("Init_handler", GetInitPos)
-lc.subscribe("Kalman_filter", GetKalmanPos)
+lc.subscribe("KALMAN_POSITION", GetKalmanPos)
 
 try:
     while True:
