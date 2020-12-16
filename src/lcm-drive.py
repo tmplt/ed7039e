@@ -11,10 +11,10 @@ import time
 
 
 BP = motor-conf.BOT_BP      # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-gp = [None, None]           # gp stands for the goal position and should be fed from decawave module or a lcm node,
-                            # gp = [desired x, desired y]
-cp = [None, None, None]     # cp stands for the current position and should be fed from decawave module or a lcm node, 
-                            # cp = [current x, current y, current Theta]
+gp = [0, 0]             # gp stands for the goal position and should be fed from decawave module or a lcm node,
+                        # gp = [desired x, desired y]
+cp = [0, 0, 0]          # cp stands for the current position and should be fed from decawave module or a lcm node, 
+                        # cp = [current x, current y, current Theta]
 
 def ThetaError(Goal, Current):
     Tdiff = Goal - Current                                      #calculate the difference
@@ -68,15 +68,15 @@ def GetGoalPos(channel,data):
     gp[1] = msg.y
 
 def GetCurrentPos(channel,data):
-    msg = dmw_position_t.decode(data)
+    msg = system_state_t.decode(data)
     cp[0] = msg.x
     cp[1] = msg.y
-    cp[2] = msg.rad
+    cp[2] = msg.theta
     drive(cp, gp)
 
 lc = lcm.LCM()
 lc.subscribe("Goal_handler", GetGoalPos)
-lc.subscribe("Kalman_filter", GetCurrentPos)
+lc.subscribe("SYSTEM_STATE", GetCurrentPos)
 
 try:
     while True:

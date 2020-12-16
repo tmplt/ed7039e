@@ -10,6 +10,16 @@ import time
 
 BP = motor-conf.BOT_BP          # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
+TickR = 0
+TickL = 0
+
+BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B 
+BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C 
+
+cp = [0,0,0]                    # current position (x, y, theta); Global variable;
+#initial_enable = False
+lc = lcm.LCM()
+
 def EncoderPlant(position,TickR,TickL,Time):
   '''
   In here a new position is  estimated with the nummber of encoder ticks.
@@ -31,14 +41,11 @@ def EncoderPlant(position,TickR,TickL,Time):
     dX = (math.cos(position[2])*Dc) / Time          # x-axis velocity
     dY = (math.sin(position[2])*Dc) / Time          # y-axis velocity
     dTheta = (NewTheta - position[2]) / Time        # the angular velovity of the robot
-return [NewX, NewY, NewTheta, dX, dY, dTheta]
-
-TickR = 0
-TickL = 0
+    return [NewX, NewY, NewTheta, dX, dY, dTheta]
 
 def EncoderFeedback(cp):
-    BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B 
-    BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C 
+    BP.offset_motor_encoder(BP.PORT_B, TickR) # reset encoder B 
+    BP.offset_motor_encoder(BP.PORT_C, TickL) # reset encoder C 
 
     tic = time.time()                           #tic-toc for calculation of elapsed time
     '''
@@ -62,11 +69,7 @@ def EncoderFeedback(cp):
     dX = temp[3]
     dY = temp[4]
     dTheta = temp[5]
-return [cp, dX, dY, dTheta, Time]
-
-cp = [0,0,0]                                    # current position (x, y, theta); Global variable;
-#initial_enable = False
-lc = lcm.LCM()
+    return [cp, dX, dY, dTheta, Time]
 
 def EncoderData():
     data = EncoderFeedback(cp)
