@@ -64,7 +64,7 @@ class Kalman(object):
 
     def predict(self):
 
-        self.xhat = np.matmul(self.A, self.xhat) #+ np.matmul(self.B, self.u)
+        self.xhat = np.matmul(self.A, self.xhat) + np.matmul(self.B, self.u)
         self.P = np.matmul(self.A, np.matmul(self.P, self.AT)) + self.Q
 
 
@@ -98,8 +98,6 @@ class Kalman(object):
 
         self.kalman_filter()
 
-        #print("x: {:.3f} x': {:.3f} y: {:.3f} y': {:.3f}".format(
-        #    self.z[0][0], self.xhat[0][0], self.z[1][0], self.xhat[2][0]))
 
     def acc_handler(self, channel, data):
         msg = io_acceleration_t.decode(data)
@@ -112,7 +110,8 @@ if __name__ == "__main__":
     kal = Kalman()
 
     lc.subscribe("IO_POSITION", kal.pos_handler)
-    #lc.subscribe("IO_ACCELERATION", kal.acc_handler)
+    #lc.subscribe("IO_ACCELERATION", kal.acc_handler) 
+    # outcommented since not in use atm
 
     try:
         while True:

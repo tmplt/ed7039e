@@ -72,7 +72,6 @@ if __name__ == "__main__":
     plt.style.use('bmh')
     plt.ion()
     gs = gridspec.GridSpec(3,2)
-    #fig, (ax1, ax2, ax3) = plt.subplots(nrows=3,ncols=1)
     plt.figure()
     ax1 = plt.subplot(gs[1:, :])
     ax2 = plt.subplot(gs[0,0])
