@@ -108,7 +108,8 @@
     # Required libs for Python nodes
     (python3.buildEnv.override {
       extraLibs = (with python3Packages; [
-        numpy                   # for motor controller
+        numpy                   # for motor controller, Kalman filter
+        scipy                   # for Kalman filter
       ])
       ++ (lib.attrValues derivations.pythonLibs)
       ++ (builtins.attrValues (import ./nix/adafruit-blinka/requirements.nix { inherit pkgs; }).packages);

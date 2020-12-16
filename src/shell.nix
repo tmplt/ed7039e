@@ -9,7 +9,8 @@ in mkShell {
     (lib.attrValues systemNodes)
 
     (python3.buildEnv.override {
-      extraLibs = lib.attrValues derivations.pythonLibs;
+      extraLibs = (lib.attrValues derivations.pythonLibs)
+                  ++ [ scipy matplotlib numpy ];
     })
   ];
 }
