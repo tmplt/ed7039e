@@ -250,7 +250,8 @@ Each node follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
 \item[\texttt{<desc>}] is a list of words interspaced by a \texttt{-} that provide a short description of the node's purpose.
 \item[\texttt{<ext>}] is the source file extension. It describes how the node should be built before it can be executed.
   For example, if the extension is \texttt{c} then the node was written and C and needs to be compiled and linked with a C compiler before the resulting binary can be executed.
-  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed.
+  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed,
+  except for satisfying the script's dependencies.
 \end{description}
 
 The source files for all nodes can be found in \texttt{src/}.
@@ -300,18 +301,55 @@ This was done for sake of simplicity.
   \label{fig:node-schema}
 \end{figure}
 
-\subsubsection{\texttt{lcm-source-dwm.c}}
+All system nodes (and the source files under \texttt{src} which define them) are described below.
+\begin{description}
+\item[DWM node (\texttt{lcm-source-dwm.c})]
 This node is responsible for extracting the position and acceleration data from the DWM.
 Upon execution it opens opens a serial communication to the DWM, enters the shell mode and allocates a buffer into which received data is read into.
-Afterwards it enters a loop within which the shell commands \texttt{av} is continously called.
+Afterwards it enters a loop within which the shell command \texttt{av} is continously called.
 While spinning in this loop, the node keeps the time and ensures that the command \texttt{apg} is called with a frequenzy of $10$~Hz.
 After the execution of each command:
 \begin{enumerate}
   \item the response is read into the buffer;
   \item the buffer is parsed for data of interest;
   \item data is converted to SI units --- m for position coordinates, $\text{ms}^{\text{-2}}$ for acceleration; and
-  \item an appropriate message type is constructed and published to all subscribing nodes.
+  \item an appropriate message type is constructed and published unto either the \texttt{IO\_POSITION} or \texttt{IO\_ACCELERATION} channel.
 \end{enumerate}
 
-\subsubsection{\texttt{lcm-source-robot-target.py}}
-This node simply provides a target coordinate, relative to the grid established by the DWM, that the robot should move to.
+\item[Motor encoders node]
+
+\item[Arrowhead node]
+
+\item[Line follower node]
+
+\item[Kalman filter node (\texttt{lcm-int-dwm-filter.py})]
+
+\item[System state node]
+
+\item[Master node]
+
+\item[DWM mode node]
+
+\item[Object mode node]
+
+\item[Line-follow mode node]
+
+\end{description}
+
+Some debugging nodes are also defined, but are external from the system-internal relations displayed in Fig.~\ref{fig:node-schema}:
+\begin{description}
+\item[Message spoofer (\texttt{lcm-debug-spoof-message.py})]
+  While developing nodes it is useful to ensure that it responds to LCM messages in the expected manner.
+  Instead of writing an ad-hoc node that sends whatever messages that need to be tested,
+  this node allows the developer send a message of any type by just speficying the correct parameters.
+
+  % Describe how the node works? Inspects the LCM-generated Python module.
+
+  For example, to send a message indicating that the Kalman-filtered position of the system is at the coordinates $(4.23, 5.12)$,
+  execute \texttt{lcm-debug-spoof-message.py KALMAN\_POSITION 4.23 5.12}.
+
+\item[Message sink (\texttt{lcm-debug-print-all.py})]
+  An inverse of the above debug node: instead of sending a message of any type,
+  this node prints a message of any type.
+  Useful for inspecting the system as any and all LCM messages will be printed by first subscribing to all channels.
+\end{description}
