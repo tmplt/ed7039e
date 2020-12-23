@@ -255,6 +255,51 @@ Each node follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
 
 The source files for all nodes can be found in \texttt{src/}.
 
+Fig.~\ref{fig:node-schema} contains a visualization of all system nodes and with which other nodes they talk to.
+Communication occurs over a common LCM channel name where only one message type is expected on each channel.
+The massage type can be derived from the channel name, and vice versa.
+This was done for sake of simplicity.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[
+    node distance = 2cm,
+    auto,
+    ]
+    % input nodes
+    \node[block] (arrowhead) {Arrowhead};
+    \node[block, left of=arrowhead] (enc) {motor \\ encoders};
+    \node[block, left of=enc] (dwm) {DWM};
+    \node[block, right of=arrowhead] (line-follower) {line \\ follower};
+
+    % intermediate nodes
+    \node[block, yshift=-6cm] at ($(enc)!0.5!(arrowhead)$) (master) {master};
+    \node[block, yshift=-2cm] at ($(dwm)!0.5!(enc)$) (kalman) {Kalman \\ filter};
+    \node[block, below of=kalman] (state) {system \\ state};
+
+    % % robot modes
+    \node[block, below of=master] (object-mode) {Object \\ mode};
+    \node[block, left of=object-mode, xshift=-2em] (dwm-mode) {DWM \\ mode};
+    \node[block, right of=object-mode, xshift=2em] (line-mode) {Line-follow \\ mode};
+
+    \path[<->] (arrowhead) edge (master)
+    (kalman) edge (state)
+    (master) edge (object-mode);
+
+    \path[->] (dwm) edge (kalman)
+    (enc) edge (state)
+    (state) edge (dwm-mode)
+    (state) edge (master)
+    (master) edge (dwm-mode)
+    (master) edge (line-mode)
+    (line-follower) edge (master)
+    (line-follower) edge (line-mode)
+    (enc) edge (object-mode);
+  \end{tikzpicture}
+  \caption{Relation chart over the system's nodes.}
+  \label{fig:node-schema}
+\end{figure}
+
 \subsubsection{\texttt{lcm-source-dwm.c}}
 This node is responsible for extracting the position and acceleration data from the DWM.
 Upon execution it opens opens a serial communication to the DWM, enters the shell mode and allocates a buffer into which received data is read into.
