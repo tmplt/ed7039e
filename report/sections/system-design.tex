@@ -3,37 +3,6 @@ This section thoroughly covers the models and simulations of the two subsystems 
 the mobile platform and the arm which is attached to the platform.
 The software used in this project is covered in section~\ref{sec:implementation}.
 
-From the problem description in section~\ref{sec:problem-description} we thus argue for five possible system states:
-when the robot is
-\begin{inline-enum}
-\item waiting for a command;
-\item moving to a destination;
-\item following a navigation line;
-\item picking an object up; and
-\item dropping an object off.
-\end{inline-enum}
-The relation between these states, and the allowed transitions between them is visually described using the state machine in Fig.~\ref{fig:state_machine}.
-\begin{figure*}[h]
-  \centering
-  \begin{tikzpicture}
-    \node[state, initial, accepting] (wait) {waiting for \\ command};
-    \node[state, right of=wait] (move) {moving to \\ destination};
-    \node[state, below of=move] (follow) {following \\ line};
-    \node[state, right of=follow] (pickup) {picking \\ up object};
-    \node[state, left of=follow] (dropoff) {dropping \\ off object};
-
-    \path[->] (wait) edge node{Arrowhead \\ signal} (move)
-    (move) edge[sloped] node{line detected \\} (follow)
-    (follow) edge[sloped] node{station detection \\ (system w/o object)} (pickup)
-    (follow) edge[sloped] node{station detection \\ (system w/ object)} (dropoff)
-    (pickup) edge[sloped] node{object picked up \\} (move)
-    (dropoff) edge[sloped] node{object dropped \\} (wait)
-    ;
-  \end{tikzpicture}
-  \caption{High-level state machine of the system.}
-  \label{fig:state_machine}
-\end{figure*}
-
 \subsection{Model}
 \subsubsection{Mobile platform}
 \label{subsubsec:unicycle}
