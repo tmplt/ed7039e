@@ -328,7 +328,8 @@ After the execution of each command:
 
 \item[Master node (\texttt{lcm-int-master.py})]
   As seen in Fig.~\ref{fig:state_machine}, the system's behavior can be described as a finite state machine.
-  The master node is responsible for ensuring that the correct mode node (DWM, object or line-follow) is running at the right time.
+  The master node is responsible for ensuring that the correct mode node (DWM, object or line-follow) is running at the right time,
+  and thus implements the referenced state machine description.
   For example, before switching to line-follow mode, the system current state is compared to a set of points where the robot would be close enough to a station to find a line.
   If it is found that the system is too far away, the line-found event is ignored and logged to \texttt{stderr} for debugging purposes.
 
