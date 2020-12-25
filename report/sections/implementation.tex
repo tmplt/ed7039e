@@ -95,6 +95,21 @@ As such, we are satisfied even though only SPI is properly supported.
 % * We cannot nix-shell into a shell with ALL appropriate python libs (whatever + brickpi3) because the new env prepends the build one in PATH.
 % ...
 
+% TODO: review
+\subsubsection{System-external services}
+The software environment generated for the Raspberry Pi automatically connects to Eduroam if credentials are available.
+Eduroam places some limitations on connected clients: firewall, e.g.
+To enable easy remote access to the system, a reverse SSH proxy is established with a known bastion host which has a static IP address.
+By exposing this proxy via a known port on the bastion, any system connected to the Internet may trivially access the Raspberry Pi remotely via a static endpoint.
+While not a necessity for the project itself, this external service is a great convenience for ad-hoc experiments and general system debugging.
+
+% TODO: note that the SSH proxy only works for a single RPi. We can’t
+% connect to two different RPis at the same time.
+% TODO: note that SSH thinks a MitM is going on because system ID
+% changes with every rebuild.
+
+% Explain the content of contrib/bastion.nix
+
 \subsubsection{Decawave}
 This project uses Decawave (or more specifically: a DWM1001 development board) for two-dimensional positioning.
 The development board constitutes of the ultra wide-band module itself, the DWM1001C, an accelerometer,
@@ -236,7 +251,7 @@ Thus, as LCM:
 \end{inline-enum}
 it was decided that our robot system would be implemented with help of it in place of ROS.
 
-\subsection{Line follower}
+\subsubsection{Line follower}
 % GPIO pins does not work. Talk about the dedicated hardware instead.
 
 \subsection{Software nodes}
