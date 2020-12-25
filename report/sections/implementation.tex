@@ -191,7 +191,7 @@ It works by communicating via the SPI function pins of the Raspberry Pi.
 The recommended way to install all necessary components is via a \texttt{curl -k | bash}.
 There are a few issues with this approach:
 \begin{inline-enum}
-\item \texttt{-k} is an alias for \texttt{--insecure};
+\item \verb|-k| is an alias for \verb|--insecure|;
   the recommended approach is thus to not verify the server certificate ---
   this allows a bad actor to feed you malicious code if they have access to your DNS or the target domain.
 \item A \texttt{curl | bash} is bad practise for installation purposes as it commonly installs files that are disconnected from the system's package manager.
@@ -210,7 +210,7 @@ Upon inspection, a few oddities stood out. The script:
   the Node JavaScript package manager, but never installs or executes any JavaScript packages;
 \item installs a C++ source file under \texttt{/usr/local/include}\footnote{A proper installation would be to build a shared library which can then be dynamically linked to when using the C++ drivers.};
 \item downloads a precompiled version of \texttt{openocd(1)}, a on-chip debugger and programmer,
-  and copies the files into system directories\footnote{No changes are made to the software, according to the mirror's documentation. An installation should instead then be made with the package manager, which is otherwise used in the scripts to install other components}, and then never uses it;
+  and copies the files into system directories\footnote{No changes are made to the software according to the mirror's documentation. An installation should instead then be made with the package manager, which is otherwise used in the scripts to install other components}, and then never uses it;
 \item runs \texttt{git(1)} as a privileged user, sometimes.
 \end{enumerate}
 The above list is truncated for sake of brevity.
