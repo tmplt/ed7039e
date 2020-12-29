@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import urllib3
 import sys
 sys.path.insert(1, '/home/ruben/git/client-library-python')
