@@ -27,4 +27,5 @@ struct vector2d_t
 struct action_t
 {
         string action;
+        string pos;
 }

@@ -9,15 +9,15 @@ import requests
 sys.path.insert(1, '/home/ruben/git/client-library-python')
 import arrowhead_client.api as ar
 
-remote_host = '192.168.43.44'               # ip to the raspberry pi
-remote_port = 22                           # port for ssh
+remote_host = ''                    # ip to the raspberry pi
+remote_port = 22                          # port for ssh
 local_host = '127.0.0.1'
 local_port = 5005                       
 
 # Creating ssh tunnel for the communication between robot and server
 server = SSHTunnelForwarder(
    (remote_host, remote_port),
-   ssh_username='pi',
+   ssh_username='root',
    ssh_private_key='/home/ruben/.ssh/id_rsa.pub',
    remote_bind_address=(local_host, local_port),
    local_bind_address=(local_host, local_port),
@@ -29,8 +29,8 @@ provider_app = ar.ArrowheadHttpClient(
         system_name='lcm_provider',
         address='127.0.0.1',
         port=5000,
-        keyfile='certificates/my_cloud/lcm_provider.key',
-        certfile='certificates/my_cloud/lcm_provider.crt',
+        keyfile='certificates/provider.key',
+        certfile='certificates/provider.crt',
 )
 
 # A service pick_up which will notify the robot to pick up a piece
