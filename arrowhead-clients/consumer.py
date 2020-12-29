@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import urllib3
 import sys
-sys.path.insert(1, '/home/ruben/git/client-library-python')
+sys.path.insert(1, '/etc/ed7039e/client-library-python')
 import arrowhead_client.api as ar
 
 urllib3.disable_warnings()

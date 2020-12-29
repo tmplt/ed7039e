@@ -2,7 +2,7 @@
 import sys
 from sshtunnel import SSHTunnelForwarder
 import requests
-sys.path.insert(1, '/home/ruben/git/client-library-python')
+sys.path.insert(1, '/etc/ed7039e/client-library-python')
 import arrowhead_client.api as ar
 
 remote_host = 'tmplt.dev'                    # ip to raspberry pi
