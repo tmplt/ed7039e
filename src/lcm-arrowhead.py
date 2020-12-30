@@ -23,25 +23,25 @@ def millis():
 @app.route('/robot/pick_up_right', methods=['GET'])
 def pick_up_right():
     publish_action('pick_up', 'right')
-    return "{'msg': 'Ok, picking piece at right side'}"
+    return {'msg': 'Ok, picking piece at right side'}
 
 # This function is called by a get request from the provider service pick_up, on left side
 @app.route('/robot/pick_up_left', methods=['GET'])
 def pick_up_left():
     publish_action('pick_up', 'left')
-    return "{'msg': 'Ok, picking piece at left side'}"
+    return {'msg': 'Ok, picking piece at left side'}
 
 # This function is called by a get request from the provider service place, on right side
 @app.route('/robot/place_right', methods=['GET'])
 def place_right():
     publish_action('place', 'right')
-    return "{'msg': 'Ok, placing piece at right side'}"
+    return {'msg': 'Ok, placing piece at right side'}
 
 # This function is called by a get request from the provider service place, on left side
 @app.route('/robot/place_left', methods=['GET'])
 def place_left():
     publish_action('place', 'left')
-    return "{'msg': 'Ok, placing piece at left side'}"
+    return {'msg': 'Ok, placing piece at left side'}
 
 if __name__ == '__main__':
     # Start flask
