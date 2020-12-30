@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 import lcm
-from robot import action_t
+from robot import io_arrowhead_t
+import datetime, time
 from flask import Flask
 
 app = Flask(__name__)
 
 # Publish a action through lcm
 def publish_action(action, position):
-    a = action_t()
+    a = io_arrowhead_t()
     a.action = action
     a.pos = position
+    a.timestamp = millis()
     lcm.LCM().publish("ACTION", a.encode())
+
+def millis():
+    ts = datetime.datetime.now()
+    return round(time.mktime(ts.timetuple()) * 1e3
+                 + ts.microsecond / 1e3)
 
 # This function is called by a get request from the provider service pick_up, on right side
 @app.route('/robot/pick_up_right', methods=['GET'])
