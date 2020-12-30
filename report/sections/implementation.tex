@@ -346,8 +346,7 @@ This was done for sake of simplicity.
     \node[block, left of=object-mode, xshift=-2em] (dwm-mode) {DWM \\ mode};
     \node[block, right of=object-mode, xshift=2em] (line-mode) {Line-follow \\ mode};
 
-    \path[<->] (arrowhead) edge (master)
-    (kalman) edge (state)
+    \path[<->] (kalman) edge (state)
     (master) edge (object-mode);
 
     \path[->] (dwm) edge (kalman)
@@ -358,7 +357,8 @@ This was done for sake of simplicity.
     (master) edge (line-mode)
     (line-follower) edge (master)
     (line-follower) edge (line-mode)
-    (enc) edge (object-mode);
+    (enc) edge (object-mode)
+    (arrowhead) edge (master);
   \end{tikzpicture}
   \caption{Relation chart over the system's nodes.}
   \label{fig:node-schema}
