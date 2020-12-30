@@ -14,7 +14,7 @@ local_port = 5005                            # For the communication with lcm-ar
 server = SSHTunnelForwarder(
    (remote_host, remote_port),
    ssh_username='root',
-   ssh_private_key='/home/ruben/.ssh/id_rsa',
+   ssh_private_key='/etc/ed7039e/.ssh/id_rsa',
    remote_bind_address=(local_host, local_port),
    local_bind_address=(local_host, local_port),
    )
