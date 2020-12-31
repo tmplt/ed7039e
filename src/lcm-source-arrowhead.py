@@ -12,7 +12,7 @@ def publish_action(action, position):
     a.action = action
     a.pos = position
     a.timestamp = millis()
-    lcm.LCM().publish("ACTION", a.encode())
+    lcm.LCM().publish("IO_ARROWHEAD", a.encode())
 
 def millis():
     ts = datetime.datetime.now()
