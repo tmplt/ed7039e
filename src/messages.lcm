@@ -56,6 +56,8 @@ struct io_encoder_t
 struct io_arrowhead_t
 {
         int64_t timestamp; // in milliseconds
+        string action;
+        string pos;
 }
 
 // Found on channel IO_LINE_FOLLOWER
@@ -98,4 +100,7 @@ struct master_t
 struct adhoc_arm_t
 {
         // this comment is required to pass lcm-gen
+        int32_t x;
+        int32_t y;
+        double rad;
 }
