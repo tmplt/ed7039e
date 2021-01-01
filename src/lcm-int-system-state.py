@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
 from robot import init_pos_t, dmw_position_t, encoder_data_t
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       # 
+from __future__ import division       
 
 import motor-conf
 import lcm
@@ -17,7 +17,6 @@ BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset enco
 BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C)) # reset encoder C 
 
 cp = [0,0,0]                    # current position (x, y, theta); Global variable;
-#initial_enable = False
 lc = lcm.LCM()
 
 def EncoderPlant(position,TickR,TickL,Time):
@@ -34,7 +33,7 @@ def EncoderPlant(position,TickR,TickL,Time):
     Dr = 2*math.pi*r*TickR/n    # The distance right wheel has traveled in [m]
     Dl = 2*math.pi*r*TickL/n    # The distance left wheel has traveled in [m]
     Dc = (Dr + Dl)/2            # The average distance body has traveled in [m]
-    #print(Dr,Dl,Dc)
+
     NewX = position[0] + math.cos(position[2])*Dc   # new x-position
     NewY = position[1] + math.sin(position[2])*Dc   # new y-position
     NewTheta = position[2] + (Dr - Dl)/l            # new Theta
@@ -84,7 +83,7 @@ def EncoderData():
     return msg.encode()
 
 def GetInitPos(channel,data):
-    msg = init_pos_t.decode(data)               ###### this node is not complitet, need to change channle name wen its done
+    msg = init_pos_t.decode(data)               ###### this node is not complete, need to change channle name wen its done
     cp[0] = msg.x
     cp[1] = msg.y
     cp[2] = msg.theta

@@ -1,5 +1,5 @@
+#!/usr/bin/env python3 
 from robot import dmw_position_t, dmw_goal_position_t
-from __future__ import print_function   # use python 3 syntax but make it compatible with python 2
 from __future__ import division         # 
 from numpy import clip
 
@@ -47,7 +47,8 @@ def drive(cp, gp):
 
         PID1 = 5                                        #The PID controller has only proportional gain to the error, controller for direction of the robot.
         v = goal[0] * PID1                              # v = Average Velacity
-        v = clip(v, -100, 100)                          #saturate the velocity value from -80 to 80
+        v = clip(v, -100, 100)                          # saturate the velocity value from -100 to 100. This is the input span for the servoes: 100 and -100 gives the maximum and the minimum velocities servos can revolte.
+                                                        # the SI unit for the velocity is dependent on the load.
 
         te = ThetaError(goal[1], cp[2])
         PID2 = 8                                        #The PID controller has only proportional gain to the error, controller for the velocity of the robot.
