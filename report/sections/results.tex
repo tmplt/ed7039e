@@ -97,3 +97,38 @@ The controllers mentioned above was tuned with a Ziegler Nichols approach and tw
 \caption{Close to undamped oscillations from \(60^{\circ}\) step with P-controller.}
 \label{Hor_osc}
 \end{figure}
+\subsection{Performance Of Line Follower}
+
+\subsubsection{Test Setup}
+Different types of controllers were made for the line following sequence.  A step response for the robot to follow was constructed as can be seen in fig. \ref{Step Response} The tests were made by letting the robot follow the straight black line which then turns with an angle of 37$^{\circ}$. The robot then follows the new direction of the line until it reach the perpendicular black line and stops. The angle was chosen to be 37$^{\circ}$, since it was determined that no steeper angles would be needed in the project. The initial idea was to use Ziegler Nichols method to tune a PID controller, but due to the fact that it was hard to reach a consistent oscillation on the line follower, this method was hard to implement. Instead P and PD controllers were tested and their performances were measured. PI and PID controllers were also tested, but the data from these tests was lost. It was determined that the controller that resulted in the smallest magnitude and amount of errors and had the shortest time with errors had the best performance. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Step Response.jpg}
+    \caption{View of the line on which the step response was tested}
+    \label{Step Response}
+\end{figure}
+
+\subsubsection{P controller}
+It was determined that the best P controller had the value of 40 on its Kp term. the performance of this controller during the step response can be sin in fig. \ref{Kp40}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Kp40.jpg}
+    \caption{The error can be seen on the y-axis while the x axis represents the iteration of the loop.}
+    \label{Kp40}
+\end{figure}
+
+\subsubsection{PD controller}
+It was determined that the best PD controller had the value of 40 on its Kp term and 10 on the Kd-term. the performance of this controller during the step response can be sin in fig. \ref{Kp40_10Kd}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Kp40_10Kd.jpg}
+    \caption{The error can be seen on the y-axis while the x axis represents the iteration of the loop.}
+    \label{Kp40_10Kd}
+\end{figure}
+
+\subsubsection{Conclusion}
+Since the negative errors occurred before the turn, and were likely caused by a poor placement of the robot in the start of the experiment, these errors were not taken into account when determining the quality of the controllers. It was thus determined that the PD-controller performed a bit better than the P-controller, it had fewer error spikes and they lasted for a shorter period of time. More importantly, the spikes were lesser frequent at the end of the experiment.
