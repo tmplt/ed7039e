@@ -45,13 +45,13 @@ def drive(cp, gp):
     while v > 8:
         goal = cart2polar(cp[0], cp[1], gp[0], gp[1])   #calculate the goal in polar coordinates, goal = [distance, angle]
 
-        PID1 = 5                                        #The PID controller has only proportional gain to the error, controller for direction of the robot.
+        PID1 = 8                                        #The PID controller has only proportional gain to the error, controller for direction of the robot.
         v = goal[0] * PID1                              # v = Average Velacity
         v = clip(v, -100, 100)                          # saturate the velocity value from -100 to 100. This is the input span for the servoes: 100 and -100 gives the maximum and the minimum velocities servos can revolte.
                                                         # the SI unit for the velocity is dependent on the load.
 
         te = ThetaError(goal[1], cp[2])
-        PID2 = 8                                        #The PID controller has only proportional gain to the error, controller for the velocity of the robot.
+        PID2 = 5                                        #The PID controller has only proportional gain to the error, controller for the velocity of the robot.
         w = te * PID2                                   # w = turning rate
 
         wv = WheelVelocities(v, w)                      #wv = [rigt wheel's velocity, left wheel's velocity]
