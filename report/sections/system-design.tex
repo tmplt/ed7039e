@@ -37,7 +37,30 @@ The relation between these five states are visually described in the state machi
 \end{figure*}
 
 \subsubsection{Motor}
-\section{Discretization of PID controller}
+\subsubsubsection{PID contoller for the LEGO EV3 motor}
+The transfer function of the LEGO EV3 motor is assumed as eq. (\ref{eq1}).This equation is called as second order transfer function. The input refers to the input power and the output refers to to wheel rotation in degrees.
+
+\begin{equation}\label{eq1}
+    G(s)=\frac{Y(s)}{U(s)}=\frac{W_n^2}{s^2+2\xi W_n s + W_n^2}
+\end{equation}
+where $W_n$ is the natural frequency and $\xi$ is the damping ratio.  These constants are given as:
+
+\begin{equation}
+\begin{split}
+     W_n & = 14.2 \\
+    \xi & = 0.92 
+\end{split}
+\end{equation}
+Then equation \ref{eq1} becomes : 
+\begin{equation}
+    G(s)=\frac{201.9}{s^2+26.17s+201.9}
+\end{equation}
+The PID controller in the Laplace transform is described as 
+    \begin{equation}
+    C(s)= K_P+K_I \frac{1}{s}+K_Ds= \frac{K_Ps+K_I+K_Ds^2}{s}
+\end{equation}
+where $K_p$,$K_I$ and $K_D$ is the proportional, integral and derivative terms respectively.
+\subsubsubsection{Discretization of PID controller}
 The PID-controller was discretized by zero order hold method. The ZOH method give a perfect match between continuous and discrete time domain. This method can also be used for system with input delays, output delays or transport delays and provides an exact discretization. 
 The eq. (\ref{eq5}) describes how to transform from s-domain to z-domain using Zero order hold method
 \begin{equation} \label{eq5}
