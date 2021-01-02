@@ -42,7 +42,8 @@ The relation between these five states are visually described in the state machi
 \end{figure*}
 
 \subsubsection{Motor}
-\subsubsubsection{PID contoller for the LEGO EV3 motor}
+\begin{description}
+\item[PID contoller for the LEGO EV3 motor]
 The transfer function of the LEGO EV3 motor is assumed as eq.~\eqref{eq1}.This equation is called as second order transfer function. The input refers to the input power and the output refers to to wheel rotation in degrees.
 
 \begin{equation}\label{eq1}
@@ -53,23 +54,23 @@ where $W_n$ is the natural frequency and $\xi$ is the damping ratio.  These cons
 \begin{equation}
 \begin{split}
      W_n & = 14.2 \\
-    \xi & = 0.92 
+    \xi & = 0.92
 \end{split}
 \end{equation}
-Then equation \ref{eq1} becomes : 
+Then equation \ref{eq1} becomes :
 \begin{equation}
     G(s)=\frac{201.9}{s^2+26.17s+201.9}
 \end{equation}
-The PID controller in the Laplace transform is described as 
+The PID controller in the Laplace transform is described as
     \begin{equation}
     C(s)= K_P+K_I \frac{1}{s}+K_Ds= \frac{K_Ps+K_I+K_Ds^2}{s}
 \end{equation}
 where $K_p$,$K_I$ and $K_D$ is the proportional, integral and derivative terms respectively.
-\subsubsubsection{Discretization of PID controller}
-The PID-controller was discretized by zero order hold method. The ZOH method give a perfect match between continuous and discrete time domain. This method can also be used for system with input delays, output delays or transport delays and provides an exact discretization. 
+\item[Discretization of PID controller]
+The PID-controller was discretized by zero order hold method. The ZOH method give a perfect match between continuous and discrete time domain. This method can also be used for system with input delays, output delays or transport delays and provides an exact discretization.
 The eq. (\ref{eq5}) describes how to transform from s-domain to z-domain using Zero order hold method
 \begin{equation} \label{eq5}
-    C(z)=(1-z^{-1}) Z(\frac{C(s)}{s}) 
+    C(z)=(1-z^{-1}) Z(\frac{C(s)}{s})
 \end{equation}
 where C(s) is the controller and Z is the Z-transform
 \begin{equation}
@@ -85,8 +86,8 @@ And finally the PID controller in discrete time domain is presented as
     C(z)= k_P + k_I \frac{1}{z-1} + k_D \frac{z-1}{z}
 \end{equation}
 
-\subsubsubsection{Motor simulation}
-The PID parameters were chosen to get low settling time, low overshoot and fast response to disturbances for the system. The best parameters for the system resulted in 
+\item[Motor simulation]
+The PID parameters were chosen to get low settling time, low overshoot and fast response to disturbances for the system. The best parameters for the system resulted in
 \begin{equation}
     \begin{split}
         K_P & = 1.35 \\
@@ -95,24 +96,24 @@ The PID parameters were chosen to get low settling time, low overshoot and fast 
     \end{split}
 \end{equation}
 The simulation is made in discrete time domain with a sampling frequency 10 Hz.
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.4\textwidth]{sections/assets/pid_motor.png}
     \caption{PID controller for the LEGO EV3 motor to rotate 10 degrees}
     \label{fig1}
 \end{figure}
-
+\end{description}
 \subsubsection{Trajectory planning}
 A point to point trajectory is described as a path from $q_{init}$ to $q_{final}$. A trajectory is a function of time such that $q(t_0) = q_{init}$ and $q(t_f) = q_{final}$. The difference between $t_0$ and $t_f$ represents the total elapsed time to execute the trajectory. The velocity and the acceleration can be computed by differentiation since the trajectory is depending of time.
 At the time $t_0$ the joint variable satisfies
 
 \begin{equation} \label{eq10}
-\begin{split} 
+\begin{split}
      q(t_0) & = q_0 \\
     \dot{q}(t_0) & = v_0
 \end{split}
 \end{equation}
-And at the $t_f$ the desired joint variable will be 
+And at the $t_f$ the desired joint variable will be
 \begin{equation} \label{eq11}
 \begin{split}
      q(t_f) & = q_f \\
@@ -120,8 +121,7 @@ And at the $t_f$ the desired joint variable will be
 \end{split}
 \end{equation}
 
-\subsubsubsection{Cubic polynomial trajectory}
-The trajectory between two configurations and the initial and final velocity is known. One way to solve this task is to solve it by polynomial function of t. Since there are four unknown constraints, it is required to use a polynomial function with four independent coefficient. Hence a cubic trajectory is considered 
+The trajectory between two configurations and the initial and final velocity is known. One way to solve this task is to solve it by polynomial function of t. Since there are four unknown constraints, it is required to use a polynomial function with four independent coefficient. Hence a cubic trajectory is considered
 \begin{equation} \label{eq12}
     q(t) = a_0 + a_1t + a_2t^2 + a_3t^3
 \end{equation}
@@ -139,7 +139,7 @@ Combining eq.~\eqref{eq12} and ~\eqref{eq13} with eq.~\eqref{eq10} and \ref{eq11
     \end{split}
 \end{equation}
 Suppose taking $t_0 = 0$ and $t_f = 1$ second with velocity constraints as $v_0 = 0$ and $v_f = 0$. Then the eq. (\ref{14}) can be written in matrix form.
-\begin{center}
+\begin{equation*}
     \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
@@ -149,15 +149,15 @@ Suppose taking $t_0 = 0$ and $t_f = 1$ second with velocity constraints as $v_0 
 a_0 \\
 a_1 \\
 a_2 \\
-a_3 
+a_3
 \end{bmatrix} = \begin{bmatrix}
 q_0 \\
 0\\
 q_f \\
 0
 \end{bmatrix}
-\end{center}
-Then solving for the letter $a_i$ by linear algebra and this letters yields to 
+\end{equation*}
+Then solving for the letter $a_i$ by linear algebra and this letters yields to
 \begin{equation} \label{15}
     \begin{split}
         a_0 = q_0 \\
@@ -170,7 +170,7 @@ The eq. (\ref{eq12}) into eq. (\ref{15}) to get the cubic polynomial function. T
 \begin{equation}
     q_i(t) = q_0 + 3(q_f - q_0)t^2 - 2(q_f - q_0)t^3
 \end{equation}
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.4\textwidth]{sections/assets/cubic.png}
     \caption{Angle profile for cubic polynomial trajectory.}
@@ -219,22 +219,22 @@ where the average velocity \parencite{Corke2011} is given by
 v = \frac{v_R + v_L}{2}
 \label{eq:av_velocity}
 \end{equation}
-Before the implementation, it is required to to find a discrete equivalent for the systems dynamics. 
+Before the implementation, it is required to to find a discrete equivalent for the systems dynamics.
 By being able to count the number of encoder ticks on each servo and some approximation it is possible to estimate the position of the robot.
-In this approximativ method we assume that the driven path in-between the two sampling points is a straight line. 
+In this approximativ method we assume that the driven path in-between the two sampling points is a straight line.
 The length of the driven path for each wheel can be computed using the following formula:
 
 \begin{equation}
     D = 2\,\pi\,r\,\frac{\Delta tick}{N}
 \end{equation}\label{eq:encoder-formula}
-Where $D$ is the length of the driven path, $r$ is the wheel radius, $\Delta tick$ is the number of recorded ticks during the two sampling points and $N$ is the number of ticks per revolution. 
+Where $D$ is the length of the driven path, $r$ is the wheel radius, $\Delta tick$ is the number of recorded ticks during the two sampling points and $N$ is the number of ticks per revolution.
 In our case the numeric values are:
 
 \begin{eqnarray*}
     r =& 0.021\, [m]\\
     N =& 360\, [\frac{tick}{2\,\pi}]
 \end{eqnarray*}
-In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively. 
+In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively.
 $D_c$ is the notation we use for the length of the driven path for the body and is similar to \eqref{eq:av_velocity}:
 
 \begin{equation}
@@ -251,9 +251,9 @@ The discretized equations of motion is given by:
 \end{eqnarray}\label{eq:Disc_EOM}
 Where $W$ is the width of the robot, i.e. the distance between the two wheels.
 The limitation of this approximativ method is the sampling rate relative the average velocity of the body.
-The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together. 
+The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together.
 E.g. if the average velocity is very high and the sampling rate is very low, the straight line will not be a good approximation for the driven arc shaped path.
-To make this approximation more accurate it is required to divide the driven path in to more points. 
+To make this approximation more accurate it is required to divide the driven path in to more points.
 This accuracy can be improved by having higher sampling rate or lower average velocity.
 
 \subsubsection{Arm}
