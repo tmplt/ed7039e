@@ -38,7 +38,7 @@ The relation between these five states are visually described in the state machi
 
 \subsubsection{Motor}
 \subsubsubsection{PID contoller for the LEGO EV3 motor}
-The transfer function of the LEGO EV3 motor is assumed as eq. (\ref{eq1}).This equation is called as second order transfer function. The input refers to the input power and the output refers to to wheel rotation in degrees.
+The transfer function of the LEGO EV3 motor is assumed as eq.~\eqref{eq1}.This equation is called as second order transfer function. The input refers to the input power and the output refers to to wheel rotation in degrees.
 
 \begin{equation}\label{eq1}
     G(s)=\frac{Y(s)}{U(s)}=\frac{W_n^2}{s^2+2\xi W_n s + W_n^2}
@@ -71,7 +71,7 @@ where C(s) is the controller and Z is the Z-transform
     C(z)=(\frac{z-1}{z})Z(\frac{k_Ps+k_I+k_Ds^2}{s} \Big/ s)
     \label{eq7}
 \end{equation}
-By looking at the z-transform table, the equation \ref{eq7} yields to
+By looking at the z-transform table, the eq.~\eqref{eq7} yields to
 \begin{equation}
     C(z)=\frac{z-1}{z}\bigg( k_p \frac{1}{1-z^{-1}}+k_I \frac{T z^{-1}}{(1-z^{-1})^2}+k_D\bigg)
 \end{equation}
@@ -124,7 +124,7 @@ Then the velocity of the cubic trajectory becomes
 \begin{equation} \label{eq13}
     \dot{q}(t) = a_1 + 2a_2t+ 3 a_3t^2
 \end{equation}
-Combining eq. (\ref{eq12}) and (\ref{eq13}) with eq. (\ref{eq10}) and (\ref{eq11}) returns four equations with four unknowns
+Combining eq.~\eqref{eq12} and ~\eqref{eq13} with eq.~\eqref{eq10} and \ref{eq11} returns four equations with four unknowns
 \begin{equation} \label{14}
     \begin{split}
         q_0 &= a_0 + a_1t_0 + a_2t_0^2 + a_3t_0^3 \\
@@ -168,7 +168,7 @@ The eq. (\ref{eq12}) into eq. (\ref{15}) to get the cubic polynomial function. T
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{sections/assets/cubic.png}
-    \caption{Angle profile for cubic polynomial trajectory}
+    \caption{Angle profile for cubic polynomial trajectory.}
     \label{fig2}
 \end{figure}
 Fig. (\ref{fig2}) shows the trajectory with $q_0 = 10^\circ$ and $q_f = -30^\circ$.
