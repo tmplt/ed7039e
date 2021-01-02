@@ -274,10 +274,10 @@ In order to get power to each motor servo and the Raspberry PI, two battery pack
 
 \subsection{Line Follower}
 
-The docking sequence of the robots movement was implemented using a line follower. A QTRX reflectance sensor from Pololu was used together with a black line to guide the robot close to the factory and to stop it with a perpendicular angle to the factory(pic). During the project, there occurred a connection issue between the Raspberry Pi and the sensor array due to the fact that no libraries that could transmit data between NixOS and the GPIO pins were found. This issue was resolved by buying an additional breakout board which, in turn, had its own GPIO pins and at the same time could be connected with the Raspberry Pi 3 thru another medium, in this case via a usb-cable. The breakout board used in this project was the Adafruit FT232H Breakout.
+The docking sequence of the robots movement was implemented using a line follower. A QTRX reflectance sensor from Pololu was used together with a black line to guide the robot close to the factory and to stop it with a perpendicular angle to the factory. During the project, there occurred a connection issue between the Raspberry Pi and the sensor array due to the fact that  NixOS could not handle the incoming data. This issue was resolved by buying an additional breakout board which, in turn, had its own GPIO pins and at the same time could be connected with the Raspberry Pi 3 through another medium, in this case via a usb-cable. The breakout board used in this project was the Adafruit FT232H Breakout.
 
 \subsubsection{Adafruit FT232H Breakout}
-Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F232H chip from FTDI and has has one port each for a usb c and stemma qt male connectors. The board is also equipped with 16 GPIO pins and also has the ability to speak with many protocols including SPI, ITC, serial UART, JTAg and others. In the project, this board was used to transfer GPIO singals from individual sensor on a sensor array to the Raspberry Pi computer. 
+Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F232H chip from FTDI and has has one port each for a usb c and stemma qt male connectors. The board is also equipped with 16 GPIO pins and also has the ability to speak with many protocols including SPI, ITC, serial UART, JTAG and others. In the project, this board was used to transfer GPIO singals from individual sensor on a sensor array to the Raspberry Pi computer. 
 \begin{figure}[H]
     \centering
     \includegraphics[width = 13 cm]{FT232H.jpg}
@@ -575,7 +575,7 @@ The tuning of the controllers was made with a Ziegler Nichols approach \parencit
 where \(T_{osc}\) is the oscillation time, n is the number of measured values in one undamped oscillation period from the output of the step response and \(T_s\) is the sampling period of the robot.
 
 \subsubsection{Controller for Line Following}
-The same operating speed was chosen for both the right and left track of the mobile platform, the speed of each track would not change from the operating speed as long as Error calculated in eq. \ref{Error_Position} would remain zero. If the position of the line underneath the sensor array changed, the error would grow and the speed of both tracks would change. An architecture for the controller which minimizes the error could be observed in fig. 
+The same operating speed was chosen for both the right and left track of the mobile platform, the speed of each track would not change from the operating speed as long as Error calculated in eq. \ref{Error_Position} would remain zero. If the position of the line underneath the sensor array changed, the error would grow and the speed of both tracks would change. An architecture for the controller which minimizes the error could be observed in fig.
 
 \begin{figure}[H]
     \centering
