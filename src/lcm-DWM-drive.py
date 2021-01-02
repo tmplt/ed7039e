@@ -76,7 +76,7 @@ def GetCurrentPos(channel,data):
     drive(cp, gp)
 
 lc = lcm.LCM()
-lc.subscribe("Goal_handler", GetGoalPos)
+lc.subscribe("ROBOT_TARGET", GetGoalPos)
 lc.subscribe("SYSTEM_STATE", GetCurrentPos)
 
 try:
