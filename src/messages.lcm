@@ -100,7 +100,4 @@ struct master_t
 struct adhoc_arm_t
 {
         // this comment is required to pass lcm-gen
-        int32_t x;
-        int32_t y;
-        double rad;
 }
