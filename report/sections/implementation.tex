@@ -379,12 +379,12 @@ After the execution of each command:
 
 \item[Motor encoders node]
 
-\item[Arrowhead node (\texttt{lcm-arrowhead.py})]
-  This node is responsible for listening on requests from the service provider and publish the message in lcm.
+\item[Arrowhead node (\texttt{lcm-source-arrowhead.py})]
+  This node is responsible for listening on requests from the service provider and publish the message in LCM.
   The node is running a flask application which is listening on the service provider. 
   To trigger the functions in the flask application a specific URL is required.
-  The functions is then forwarding the messages to other nodes through lcm.
-  It publish a message action; "pick up" or "place", and position; "right" or "left".
+  The functions is then forwarding the messages to other nodes through LCM.
+  It publish a message action; ``pick up'' or ``place'', and position; ``right'' or ``left''.
   
   The flask runs in http which is insecure. 
   The secure mode (https) is not needed because the call for the URL is happening in the same device as the arrowhead node is running on.
@@ -438,16 +438,16 @@ Some debugging nodes are also defined, but are external from the system-internal
 \end{figure}
 
 Figure \ref{fig:arrowhead_intercloud} shows the inter-cloud communcation and communication to the Arrowhead node.  
-The Station Consumer sends a POST request for the "place" service and also sends a json with the position.  
+The Station Consumer sends a POST request for the ``place'' service and also sends a json with the position.  
 The provider is then sending a GET request depending on the service and the position to the arrowhead node.  
 When Arrowhead node receives the request, it will publish a message which other nodes are getting if they are subscribed to that channel.
 
 When the robot have executed the service, the conveyor belt sensor detects a piece on the conveyor belt and starts running.  
-When it reaches the end sensor, the conveyor belt will stop and will notify the Station Consumer which will then send a request for the "pick up" services with a position.  
+When it reaches the end sensor, the conveyor belt will stop and will notify the Station Consumer which will then send a request for the ``pick up'' services with a position.  
 The request will then reach the robot and it will execute the service. 
 
 \subsubsection{Provider}
-The purpose of the provider is to provide services which a consumer in the same arrowhead cloud or in another arrowhead cloud can consume. The provider is offering two services; "pick up" and "place".
+The purpose of the provider is to provide services which a consumer in the same arrowhead cloud or in another arrowhead cloud can consume. The provider is offering two services; ``pick up'' and ``place''.
 When running the provider it registers the system and its services to the Service Registry. 
 
 The provider is using a secure https connection with self signed client certificate.  
@@ -460,7 +460,7 @@ In that way the whole chain is trustworthy. (\url{https://github.com/eclipse-arr
 The service functions in the provider is using POST http-method. 
 When sending a request for a service, a json with the position where it should pick up is required.  
 When the provider recieves a post request with a position, the provider is then sending a request to the lcm-source-arrowhead.py so called arrowhead node. 
-The arrowhead node is then publishing a message to other nodes with a timestamp, "pick up" or "place" and position. 
+The arrowhead node is then publishing a message to other nodes with a timestamp, ``pick up'' or ``place'' and position. 
 
 The provider can either be running on the raspberry pi where the nodes are running or on another machine. 
 If running on another machine a ssh connection is needed to communicate with the rasberry pi. 
@@ -472,7 +472,7 @@ Intra-cloud rules is needed if consumer is in the same cloud.
 If the consumer is in another cloud, inter-cloud rules need to be added. 
 The intra and inter-cloud rules can be added in the Authorization system. 
 
-The provider are using the client-library-python and is written in python. 
+The provider are using the client-library-python and is written in Python. 
 
 \subsubsection{Consumer}
 The purpose of the consumer is to consume services which are offered by a provider in Arrowhead Service Registry. 
@@ -481,4 +481,4 @@ The consumer needs to manually be added as a system to the Service Registry and 
 The consumer in the project were used for debuging and testing the provider. The sequence diagram in figure \ref{fig:arrowhead_intercloud} shows the real system and the communication between. The Station Consumer is instead communicate with the provider. 
 The consumer is using self signed certificates in the https connection which is the same as the provider. 
 
-The consumer are using the client-library-python and is written in python. 
+The consumer are using the client-library-python and is written in Python.
