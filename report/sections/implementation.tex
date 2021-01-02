@@ -387,7 +387,12 @@ After the execution of each command:
 
 \item[Kalman filter node (\texttt{lcm-int-dwm-filter.py})]
 
-\item[System state node]
+\item[System state node (\texttt{lcm-int-system-state.py})]
+ takes the filtered DMW data and the the motor encoders data and estimate the new position, as described in \eqref{eq:Disc_EOM}.
+By knowing the old positions, the new positions and the elapsed time (sampling time) it is also possible to estimate the velocities. 
+The $x$ and $y$ velocities are required for kalman filter to be able to make better estimations for the spacial position.
+This node also estimate the angle of attack and its derivative, i.e. the angular velocity.
+
 
 \item[Master node (\texttt{lcm-int-master.py})]
   As seen in Fig.~\ref{fig:state_machine}, the system's behavior can be described as a finite state machine.
@@ -396,7 +401,11 @@ After the execution of each command:
   For example, before switching to line-follow mode, the system current state is compared to a set of points where the robot would be close enough to a station to find a line.
   If it is found that the system is too far away, the line-found event is ignored and logged to \texttt{stderr} for debugging purposes.
 
-\item[DWM mode node]
+\item[DWM mode node (\texttt{lcm-DWM-drive.py})]
+ is the node where the current position $(x, y, \theta)$ and the desired position are the inputs.
+By having this inputs it is possible to calculate the angular and spacial errors for the movement, as described in \eqref{eq:cart2polar}
+Two simple PID controllers are designed to make sure this errors go to zero, as shown in fig\ref{fig:PID1} and fig\ref{fig:V_PID}.
+The robot has arrived to the desired position when the errors are zeros.
 
 \item[Object mode node]
 
