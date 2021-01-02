@@ -1,7 +1,57 @@
 \section{Future improvements}
-% Talk about how an embedded system would be more suitable for this project:
-% * compass IC
-% * interrupts
-% * no complications with Rich OSs (Linux)
-%
-% Also talk somewhere about why we didnt design an embedded system to begin with.
+% Tackle the most obvious first
+The result of this project can be improved in several ways: the most
+obvious way is spending the necessary time to finalize all software
+nodes and their interactions such that all milestones defined in
+section~\ref{sec:milestones} are reached.
+
+% Spend some time to ditch the additional hardware
+The current robot system currently depends on some external hardware
+which would be unnecessary if the Linux kernel was aware of all the
+peripherals offered by the hardware. It may be worth it to investigate
+why these are not already supported by NixOS and ultimately push the
+eventual fixes upsteam. While improving the overall quality of this
+project, it would also bump the overall quality of NixOS itself.
+
+% An embedded system instead
+An alternative to the current hardware setup and software stack would be
+the design of a truly embedded system without a rich OS (Linux in this
+case). A custom hardware design would allow the installation of multiple
+sensors that could help in the problem space: such as a compass for
+deriving the direction in which the robot is currently heading; and
+directly designing the wideband-module of the DWM into the hardware, so
+that the whole DWM-tag subsystem can be replaced. Further, an embedded
+system would allow the implementation of a code-base that fully relies
+on hardware interrupts\footnote{A feature more prominent and earier to
+  work with on an embedded system, where a change in input voltage
+  directly interrupts the processor (be it from a task of lower
+  priority, or from sleep) to start a procedure to process data.} which
+would enable the removal of any busy-while loops related to I/O. the
+system would thus be made real-time capable if properly programmed. An
+interrupt-oriented approach would allow the processor to sleep whenever
+it has no data to process. This allows for a more responsive system, and
+one that consumes less energy to operate.
+
+% While not required, it would be more proper
+Although the problem description does not call for a real-time system,
+such an implementation would be much more proper for the problem domain,
+and would more closely approximate how an actual industial system would
+be implemented.
+
+% Possible to apply formal analysis
+Further, the implementation of such a system could be the subject for a
+formal analysis with the lack of a rich OS that needlessly complicates
+the call-stack.
+
+% Can we port the current software stack?
+The software-node based structure can readily be ported to a real-time
+operating system (RTOS) if it allows the implementation of ``tasks''
+that trigger on interrupts; and/or can be called from another task; and
+if the RTOS implements message passing between these tasks. An example
+for such a RTOS would be Real-Time Interrupt-driven Concurrency (RTIC)
+\parencite{rtic}. Of possible interest would also be the MicroPython
+project, which could allow minimal porting changes of the currently
+available Python nodes if properly implemented for the target RTOS.
+\parencite{micropython}.\newpage
+%Robot hardware and lego
+For the hardware side of the robot some other material than lego, like 3D printed body frames could be used to increase the physical stability of the robot itself. Also to make better or more advanced controllers for the robot arm motion, a dynamical model of the robot arm could be derived and put on state space representation since this is often advantageous if one wishes to make a good controller.
