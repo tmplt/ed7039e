@@ -44,6 +44,42 @@ where the average velocity \parencite{Corke2011} is given by
 v = \frac{v_R + v_L}{2}
 \label{eq:av_velocity}
 \end{equation}
+Before the implementation, it is required to to find a discrete equivalent for the systems dynamics. 
+By being able to count the number of encoder ticks on each servo and some approximation it is possible to estimate the position of the robot.
+In this approximativ method we assume that the driven path in-between the two sampling points is a straight line. 
+The length of the driven path for each wheel can be computed using the following formula:
+
+\begin{equation}
+    D = 2\,\pi\,r\,\frac{\Delta tick}{N}
+\end{equation}\label{eq:encoder-formula}
+Where $D$ is the length of the driven path, $r$ is the wheel radius, $\Delta tick$ is the number of recorded ticks during the two sampling points and $N$ is the number of ticks per revolution. 
+In our case the numeric values are:
+
+\begin{eqnarray*}
+    r =& 0.021\, [m]\\
+    N =& 360\, [\frac{tick}{2\,\pi}]
+\end{eqnarray*}
+In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively. 
+$D_c$ is the notation we use for the length of the driven path for the body and is similar to \eqref{eq:av_velocity}:
+
+\begin{equation}
+    D_c = \frac{D_r + D_l}{2}
+\end{equation}
+The discretized equations of motion is given by:
+
+\begin{eqnarray}
+\begin{aligned}
+    x(k+1) =& x(k) + D_c(k)\,cos(\theta(k))\\
+    y(k+1) =& y(k) + D_c(k)\,sin(\theta(k))\\
+    \theta(k+1) =& \theta(k) + \frac{D_r(k)-D_l(k)}{W}
+\end{aligned}
+\end{eqnarray}\label{eq:Disc_EOM}
+Where $W$ is the width of the robot, i.e. the distance between the two wheels.
+The limitation of this approximativ method is the sampling rate relative the average velocity of the body.
+The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together. 
+E.g. if the average velocity is very high and the sampling rate is very low, the straight line will not be a good approximation for the driven arc shaped path.
+To make this approximation more accurate it is required to divide the driven path in to more points. 
+This accuracy can be improved by having higher sampling rate or lower average velocity.
 
 \subsubsection{Arm}
 
@@ -126,7 +162,7 @@ G_{c}(s) = \frac{K_p}{s + K_p}
 \end{equation}
 
 This system will have a pole at $-K_p$.
-Any positive proportional gain will results in a stable pole and which in turn a stable system.
+Any positive proportional gain will results in a stable pole and which in turn leads to a stable system.
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/Theta_PID.PNG}
