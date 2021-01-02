@@ -7,21 +7,19 @@ When all tasks in a project have been marked as ``done'', the milestone has been
 a feature has either been implemented, or a bug has been fixed, depending on the milestone definition.
 For example, the milestone of implementing two-dimensional navigation is organized via the \href{https://github.com/tmplt/ed7039e/projects/1}{project under the same name}.
 
-Once a week a meeting will be held to wrap up the previous week and make any necessary preparations for the coming week,
-such as assigning tasks, helping with any issues that may have appeared, etc.
+Once a week a meeting was held to wrap up the previous week and make any necessary preparations for the coming week:
+such as assigning tasks, helping with any blocking issues, etc.
 
 \subsection{Git work flow}
 If one or more team members wishes to apply a change to the repository,
-they will create an appropriate branch in their fork,
+they create an appropriate branch in their fork of the repository,
 commit their changes to this branch and create a pull request to the original repository.
 After its submission it is up to the repository maintainer to verify that proposed changes are:
 appropriate,
-hold a certain quality (e.g., in the case of a code submission, that the code is sufficiently commented and easily understood),
+hold a certain quality (e.g., in the case of a code submission, that the code is sufficiently commented and understood),
 and may be reproducibly built. % TODO: refer to the section on Nix?
 If these criteria are not met, the required changes will be communicated to the pull request author(s) either via the GitHub's built-in review tools, or in person.
 When the above criteria are met, the maintainer will merge the commits into the tree of the target branch.
 The main branch of this project is denoted as the ``master'' branch wherein only working code should reside.
 Any features that require an extensive implementation and/or testing period may reside in any amount of additional branches,
 be it under the origin repository or under a fork.
-
-Ultimately, the maintainer is responsible for all code that is merged.

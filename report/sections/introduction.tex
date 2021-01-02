@@ -34,13 +34,46 @@ where $(x, y)$ denote a position on the factory floor and $z, z \geq 0$, an elev
 
 % Mention the inclusion of Arrowhead in the problem.
 A station signals a fully processed object via the Arrowhead Framework in a defined local cloud.
-Upon this signal, the task of moving the object is to be delegated to the system this project aims to develop.
+Upon this signal, the task of moving the object is to be delegated to the mechatronical system this project aims to develop.
+
+% Draw a nice state machine representation of the issue.
+From the above problem description five possible system states are thus argued for:
+when the robot is
+\begin{inline-enum}
+\item waiting for a command;
+\item moving to a destination;
+\item following a navigation line;
+\item picking an object up; and
+\item dropping an object off.
+\end{inline-enum}
+The relation between these states, and the allowed transitions between them is visually described using the state machine in Fig.~\ref{fig:state_machine}.
+\begin{figure*}[h]
+  \centering
+  \begin{tikzpicture}
+    % TODO transpose?
+    \node[state, initial, accepting] (wait) {waiting for \\ command};
+    \node[state, right of=wait] (move) {moving to \\ destination};
+    \node[state, below of=move] (follow) {following \\ line};
+    \node[state, right of=follow] (pickup) {picking \\ up object};
+    \node[state, left of=follow] (dropoff) {dropping \\ off object};
+
+    \path[->] (wait) edge node{Arrowhead \\ signal} (move)
+    (move) edge[sloped] node{line detected \\} (follow)
+    (follow) edge[sloped] node{station detection \\ (system w/o object)} (pickup)
+    (follow) edge[sloped] node{station detection \\ (system w/ object)} (dropoff)
+    (pickup) edge[sloped] node{object picked up \\} (move)
+    (dropoff) edge[sloped] node{object dropped \\} (wait)
+    ;
+  \end{tikzpicture}
+  \caption{High-level state machine of the system.}
+  \label{fig:state_machine}
+\end{figure*}
 
 % TODO: insert an image of the conveyor belt with measures.
 
 \subsection{Limitations}
 % Note and expound on the very large problem domain.
-The problem domain is vast and infinite configurations can mimic the wanted factory setting:
+The problem domain is vast and infinite configurations can mimic a wanted factory setting:
 \begin{inline-enum}
     \item different placement/rotations of one or more stations;
     \item obstacles of multiple types; static and dynamic (e.g. humans, other robots);
@@ -51,7 +84,7 @@ Support for more configurations require a more complex system model, simulation 
 and more complexity requires more development time.
 
 % Note time limitation and the smaller problem space we aim to tackle.
-The system developed in this project is to be thoroughly modelled, simulated, and implemented in the time span of twelve weeks (weeks 36--48).
+The system developed in this project is to be thoroughly modelled, simulated, and implemented in the time span of two semesters.
 For that reason (and those stated in the previous paragraph), this project is thus limited to two stations:
 a single designated pick-up point and a single designated drop-off point  --- both static and elevated (however, $z_0 = z$).
 Furthermore, the system environment will contain no other obstacles, and if an object is dropped, the displacement procedure ends and is considered to have failed;
@@ -61,6 +94,5 @@ If an object is successfully displaced automatically to its destination once, th
 % Note that the system has no real-time requirement
 % XXX: unless we require the system to not overshoot its 2D destionations, then we need to process location data with known delay.
 % TODO: find a reference on this statement.
-Because the above defined problem domain lacks any time component (as would be the case if the system would need to dodge moving obstacles, respond to time-dependent destinations, etc.)
-and because the object need only be moved to its destination eventually (as this is only a proof of concept), the implementation is under no real-time requirement.
+Because the above defined problem domain lacks any time component (as would be the case if the system would need to dodge moving obstacles, respond to time-dependent destinations, etc.) and becafuse the object need only be moved to its destination eventually, the implementation is under no real-time requirement.
 This greatly lessens the requirement of the system model and software implementation.

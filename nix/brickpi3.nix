@@ -1,3 +1,5 @@
+# This expression describes all alternations that needs to be done so
+# that we may utilize the BrickPi3 on the Rasberry Pi.
 { pkgs, lib, ... }:
 
 {

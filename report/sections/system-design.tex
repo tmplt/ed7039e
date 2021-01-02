@@ -1,5 +1,10 @@
-\section{System design and composition}
+\section{System model and simulations}
+This section thoroughly covers the models and simulations of the two subsystems that constitute the mechatronical system:
+the mobile platform and the arm which is attached to the platform.
+The software used in this project is covered in section~\ref{sec:implementation}.
+
 \subsection{Model}
+
 The system is modeled in two parts: the moving base and the\ldots
 % TODO: describe the moving base, and the attachment, whatever it ends up being.
 % Include physical models.
@@ -173,24 +178,25 @@ The eq. (\ref{eq12}) into eq. (\ref{15}) to get the cubic polynomial function. T
 \end{figure}
 Fig. (\ref{fig2}) shows the trajectory with $q_0 = 10^\circ$ and $q_f = -30^\circ$.
 
+
 \subsubsection{Mobile platform}
 \label{subsubsec:unicycle}
-The model used in this case is the unicycle model, due to the differential steering. 
-This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angle to its wheels. 
-The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side. 
+The model used in this case is the unicycle model, due to the differential steering.
+This is because of the mobile platform has only two wheels/trucks and it is not able to apply any steering angle to its wheels.
+The only way this robot can change orientation is by giving different velocity on each wheel-driving servo on left- and right- side.
 With this feature it is also possible to change the orientation of the mobile platform without changing the position of the platform.
 I.e. the robot is able to spin while the right-hand side wheels have the same velocity as the left-hand side wheels, in opposite direction.
-\begin{figure}[h!]
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/car-unicycle.png}
-\caption{Unicycle model of a car-like robot. 
-$v_L$ and $v_R$ represent the left- and right-hand side wheels' velocities respectively. 
+\caption{Unicycle model of a car-like robot.
+$v_L$ and $v_R$ represent the left- and right-hand side wheels' velocities respectively.
 The robot follows a path around the instantaneous center of rotation (ICR) where $R_L$ and $R_R$ are the distances from left and right wheels to ICR respectively and $w$ is the distance between them.}
 \label{fig:UnicycleModel}
-\end{figure} 
+\end{figure}
 
-As shown in Fig.~\ref{fig:UnicycleModel} The robot follows a curved path with the instantaneous center of rotation at its center. 
-The left-hand side wheels have velocity $v_L$ and moves along an arc with radius $R_L$ during the time that right-hand side wheels moves along another arc with radius $R_R$ at the speed of $v_R$. 
+As shown in Fig.~\ref{fig:UnicycleModel} The robot follows a curved path with the instantaneous center of rotation at its center.
+The left-hand side wheels have velocity $v_L$ and moves along an arc with radius $R_L$ during the time that right-hand side wheels moves along another arc with radius $R_R$ at the speed of $v_R$.
 The turning rate of the body is
 \begin{equation*}
 \dot{\theta}= \frac{v_L}{R_L} = \frac{v_R}{R_R}
@@ -208,11 +214,49 @@ the equations of motion for this model are
 \end{aligned}
 \label{eq:MotionEq}
 \end{eqnarray}
-where the average velocity\parencite{Corke2011} is given by        
+where the average velocity \parencite{Corke2011} is given by
 \begin{equation}
-v = \frac{v_R + v_L}{2} 
+v = \frac{v_R + v_L}{2}
 \label{eq:av_velocity}
 \end{equation}
+Before the implementation, it is required to to find a discrete equivalent for the systems dynamics. 
+By being able to count the number of encoder ticks on each servo and some approximation it is possible to estimate the position of the robot.
+In this approximativ method we assume that the driven path in-between the two sampling points is a straight line. 
+The length of the driven path for each wheel can be computed using the following formula:
+
+\begin{equation}
+    D = 2\,\pi\,r\,\frac{\Delta tick}{N}
+\end{equation}\label{eq:encoder-formula}
+Where $D$ is the length of the driven path, $r$ is the wheel radius, $\Delta tick$ is the number of recorded ticks during the two sampling points and $N$ is the number of ticks per revolution. 
+In our case the numeric values are:
+
+\begin{eqnarray*}
+    r =& 0.021\, [m]\\
+    N =& 360\, [\frac{tick}{2\,\pi}]
+\end{eqnarray*}
+In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively. 
+$D_c$ is the notation we use for the length of the driven path for the body and is similar to \eqref{eq:av_velocity}:
+
+\begin{equation}
+    D_c = \frac{D_r + D_l}{2}
+\end{equation}
+The discretized equations of motion is given by:
+
+\begin{eqnarray}
+\begin{aligned}
+    x(k+1) =& x(k) + D_c(k)\,cos(\theta(k))\\
+    y(k+1) =& y(k) + D_c(k)\,sin(\theta(k))\\
+    \theta(k+1) =& \theta(k) + \frac{D_r(k)-D_l(k)}{W}
+\end{aligned}
+\end{eqnarray}\label{eq:Disc_EOM}
+Where $W$ is the width of the robot, i.e. the distance between the two wheels.
+The limitation of this approximativ method is the sampling rate relative the average velocity of the body.
+The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together. 
+E.g. if the average velocity is very high and the sampling rate is very low, the straight line will not be a good approximation for the driven arc shaped path.
+To make this approximation more accurate it is required to divide the driven path in to more points. 
+This accuracy can be improved by having higher sampling rate or lower average velocity.
+
+\subsubsection{Arm}
 
 \subsection{Simulation}
 % Simulte the models from the previous section and show that it will work.
@@ -221,15 +265,15 @@ v = \frac{v_R + v_L}{2}
 A simulation profile is made to make sure of the unicycle mode in sub section \ref{subsubsec:unicycle} is the suitable model for this application.
 The simulation is made in discrete time domain with the sampling frequency of $10$~Hz.
 This is done in the described way due to the robot is going to operate in discrete time.
-The sampling frequency is assumed to be low and that is because the designed controllers are going to be able to work fine for higher samplings frequencies but that is not guaranteed for vise-versa.\\  
+The sampling frequency is assumed to be low and that is because the designed controllers are going to be able to work fine for higher samplings frequencies but that is not guaranteed for vise-versa.
 As the unicycle model describes the systems dynamics.
 The position of the robot $(x, y, \theta)$ is dependent on the two wheel velocities. Which in turn has dependencies to the average velocity $V$ and the angular velocity $\omega$. These relations are presented in Eq.~\eqref{eq:ThetaDot} -- Eq.~\eqref{eq:av_velocity}.
-\begin{figure*}[ht]
+\begin{figure*}[h]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/omegaCtrlr.png}
 \caption{Overview of the systems block diagram where the angular velocity $\omega$ is controlled by a PID controller.}
 \label{fig:overview}
-\end{figure*} 
+\end{figure*}
 
 A pole placement analyze is required for the design of a PID controller.
 This analyze is done in continues time domain, due to its simplicity.
@@ -249,8 +293,8 @@ Where $G(s)$ is the transfer function
 However it is the angular position $\theta$ which is relevant in this case.
 So it is required to implement an integrator in the feedback to make the angular position controllable.
 \tikzset{
-    block/.style = {draw, rectangle, 
-    minimum height=1cm, 
+    block/.style = {draw, rectangle,
+    minimum height=1cm,
     minimum width=2cm},
     input/.style = {coordinate,node distance=1cm},
     output/.style = {coordinate,node distance=2cm},
@@ -272,46 +316,46 @@ So it is required to implement an integrator in the feedback to make the angular
         \draw [->] (controller) -- node {} (plant);
         \draw [->] (plant) -- node [name=y] {$Y(s)$}(output);
         \draw [->] (y) |- node [above,pos=0.79] {} (feedback) ;
-        \draw [->] (feedback) -| node[pos=0.99] {$-$} 
+        \draw [->] (feedback) -| node[pos=0.99] {$-$}
         node [near end] {} (sum);
         \end{tikzpicture}
     \end{center}
     \caption{Closed loop system with a integrator in the feedback.}\label{fig:closedloop}
 \end{figure}
 
-In this case the closed loop transfer function will be as shown in Eq.\eqref{eq:closedloop}
+In this case the closed loop transfer function will be as shown in Eq.~\eqref{eq:closedloop}
 \begin{equation}
 G_{c}(s) = \frac{PID}{s + PID}
 \label{eq:closedloop}
-\end{equation} 
-As the closed loop transfer function of the system is describing a first order system, it is possible to use a P-controller. 
-I.e. the controller only has a proportional gain and doesn't require a integrative or derivative elements. 
-So the final closed loop transfer function will be 
+\end{equation}
+As the closed loop transfer function of the system is describing a first order system, it is possible to use a P-controller.
+I.e. the controller only has a proportional gain and doesn't require a integrative or derivative elements.
+So the final closed loop transfer function will be
 \begin{equation}
 G_{c}(s) = \frac{K_p}{s + K_p}
 \label{eq:kp}
 \end{equation}
 
 This system will have a pole at $-K_p$.
-Any positive proportional gain will results in a stable pole and which in turn a stable system.
+Any positive proportional gain will results in a stable pole and which in turn leads to a stable system.
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/Theta_PID.PNG}
 \caption{The complete control block for the angular position in discrete time domain.}
 \label{fig:PID1}
 \end{figure*}
- 
+
 It is required to make sure that $\theta$ error, $\theta_e$ is in $(-\pi,\pi]$ span. Due to the $\theta = \theta \pm 2 \cdot n \cdot \pi$, it is possible for the error be in out of this span.
-By using a function called arctan2 or atan2 in many programming languages it is possible to accomplish this challenge.\\
-This function often has two input argument (y,x).\\ 
-By defining 
+By using a function called arctan2 or atan2 in many programming languages it is possible to accomplish this challenge.
+This function often has two input argument (y,x).
+By defining
 \begin{equation}
-\theta = atan2(sin(\theta),\, cos(\theta))
+\theta = \text{atan2}(\sin(\theta),\, \cos(\theta))
 \end{equation}
 $\theta$ will always be in $(-\pi,\pi]$ span.
 
 Due to the physical limits the servos have, two saturation blocks are required.
-These blocks are shown in figure(\ref{fig:PID1}) and the assumption for their limits are $(-10,10)$~[cm/s]. 
+These blocks are shown in Fig.~\ref{fig:PID1} and the assumption for their limits are $(-10,10)$~[cm/s].
 This assumption is done to make the simulation more alike the real application.
 \begin{figure}[ht]
 \centering
@@ -320,12 +364,12 @@ This assumption is done to make the simulation more alike the real application.
 \label{fig:Theta_Step}
 \end{figure}
 
-The result of the simulation, the step response for the angular position control system is presented in figure(\ref{fig:Theta_Step}).
+The result of the simulation, the step response for the angular position control system is presented in Fig.~\ref{fig:Theta_Step}.
 As it shown this is a stable system, it has no steady state error, no oscillation and relative fast rise-time.
 
-In this part of the mobile platforms movement it is important to be able to control the spacial position $(x, y)$. 
-As shown in the kinematic equations Eq.~\eqref{eq:MotionEq} the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$. 
-A design of a controller for the average velocity is required to make it possible to control the spacial position. 
+In this part of the mobile platforms movement it is important to be able to control the spacial position $(x, y)$.
+As shown in the kinematic equations Eq.~\eqref{eq:MotionEq} the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$.
+A design of a controller for the average velocity is required to make it possible to control the spacial position.
 Take note of the two input \texttt{AverageVelocity}, \texttt{Desired\_Theta} and the two output \texttt{X}, \texttt{Y} in figure(\ref{fig:PID1}).
 
 By redefining the spatial error from a Cartesian coordinate system to a polar coordinate system it is possible to design a controller for average velocity.
@@ -335,47 +379,35 @@ In this case the error will be defined as following:
 \Delta x &= Desired\_X - X\\
 \Delta y &= Desired\_Y - Y\\
 Distance &= \sqrt{\Delta x^2 + \Delta y^2}\\
-Desired\_\theta &= atan2(\Delta y, \Delta x)
+Desired\_\theta &= \text{atan2}(\Delta y, \Delta x)
 \end{aligned}
 \label{eq:cart2polar}
 \end{eqnarray}
 
-Now by defining the distance as an error to a PID controller for the average velocity, it makes it possible for the mobile platform to stop at the desired position. 
+Now by defining the distance as an error to a PID controller for the average velocity, it makes it possible for the mobile platform to stop at the desired position.
 In this case a P controller, a controller which has only a proportional gain, is enough.
-\begin{figure*}[ht]
+\begin{figure*}[h]
 \centering
 \includegraphics[width=\textwidth]{sections/assets/V_PID.PNG}
-\caption{Overview of the complete systems block diagram for the spatial position control. figure(\ref{fig:PID1}) is an overview of the ``Steering´´ block and Eq.~\eqref{eq:cart2polar} is the mathematical definition for the block function ``Cartesian- to Polar-coordinates Converter´´.}
+\caption{Overview of the complete systems block diagram for the spatial position control. Fig.~\ref{fig:PID1} is an overview of the ``Steering'' block and Eq.~\eqref{eq:cart2polar} is the mathematical definition for the block function ``Cartesian- to Polar-coordinates Converter''.}
 \label{fig:V_PID}
 \end{figure*}
- 
-Here comes some of the results for the spacial position control simulation. In this case the desired position is $(100, 100)$, the proportional gain for the angular velocity controller is $K_p = 4$ and the proportional gain for the average velocity controller is $K_p = 5$. If you are interested to see more plots, you can go to the Git-repository under \texttt{simulation/Diff\_Drive/README} and you will find out how to generate more relative plots for this system.\\
 
-\begin{figure}[ht]
+Here comes some of the results for the spacial position control simulation. In this case the desired position is $(100, 100)$, the proportional gain for the angular velocity controller is $K_p = 4$ and the proportional gain for the average velocity controller is $K_p = 5$. If you are interested to see more plots, you can go to the Git-repository under \texttt{simulation/Diff\_Drive/README.txt} and you will find out how to generate more relative plots for this system.
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/traj.png}
-\caption{The drived trajectory.}
+\caption{The driven trajectory.}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.4\textwidth]{sections/assets/WV.png}
 \caption{The wheels' velocities during the drive time.}
 \end{figure}
 
+\subsubsection{Arm}
 
 \subsection{Hardware}
-% Explain the raspberry pi and it's attachments.
-
-% TODO: remove this section; talk about software in `implementation.nix` instead.
-\subsection{Software}
-
-% TODO: rewrite/move elsewhere?
-\subsubsection{System-external services}
-The software environment generated for the Raspberry Pi automatically connects to Eduroam if credentials are available.
-Eduroam places some limitations on connected clients: firewall, e.g.
-To enable easy remote access to the system, a reverse SSH proxy is established with a known bastion host which has a static IP address.
-By exposing this proxy via a known port on the bastion, any system connected to the Internet may trivially access the Raspberry Pi remotely via a static endpoint.
-While not a necessity for the project itself, this external service is a great convenience for ad-hoc experiments and general system debugging.
-
-% Explain the content of contrib/bastion.nix
+% Explain the raspberry pi and it's attachments, the motors, and all the lego
