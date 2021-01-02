@@ -56,6 +56,8 @@ struct io_encoder_t
 struct io_arrowhead_t
 {
         int64_t timestamp; // in milliseconds
+        string action;
+        string pos;
 }
 
 // Found on channel IO_LINE_FOLLOWER

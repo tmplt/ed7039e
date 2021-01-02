@@ -1,4 +1,11 @@
 \section{Implementation}
+% Summarize the section
+Within this section a defined set of project milestones that divide the problem description into smaller parts is presented.
+The project's prototyping efforts with the chosen hardware is then thoroughly covered:
+issues encountered, how these were resolved, and ultimately the final design choices.
+Lastly, the system's software components are covered: what they are supposed to do, how they work, and how they relate to other components.
+
+% Summarize where project source can be found and how to interpret file references.
 The source for this project (as well as the source code for this report) is available at the git repository hosted publicly at \href{https://github.com/tmplt/ed7039e}{github.com/tmplt/ed7039e}.
 If not otherwise specified, any references to a repository shall mean this repository.
 Any and all references to files/directories will be to paths relative the repository root.
@@ -10,10 +17,11 @@ For example, \texttt{report/} and \texttt{src/lcm-source-dwm.c} refer to \href{h
 % A proper implementation would be on a micro-controller that allows code to be run bare-metal, without having to fight with the Linux kernel.
 
 \subsection{Milestones}
-The project is divided into four milestones:
+\label{sec:milestones}
+The project was divided into four milestones:
 \begin{enumerate}
 \item \textbf{Two-dimensional navigation:}
-  the system should be able to determine its coordinates in a ad-hoc, local grid.
+  the system should be able to determine its coordinates in an ad-hoc, localized grid.
   From its initial position, it should then be able to respond to movement commands on the form ``move to position $(x, y)$''.
 
 \item \textbf{Navigation-line detection:}
@@ -29,20 +37,20 @@ The project is divided into four milestones:
   but the system is to move to the second station instead and execute the pickup-process in reverse.
 \end{enumerate}
 
-% TODO: write here when each milestone was reached and why it took the time it did
+The set of milestones the project reached are reviewed in section~\ref{sec:results}.
 
 \subsection{Prototyping}
-% Here we describe the prototyping stages of the system's components if anything
-% out of the ordinary pops up.
+This section thoroughly cover the prototyping efforts regarding both hardware and software of the project,
+particularly that of data acquisition and processing.
 
 \subsubsection{NixOS}
 % Introduce NixOS and what is gives us
-In this project we have chosen to use NixOS as the operating system on which to run our software.
+In this project it was decided that NixOS should be used as the operating system on which to run our software.
 NixOS is a Linux distibutiton (henceforth referred to as a ``distro'') based upon the Nix package manager (and the terms will be used interchangibly henceforth) that aims to be
 \begin{inline-enum}
 \item reproducible:
   ``packages [are built] in isolation from each other. [\ldots] they are reproducible and don't have any undeclared dependencies.''\footnote{A positive side-effect of this feature is the complete mitigation of ``dependency hell'': a term relating to a set of problems that commonly arise if multiple versions of a dependency are installed on a system.};
-  so if a package works on one machine, it will work on any machine.
+  this means that if a package works on one machine, it will work on any machine\footnote{As long as the machines' hardware architectures are all supported.}.
   Also, when building a package on multiple machine, all machines will yield the exact same output file tree.
 \item Declarative:
   packages are described in expressions that are trivially shared and combined with other package declarations; and
@@ -50,25 +58,27 @@ NixOS is a Linux distibutiton (henceforth referred to as a ``distro'') based upo
   ``installing or upgrading one package cannot break other packages''.
 \end{inline-enum}~\parencite{nixos.org}
 
-Effectively, NixOS allows us to functionally declare our system in a single (or multiple) expressions ---
-that is: Nix enables us to describe the software components of our system in a common manner and how they relate to eachother.
+% What is the effect of the above?
+Effectively, NixOS allows its user to functionally declare their system in a single (or multiple) expressions ---
+that is: Nix enables the user to describe the software components of a system in a common manner and how the components relate to one another.
 The realization of these expressions can be seen in the repository's \texttt{*.nix} files.
-Of particular interest is \texttt{mmc-image.nix}: evaluating this expression generates a bootable image readily flashed onto a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, memory card.} that contains the full softare stack and operation instuctions of our robot system.
-With the combination of git we can thus version control not only our custom software, but all its dependencies and the complete system behavior.
+Of particular interest is \texttt{mmc-image.nix}: evaluating this expression generates a bootable image readily flashed onto a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, memory card.} that contains the full softare stack and operation instuctions of the project's robot system.
+With the combination of git, the custom software is not only checked into version control, but so are all dependencies and the complete system behavior.
 
 % How does it differ from a conventional disto?
-NixOS is a contrast to the conventional Linux distribution where changes are made to the system via iterative global changes to the system state:
+NixOS is a contrast to the conventional Linux distribution where changes are made to the system via iterative global changes to the system state;
 the installation and configuration of software piece-by-piece, for example.
-In this mode, it is common to apply ``small changes'' that eventually coalesce into a significant diversion from the originally intended system behavior ---
+In this development mode, it is common to apply ``small changes'' that eventually coalesce into a significant diversion from the originally intended system behavior (a behavior that likely is not the same a few project iterations later) ---
 changes made are not always documented which create a dependency on the ever-changing global state of the system (that is, the file system in which the system is prototyped/implemented).
-Of note within this mode is that if the file sysetm is lost, many hours of work may have been wasted if necessary precautions weren't adhered to (by all project members) from the start of the project (such as writing a script that apply all global state changes from a fresh install, for example).
-Our usage of NixOS \textit{forces} us to adhere to such precautions.
+Of note within this mode is that if the file system is lost,
+many hours of work may have been wasted if necessary precautions were not adhered to (by all project members) from the start of the project (such as writing a script that apply all global state changes from a fresh install, for example).
+The usage of NixOS theoretically \textit{forces} its user to adhere to such precautions \textit{if} combined with version control.
 
 % What are the negatives of NixOS?
 NixOS is no silver bullet, however.
 Because of its design, whenever something is to be implemented on NixOS it must be done properly the first time.
-Its non-adherence to the Filesystem Hierarchy Standard (FHS)\footnote{the existance and FHS-defined usage of \texttt{/usr}, \texttt{/lib}, \texttt{/var}, and other system directories.} breaks both the build and execution process of many programs.
-Unless a program is portably written, it must be patched before it can be used on NixOS where all system files exist under \texttt{/nix/store} which is required to enable the features enumerated in the previous paragraphs.
+Its non-adherence to the Filesystem Hierarchy Standard (FHS)\footnote{the existance and FHS-defined usage of \texttt{/usr}, \texttt{/lib}, \texttt{/var}, and other Unix-standard system directories.} breaks both the build and execution process of many programs.
+Unless a program is portably written, it must be patched before it can be used on NixOS where all system files exist under a common prefix (\texttt{/nix/store}) which is required to enable the features enumerated in the previous paragraphs.
 
 % Hardware issues
 Another problem is the distro's relative infancy to other distros, particularly when it comes to hardware support.
@@ -76,68 +86,91 @@ NixOS builds with a generic Linux kernel by default.
 A generic kernel is expected to run on a generic system.
 Because of the availability of hardware peripherals such as general-purpose input/output pins, GPIO;
 universal asynchronous receiver-transmitter, UART;
-serial peripheral interface, SPI; and other on the Raspberry Pi we use in this project, our system is not generic.
-The result of this is that these peripherals, which we all need, simply do not work.
+serial peripheral interface, SPI; and other on the Raspberry Pi which is used in this project, the project's system is not generic.
+The result of this is that these peripherals, which are all required, simply do not work.
 Fortunately, some work has already been done (and is still being done) by the NixOS community to remedy this.
 By applying a so called device-tree overlay on the Linux kernel (and thus describing how an otherwise unknown peripheral may be utilized) SPI was successfully enabled,
-which was required to actuate our robot's motors.
-Other components we required could be utilized by help of the Raspberry Pi's USB port (fortunately a generic peripheral).
-Had we instead opted to use a distro officially supposted by the Raspberry Pi, all of these peripherals would simply work out of the box, but we would then loose the featuses enumerated above.
+which was required to actuate the robot's motors.
+Other required components could be utilized by help of the Raspberry Pi's USB port (fortunately a generic peripheral).
+Had it been decided to use a distro officially supposted by the Raspberry Pi,
+all of these peripherals would simply work out of the box,
+but that would result in a loss of the features previously enumerated.
 
+% What about the RPi kernels?
 Some non-generic kernels are offered by NixOS that imply support for Raspberry Pis, but offer none in practise.
 The reason for these kernels' availability is presently unknown.
+Inspecting the expressions that define these kernels however, it is found that they apply some non-generic procedures to enable a proper boot sequence of the hardware.
+It may be the case that these were added without any consideration to full peripheral support.
 
-While its certainly possible to enable proper hardware support for all peripherals in the kernel we use, we are on a tight deadline.
-As such, we are satisfied even though only SPI is properly supported.
+% We are however satisfied for prototyping purposes.
+While its technically possible to enable proper hardware support for all peripherals in the kernel that are required,
+the project is on a deadline.
+As such, we are satisfied even though only SPI is properly supported;
+remaining peripherals can instead be utilized by help of dedicated hardware that offer an USB-interface.
 
-% TODO: what problems does NixOS cause?
-% * We cannot use vscode-remote
-% * We cannot nix-shell into a shell with ALL appropriate python libs (whatever + brickpi3) because the new env prepends the build one in PATH.
-% ...
+\subsubsection{System-external services}
+% What external services do we offer?
+To ease the prototyping efforts on the Raspberry Pi a convenience system service was drafted up with help of Nix:
+by declaring an expression that contains the login credentials to the university's wireless network (eduroam),
+and a system service that automatically establishes a reverse SSH proxy to a project-controlled server with a static IP adress,
+the network limitations of eduroam\footnote{Particularly that of network adress translation (NAT), where a server behind NAT may not be accessed from the outside unless some control of the firewall is at hand, which we did not have.} were mostly side-stepped.
+
+% And this resulted in what?
+Effectively, this reverse proxy allowed any project member to access the Raspberry Pi via SSH from anywhere with an Internet connection,
+which helped both during implementation and debugging.
+
+% TODO: note that the SSH proxy only works for a single RPi. We can’t
+% connect to two different RPis at the same time.
+% TODO: note that SSH thinks a MitM is going on because system ID
+% changes with every rebuild.
 
 \subsubsection{Decawave}
+% What is the decawave? How does it work? Summarize
 This project uses Decawave (or more specifically: a DWM1001 development board) for two-dimensional positioning.
-The development board constitutes of the ultra wide-band module itself, the DWM1001C, an accelerometer,
+The development board constitutes of a ultra wide-band module, the DWM1001C, an accelerometer,
 and a Raspberry Pi-compatible GPIO-header.
-Via communication over UART, we are able to query its measured position as reported by help of the Decawave anchor nodes\footnote{An anchor is another development board configured for static installation at a known coordinate, used for position calculation. A non-static device with unknown coordinates (as is used in our system) is known as a tag.},
-and use this data to figure out where our system is located in the mimicked factory.
+By help of a set of ``anchors''\footnote{An anchor is another development board configured for static installation at a known coordinate, used for position calculation. A non-static device with unknown coordinates (as is used in our system) is known as a tag.} a ``tag'' is capable of determining its position relative to the connected anchors by calculating the time-of-flight of messages sent to and from the anchors with satisfactory accuracy.
+Thus, by using the development board's (henceforth reffesed to as a/the ``DWM'') USB-interface,
+position and acceleration data is queried and used to determine the relative position of the robot in the mimicked factory.
 
 % Describe the TLV API we wanted to use.
-The device (henceforth referred to as a/the ``DWM'') exposes two modes over UART which we can use to extract data of interest.
+The DWM  exposes two modes over its USB-interface which can use to extract data of interest.
 One of the modes is a type-length-value (TLV) API which is very suitable for automated interaction:
-to extract data using this mode, we need only write three bytes on the form \texttt{\textbf{MSB}}, \texttt{\textbf{MSB-1}}, \texttt{\textbf{MSB-2}}, \texttt{\textbf{...}} where:
+to extract data using this mode, one need only write three bytes on the form \texttt{\textbf{MSB}}, \texttt{\textbf{MSB-1}}, \texttt{\textbf{MSB-2}}, \texttt{\textbf{...}} where:
 \begin{description}
-\item[\texttt{MSB}] is the \textit{type} of data we want to send. We specify \texttt{0x40} to call a function via the API.
-\item[\texttt{MSB-1}] is the value \textit{value} we want to sent. We specify (for example) \texttt{0x02} to call a function asking for the DWM position.
-\item[\texttt{MSB-2}] is the length of the data we want to send. Function \texttt{0x02} takes no payload, so we specifify \texttt{0x00} here.
+\item[\texttt{MSB}] is the \textit{type} of data one wants to send. \texttt{0x40} is specified to call a function via the API.
+\item[\texttt{MSB-1}] is the value \textit{value} one wants to sent. \texttt{0x02} is speficied (for example) to call a function asking for the DWM position.
+\item[\texttt{MSB-2}] is the length of the data one wants to send. Function \texttt{0x02} takes no payload, so \texttt{0x00} is specified here.
 \item[\texttt{...}] would be a payload of length \texttt{\textbf{MSB-2}} had the function type taken a payload of non-zero size.
 \end{description}
 One sequece of these bytes constitute a TLV ``frame''.
 
 % Explain the TLV frames, and how nice they are to work with.
-After this frame has been written over the serial connection we receive two TLV frames in response:
-the first will denote whether the function call was successful (three bytes) and the second the function return data (at least three bytes).
-If the first frame says success, we read the next two bytes from which we will know what kind of data the remaining incoming bytes should be interpreted as,
-and how much more we should read.
+After this frame has been written over the serial connection two TLV frames are received in response:
+the first (of length 3 bytes) denotes whether the function call was successful and the second (at least 3 bytes long) the function return data.
+If the first frame says success, the next two bytes are read from which is derived what kind of data the remaining incoming bytes should be interpreted as,
+and how many more should be read.
 Implementation-wise, always knowing how much data to read allows for performant I/O\footnote{input/output operations: many of which require calling system functions; this is a relatively costly operation.} and easier error handling.
-It also allows easy construction of the LCM messages, because they are just a single \texttt{memcpy(3)}\footnote{\texttt{memcpy} - copy memory area: a common operation where a given amount of bytes are copied from a source adress to a destination adress.} away as the byte stream can be trivially represented as a \texttt{struct} following the API documentation.
+It also allows easy construction of subsequent system messages (see sections~\ref{sec:ROS} and \ref{sec:LCM}), because they are just a single \texttt{memcpy(3)}\footnote{\texttt{memcpy} - copy memory area: a common (and performant) operation where a given amount of bytes are copied from a source adress to a destination adress.} away as the byte stream can be trivially represented as a \texttt{struct} following the API documentation.
 
 % No access to acceleration data using the TLV API; generic shell required.
-Unfortunately, the TLV API does not expose a function for reading the accelerometer data which we require do estimate the direction of our robot.
+Unfortunately, the TLV API does not expose a function for reading the accelerometer data which is required to estimate the direction of our robot.
 A command is, however, readibly available via the interactive shell mode.
-This mode instead replies in a human-readable format, but without telling us how many bytes are to be read, and in what way to interpret the data we read.
+This mode instead replies in a human-readable format, but without telling the caller how many bytes are to be read beforehand, nor in what way to interpret the data read.
 Fortunately, when the shell is ready to process new input, it writes a ``\texttt{dwm>}'' shell prompt;
-we simply read the response until this string is encountered.
-This ultimately require us to perform more I/O operations and parse the data upon reception, an operation that is slower than a mere \texttt{memcpy},
+bytes can simply be read until this string is encountered.
+This ultimately boils down to more I/O operations and a parsing procedure upon data reception, and operation that is slower than a mere \texttt{memcpy},
 but is nevertheless readibly available via a proper call to the \texttt{scanf(3)} family of functions.
 
 An alternative approach where both the TLV API and the shell mode was used was tested but ultimately scrapped:
-the time to transition from the TLV API to the shell mode took approximately $1$~s, which broke our $10$~Hz requirement.
+the time to transition from the TLV API to the shell mode took approximately $1$~s, which broke the robot system's $10$~Hz requirement.
 
 \textit{Why} accelerometer data can be queried in one mode but not the other is presently unknown.
-We surmise that the existance of the shell mode is for debugging purposes only (because of its human readable format --- and its insistance of using different methods of formatting for similar data types) and that accelerometer data is omitted from the TLV API because it is used by the internal localization functions to detect when the hardware is stationary, or because the developers simply did not foresee this kind of utilization, or both.
+It is surmised that the existance of the shell mode is for debugging purposes only (because of its human readable format --- and its insistance of using different methods of formatting for similar data types) and that accelerometer data is omitted from the TLV API because it is used by the internal localization functions to detect when the hardware is stationary,
+or because the developers simply did not foresee this kind of utilization,
+or both.
 
-Nevertheless, the data we receive when asking for the position is a tuple of
+Nevertheless, the data received when asking for the position is a tuple of
 $(x, y, z, q)$, where
 \begin{description}
 \item[$(x, y, z)$] is the reported coordinate in millimeters in three-dimensional space, and
@@ -145,16 +178,23 @@ $(x, y, z, q)$, where
 \end{description}
 
 Of note is that the decive cannot approximate its position unless it can connect to at least three anchors.
-Additionally, the quality factor, $q$, is higher when connected to four anchors.
-During measurements, and if there are more than four anchors available, it will chose the best four anchors to calculate its position. % What does "best" mean here? Refer to documentation.
-Because of this, we will then have to consider that our system may suddenly no longer be able fo find its position,
-and decide what should be done in order to establish a connection with the disconnected anchors.
+Additionally, the quality factor, $q$, is higher when connected to four anchors, but follow no other pattern;
+the DWM manual contain no formula for its derivation and questions posed by other users of the hardware on official forums have been met with inconclusive answers from the vendor.
+$q$ can thus not be used as a fully qualitative factor of $(x, y, z)$, but more as an indicator if the coordinates are ``good'' of ``bad''.
+Alternatively as a simple indicator whether the DWM is connected to three or four anchors.
 
-Additionally, the data we receive when asking for the acceleration is a tuple of $(x, y, z)$, where
+Because of the three-anchor dependency, a system state where less than three anchors are available must be considered:
+what should be done when the robot does not know where it is located?
+How can anchor communication be estabished?
+
+Additionally, the received when asking for the acceleration is a tuple of $(x, y, z)$, where
 \begin{description}
 \item[$(x, y, z)$] is the reported acceleration in three-dimensional space described as raw registers.
 \end{description}
 % TODO: explain how the register values are calculated to m/s^2
+These raw register values are then converted to SI units using a known formula.
+
+See \verb|src/lcm-sourcm-dwm.c| for the procedures that communicate with the DWM.
 
 % The data can be considered a random process.
 
@@ -176,26 +216,27 @@ It works by communicating via the SPI function pins of the Raspberry Pi.
 The recommended way to install all necessary components is via a \texttt{curl -k | bash}.
 There are a few issues with this approach:
 \begin{inline-enum}
-\item \texttt{-k} is an alias for \texttt{--insecure};
+\item \verb|-k| is an alias for \verb|--insecure|;
   the recommended approach is thus to not verify the server certificate ---
-  this allows a bad actor to feed you malicious code if they have access to your DNS or the target domain.
-\item A \texttt{curl | bash} is bad practise for installation purposes as it commonly installs files that are disconnected from the system's package manager.
+  this allows a bad actor to feed the caller malicious code if they have access to their DNS or the target domain.
+\item A \texttt{curl | bash} is bad practise for installation purposes as it commonly installs files that are disconnected from the system's package manager,
+  thus putting the file system in a ``dirty'' state.
 \item A \texttt{curl | bash} can be detected server-side and thus can conditionally feed a user malicious code.
   A dowload of the code first may thus pass a manual inspection before execution. \parencite{curl-bash}
 \end{inline-enum}
 
-Because we use NixOS, the content of the script had to be inspected so that an equivalent Nix expression could be written ---
-see \texttt{nix/brickpi3.nix} for the final result.
+Because the project uses NixOS, the content of the script had to be inspected so that an equivalent Nix expression could be written ---
+see the \texttt{brickpi3} attribute in \texttt{nix/derivations.nix} for the final result.
 Upon inspection, a few oddities stood out. The script:
 \begin{enumerate}
 \item expects and requires the script to be run by the user \texttt{pi}\footnote{Not all users of the peripheral is \texttt{pi}. For example, we use it as \texttt{root} while prototyping.};
 \item changes the ownership of a directory with \texttt{sudo(8)} on files under \texttt{/home/pi}, to \texttt{pi}\footnote{In this context, the operations could all have been done as \texttt{pi}.};
-\item insecurely downloads multiple scripts and executes them silently --- the downloaded scrips do the same;
-\item configures an \texttt{apt(8)} repository (and thus requires to be run on a Debian derivative) for \texttt{npm(1)},
+\item insecurely downloads multiple scripts and executes them silently --- the downloaded scripts do the same;
+\item configures an \texttt{apt(8)} repository (and thus requires to be run on a Debian distro) for \texttt{npm(1)},
   the Node JavaScript package manager, but never installs or executes any JavaScript packages;
 \item installs a C++ source file under \texttt{/usr/local/include}\footnote{A proper installation would be to build a shared library which can then be dynamically linked to when using the C++ drivers.};
-\item downloads a precompiled version of \texttt{openocd(1)}, a on-chip debugger and programmer,
-  and copies the files into system directories\footnote{No changes are made to the software, according to the mirror's documentation. An installation should instead then be made with the package manager, which is otherwise used in the scripts to install other components}, and then never uses it;
+\item downloads a precompiled version of \texttt{openocd(1)}, an on-chip debugger and programmer,
+  and copies the files into system directories\footnote{No changes are made to the software according to the mirror's documentation. An installation should instead then be made with the package manager, which is otherwise used in the scripts to install other components}, and then never uses it;
 \item runs \texttt{git(1)} as a privileged user, sometimes.
 \end{enumerate}
 The above list is truncated for sake of brevity.
@@ -204,15 +245,17 @@ After a thorough manual inspection of all scripts it was found that only a singl
 The final Nix expression is thus a combination of two \texttt{python3Packages.buildPythonPackage} where both sources are securely downloaded from official mirrors and verified with a known checksum.
 We conclude that the usage of this Nix expression leaves the system in a proper state (which the official installation script does not, by oddity 5 and 6\footnote{we consider a proper state of system one in which all installed software components are tracked by the package manager(s).}) and greatly decreases the number of attack vectors with which to run malicious code on our system.
 
-% What need to be done to be able to stack BrickPi3s?
-
 \subsubsection{RobotOS}
+\label{sec:ROS}
 % We wanted to use ROS as it was very common to the problem space, and had a lot of readily available solutions for common robot problems.
 It was initially decided that the robot system would be implemented with RobotOS (ROS), ``a set of software libraries and tools that help you build robot applications.''\footnote{See \href{https://www.ros.org/}{https://www.ros.org/}.}
-The chief reason was its common application in the problem space, its API for communicating different types of messages between different programs\footnote{Known as inter-process communication (IPC).} (in this context known as ``nodes''), and the many readily available solutions to problems we were likely to stumble upon.
+The chief reason was its common application in the problem space,
+its API for communicating different types of messages between different programs\footnote{Known as inter-process communication (IPC).} (in this context known as ``nodes''),
+and the many readily available solutions to problems we were likely to stumble upon.
 % Only officially supports very specific Ubuntu versions, and while probably very applicable to use Nix in this case, it was deemed
 % composing ROS on Nix would take too long. (the dependency tree is HUGE)
-However, ROS is only officially supported on very specific versions of Ubuntu (at this time of writing), a disto we were not using and a disto that had a very different design philosophies from NixOS;
+However, ROS is only officially supported on very specific versions of Ubuntu (at this time of writing),
+a distro we were not using and a distro that had a very different design philosophies from NixOS;
 using ROS on NixOS would thus require a Nix expression to be written that correctly packages the software.
 At this point, it was surmised that ROS made several assumption about the global system state that had to be adressed during packaging.
 This reason alone would likely require a lot of prototyping time for a simple proof-of-concept execution.
@@ -220,28 +263,48 @@ A consultation from another effort to port ROS to an unofficial repository showe
 It was thus decided to find an alternative to RobotOS due to time constrains.
 
 \subsubsection{LCM}
+\label{sec:LCM}
 % Trivial to package: just a simple mkDerivation. Nodes are similarly easily packaged. See `nix/software-nodes.nix`.
 Lightweight Communications and Marshalling (LCM) ``is a set of libraries and tools for message passing and data marshalling [\ldots] It provides a publish/subscribe message passing model and automatic marshalling/unmarshalling code generation with bindings for applications''.
+
 LCM effectively provides a set of simple functions that enable IPC with the benefit of not requiring a special-purpose daemon (as is required when running ROS).
-In difference to ROS, LCM supports any GNU/Linux system (and thus NixOS) and relies on UDP multicasting for broadcasting purposes.
-Its short list of dependencies made LCM trivial to package to NixOS: the final expression in \texttt{nix/software-nodes.nix} can be summarized as a \texttt{stdenv.mkDerivation} and the whitelisting of an UDP port in the system firewall.
+In difference to ROS, LCM supports any GNU/Linux system (and thus NixOS).
+Its short list of dependencies made LCM trivial to package with Nix:
+the final \texttt{lcm} attribute in \texttt{nix/derivations.nix} can be summarized as a \texttt{stdenv.mkDerivation} and the whitelisting of an UDP port in the system firewall to enable its execution.
 
 % Support for C and Python which we have decided to use thus far.
 % The core component of ROS we wanted was the message-passing (IPC) component, which this library provides for ANY POSIX-compliant system.
-Thus, as LCM:
+Thus, becasue LCM:
 \begin{inline-enum}
 \item enables us to trivially utilize IPC with different message types;
 \item has bindings for C and Python; and
 \item is trivially packaged,
 \end{inline-enum}
-it was decided that our robot system would be implemented with help of it in place of ROS.
+it was decided that the project's robot system would be implemented with help of it in place of ROS.
 
-\subsection{Line follower}
+\subsubsection{Line follower}
 % GPIO pins does not work. Talk about the dedicated hardware instead.
 
 \subsection{Software nodes}
+% What is a software node?
+The usage of LCM allows us to define ``software nodes'' which were briefly explained in section~\ref{sec:ROS}.
+A software node is a small stand-alone executable program, written in any language that useally has a single purpose in the system the project implements.
+For example, one node in the system reads data from the DWM;
+another approximates its position using a Kalman filter;
+another actuates the motors to pick up the object the system aims to displace; etc.
+If a node depends on data from another node,
+it is packaged in a message of a certain type and published on a channel.
+The depending node then subscribes to this channel,
+receives a message whenever one is published on that channel,
+and processes it.
+
+% How do the structure of nodes help?
+This structure have allowed us to write a set of smaller programs which are usually easier to implement and debug across multiple project members,
+instead of maintaining a monolithic program that does everything, which are useally harder to both implement and debug,
+especially when multiple project members need to contribute.
+
 % Here we'll summarize each node
-Each node follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
+Each node in the project follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
 \begin{description}
 \item[\texttt{<type>}] denotes the type of three possible alternatives:
   \texttt{source}, which denotes that the node only provides messages to the system;
@@ -250,23 +313,111 @@ Each node follow the naming scheme of \texttt{lcm-<type>-<desc>.<ext>} where
 \item[\texttt{<desc>}] is a list of words interspaced by a \texttt{-} that provide a short description of the node's purpose.
 \item[\texttt{<ext>}] is the source file extension. It describes how the node should be built before it can be executed.
   For example, if the extension is \texttt{c} then the node was written and C and needs to be compiled and linked with a C compiler before the resulting binary can be executed.
-  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed.
+  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed,
+  except for satisfying the script's dependencies.
 \end{description}
 
 The source files for all nodes can be found in \texttt{src/}.
 
-\subsubsection{\texttt{lcm-source-dwm.c}}
+Fig.~\ref{fig:node-schema} contains a visualization of all system nodes and with which other nodes they talk to.
+Communication occurs over a common LCM channel name where only one message type is expected on each channel.
+The massage type can be derived from the channel name, and vice versa.
+This was done for sake of simplicity.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[
+    node distance = 2cm,
+    auto,
+    ]
+    % input nodes
+    \node[block] (arrowhead) {Arrowhead};
+    \node[block, left of=arrowhead] (enc) {motor \\ encoders};
+    \node[block, left of=enc] (dwm) {DWM};
+    \node[block, right of=arrowhead] (line-follower) {line \\ follower};
+
+    % intermediate nodes
+    \node[block, yshift=-6cm] at ($(enc)!0.5!(arrowhead)$) (master) {master};
+    \node[block, yshift=-2cm] at ($(dwm)!0.5!(enc)$) (kalman) {Kalman \\ filter};
+    \node[block, below of=kalman] (state) {system \\ state};
+
+    % % robot modes
+    \node[block, below of=master] (object-mode) {Object \\ mode};
+    \node[block, left of=object-mode, xshift=-2em] (dwm-mode) {DWM \\ mode};
+    \node[block, right of=object-mode, xshift=2em] (line-mode) {Line-follow \\ mode};
+
+    \path[<->] (kalman) edge (state)
+    (master) edge (object-mode);
+
+    \path[->] (dwm) edge (kalman)
+    (enc) edge (state)
+    (state) edge (dwm-mode)
+    (state) edge (master)
+    (master) edge (dwm-mode)
+    (master) edge (line-mode)
+    (line-follower) edge (master)
+    (line-follower) edge (line-mode)
+    (enc) edge (object-mode)
+    (arrowhead) edge (master);
+  \end{tikzpicture}
+  \caption{Relation chart over the system's nodes.}
+  \label{fig:node-schema}
+\end{figure}
+
+All system nodes (and the source files under \texttt{src} which define them) are described below.
+\begin{description}
+\item[DWM node (\texttt{lcm-source-dwm.c})]
 This node is responsible for extracting the position and acceleration data from the DWM.
 Upon execution it opens opens a serial communication to the DWM, enters the shell mode and allocates a buffer into which received data is read into.
-Afterwards it enters a loop within which the shell commands \texttt{av} is continously called.
+Afterwards it enters a loop within which the shell command \texttt{av} is continously called.
 While spinning in this loop, the node keeps the time and ensures that the command \texttt{apg} is called with a frequenzy of $10$~Hz.
 After the execution of each command:
 \begin{enumerate}
   \item the response is read into the buffer;
   \item the buffer is parsed for data of interest;
   \item data is converted to SI units --- m for position coordinates, $\text{ms}^{\text{-2}}$ for acceleration; and
-  \item an appropriate message type is constructed and published to all subscribing nodes.
+  \item an appropriate message type is constructed and published unto either the \texttt{IO\_POSITION} or \texttt{IO\_ACCELERATION} channel.
 \end{enumerate}
 
-\subsubsection{\texttt{lcm-source-robot-target.py}}
-This node simply provides a target coordinate, relative to the grid established by the DWM, that the robot should move to.
+\item[Motor encoders node]
+
+\item[Arrowhead node]
+
+\item[Line follower node]
+
+\item[Kalman filter node (\texttt{lcm-int-dwm-filter.py})]
+
+\item[System state node]
+
+\item[Master node (\texttt{lcm-int-master.py})]
+  As seen in Fig.~\ref{fig:state_machine}, the system's behavior can be described as a finite state machine.
+  The master node is responsible for ensuring that the correct mode node (DWM, object or line-follow) is running at the right time,
+  and thus implements the referenced state machine description.
+  For example, before switching to line-follow mode, the system current state is compared to a set of points where the robot would be close enough to a station to find a line.
+  If it is found that the system is too far away, the line-found event is ignored and logged to \texttt{stderr} for debugging purposes.
+
+\item[DWM mode node]
+
+\item[Object mode node]
+
+\item[Line-follow mode node]
+
+\end{description}
+
+Some debugging nodes are also defined, but are external from the system-internal relations displayed in Fig.~\ref{fig:node-schema}:
+\begin{description}
+\item[Message spoofer (\texttt{lcm-debug-spoof-message.py})]
+  While developing nodes it is useful to ensure that it responds to LCM messages in the expected manner.
+  Instead of writing an ad-hoc node that sends whatever messages that need to be tested,
+  this node allows the developer send a message of any type by just speficying the correct parameters.
+
+  % Describe how the node works? Inspects the LCM-generated Python module.
+
+  For example, to send a message indicating that the Kalman-filtered position of the system is at the coordinates $(4.23, 5.12)$,
+  execute \texttt{lcm-debug-spoof-message.py KALMAN\_POSITION 4.23 5.12}.
+
+\item[Message sink (\texttt{lcm-debug-print-all.py})]
+  An inverse of the above debug node: instead of sending a message of any type,
+  this node prints a message of any type.
+  Useful for inspecting the system as any and all LCM messages will be printed by first subscribing to all channels.
+\end{description}

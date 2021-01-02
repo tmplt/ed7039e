@@ -97,11 +97,13 @@
   boot.supportedFilesystems = lib.mkForce [ "vfat" ];
   i18n.supportedLocales = lib.mkForce [ (config.i18n.defaultLocale + "/UTF-8") ];
 
-  # TODO: properly document
+  # Intall all nodes we have written (from under ./src/) and install
+  # all Python dependencies.
   environment.systemPackages = with pkgs; let
     derivations = pkgs.callPackage ./nix/derivations.nix { };
   in [
     screen # for decawave debugging
+    git # for convenience (see systemd.clone-robot-repo below)
 
     # Required libs for Python nodes
     (python3.buildEnv.override {
@@ -117,10 +119,32 @@
     scripts
   ]);
 
-  # TODO: document
+  # Describe the environment properly for the FT232H which we use for
+  # line-follwing.
   environment.variables = {
     BLINKA_FT232H = "1";
     LD_LIBRARY_PATH = "${pkgs.libusb}/lib/";
+  };
+
+  # Clone this repo to the file system for convenience. While this
+  # could be done using some
+  #
+  #    environment.etc."repo" = fetchgit { ... }
+  #
+  # that would symlink to the Nix store, and would be read-only.
+  systemd.services.clone-robot-repo = {
+    description = "Clone the robot's git repository";
+    serviceConfig.Type = "oneshot";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+
+    # Try to clone until we succeed (in case Internet connection is spotty).
+    script = ''
+      mkdir -p /root/repo && cd /root/repo
+      while [ ! $(${pkgs.git}/bin/git rev-parse --is-inside-work-tree) ]; do
+        ${pkgs.git}/bin/git clone https://github.com/tmplt/ed7039e.git . || true
+      done
+    '';
   };
 
   # Required for the LCM UDP multicast transport implementation

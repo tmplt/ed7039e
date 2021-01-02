@@ -11,8 +11,8 @@
 #include <signal.h>
 
 #include <lcm/lcm.h>
-#include "robot_dwm_position_t.h"
-#include "robot_dwm_acceleration_t.h"
+#include "robot_io_position_t.h"
+#include "robot_io_acceleration_t.h"
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 #define ERROR(...) {                                            \
@@ -172,15 +172,14 @@ void timespec_diff(struct timespec *a, struct timespec *b, struct timespec *r)
 int publish_pos(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
-        int64_t x = 0, y = 0, z = 0;
-        int8_t q = 0;
-        if ((retval = sscanf(ctx->buf, "%*s\napg: x:%ld y:%ld z:%ld qf:%d\r\n",
+        int x = 0, y = 0, z = 0, q = 0;
+        if ((retval = sscanf(ctx->buf, "%*s\napg: x:%d y:%d z:%d qf:%d\r\n",
                              &x, &y, &z, &q)) != 4) {
                 ERROR("sscanf failure: %d", retval);
                 return -ENOMSG;
         }
 
-        robot_dwm_position_t pos = {
+        robot_io_position_t pos = {
                 .timestamp = timestamp,
                 .x = x / 1e3,
                 .y = y / 1e3,
@@ -188,7 +187,7 @@ int publish_pos(ctx_t *ctx, int64_t timestamp)
                 .q = q,
 
         };
-        return robot_dwm_position_t_publish(ctx->lcm, "POSITION", &pos);
+        return robot_io_position_t_publish(ctx->lcm, "IO_POSITION", &pos);
 }
 
 /* Converts the raw LIS2DH12 acceleration register value `v` to SI unit (m/s^2). */
@@ -206,20 +205,20 @@ float raw_acc_reg_to_si(int64_t v)
 int publish_acc(ctx_t *ctx, int64_t timestamp)
 {
         int retval;
-        int64_t x = 0, y = 0, z = 0;
-        if ((retval = sscanf(ctx->buf, "%*s\nacc: x = %ld, y = %ld, z = %ld\r\n",
+        int x = 0, y = 0, z = 0;
+        if ((retval = sscanf(ctx->buf, "%*s\nacc: x = %d, y = %d, z = %d\r\n",
                              &x, &y, &z)) != 3) {
                 ERROR("sscanf failure: %d", retval);
                 return -ENOMSG;
         }
 
-        robot_dwm_acceleration_t acc = {
+        robot_io_acceleration_t acc = {
                 .timestamp = timestamp,
                 .x = raw_acc_reg_to_si(x),
                 .y = raw_acc_reg_to_si(y),
                 .z = raw_acc_reg_to_si(z),
         };
-        return robot_dwm_acceleration_t_publish(ctx->lcm, "ACCELERATION", &acc);
+        return robot_io_acceleration_t_publish(ctx->lcm, "IO_ACCELERATION", &acc);
 }
 
 /* Queries the DWM context `ctx` with the function `fun` and forwards the response

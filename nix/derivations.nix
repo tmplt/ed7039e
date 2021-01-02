@@ -1,3 +1,5 @@
+# This expression describes how all code we have written (and how some
+# dependencies not packaged in nixpkgs) are to be built and installed.
 { pkgs, ... }:
 with pkgs;
 
@@ -40,12 +42,33 @@ in rec {
       propagatedBuildInputs = [ lcm ];
       cmakeFlags = [ "-DINSTALL_PYTHON_DEPS=ON" ];
     };
+
+    arrowheadClient = python3Packages.buildPythonPackage rec {
+      name = "${pname}-${version}";
+      pname = "arrowhead-client";
+      version = "0.2.0a2";
+
+      src = fetchFromGitHub {
+        owner = "arrowhead-f";
+        repo = "client-library-python";
+        rev = "v${version}";
+        sha256 = "0cbzsfng2cv2wrk5cws29y8i9h9id4bflhhh0iqlpmfb9lj7cw6a";
+      };
+
+      nativeBuildInputs = with python3Packages; [
+        requests
+        flask
+        gevent
+        typing-extensions
+      ];
+      propagatedBuildInputs = nativeBuildInputs;
+    };
   };
 
   lcm = stdenv.mkDerivation rec {
     name = "lcm";
     version = "1.4.0";
-      
+
     src = fetchFromGitHub {
       owner = "lcm-proj";
       repo = "lcm";
