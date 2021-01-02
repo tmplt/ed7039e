@@ -35,6 +35,121 @@ The relation between these five states are visually described in the state machi
   \caption{High-level state machine of the system.}
   \label{fig:state_machine}
 \end{figure*}
+
+\subsubsection{Motor}
+\section{Discretization of PID controller}
+The PID-controller was discretized by zero order hold method. The ZOH method give a perfect match between continuous and discrete time domain. This method can also be used for system with input delays, output delays or transport delays and provides an exact discretization. 
+The eq. (\ref{eq5}) describes how to transform from s-domain to z-domain using Zero order hold method
+\begin{equation} \label{eq5}
+    C(z)=(1-z^{-1}) Z(\frac{C(s)}{s}) 
+\end{equation}
+where C(s) is the controller and Z is the Z-transform
+\begin{equation}
+    C(z)=(\frac{z-1}{z})Z(\frac{k_Ps+k_I+k_Ds^2}{s} \Big/ s)
+    \label{eq7}
+\end{equation}
+By looking at the z-transform table, the equation \ref{eq7} yields to
+\begin{equation}
+    C(z)=\frac{z-1}{z}\bigg( k_p \frac{1}{1-z^{-1}}+k_I \frac{T z^{-1}}{(1-z^{-1})^2}+k_D\bigg)
+\end{equation}
+And finally the PID controller in discrete time domain is presented as
+\begin{equation}
+    C(z)= k_P + k_I \frac{1}{z-1} + k_D \frac{z-1}{z}
+\end{equation}
+
+\subsubsubsection{Motor simulation}
+The PID parameters were chosen to get low settling time, low overshoot and fast response to disturbances for the system. The best parameters for the system resulted in 
+\begin{equation}
+    \begin{split}
+        K_P & = 1.35 \\
+        K_I & = 6 \\
+        K_D & = 0.08 \\
+    \end{split}
+\end{equation}
+The simulation is made in discrete time domain with a sampling frequency 10 Hz.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{sections/assets/pid_motor.png}
+    \caption{PID controller for the LEGO EV3 motor to rotate 10 degrees}
+    \label{fig1}
+\end{figure}
+
+\subsubsection{Trajectory planning}
+A point to point trajectory is described as a path from $q_{init}$ to $q_{final}$. A trajectory is a function of time such that $q(t_0) = q_{init}$ and $q(t_f) = q_{final}$. The difference between $t_0$ and $t_f$ represents the total elapsed time to execute the trajectory. The velocity and the acceleration can be computed by differentiation since the trajectory is depending of time.
+At the time $t_0$ the joint variable satisfies
+
+\begin{equation} \label{eq10}
+\begin{split} 
+     q(t_0) & = q_0 \\
+    \dot{q}(t_0) & = v_0
+\end{split}
+\end{equation}
+And at the $t_f$ the desired joint variable will be 
+\begin{equation} \label{eq11}
+\begin{split}
+     q(t_f) & = q_f \\
+    \dot{q}(t_f) & = v_f
+\end{split}
+\end{equation}
+
+\subsubsubsection{Cubic polynomial trajectory}
+The trajectory between two configurations and the initial and final velocity is known. One way to solve this task is to solve it by polynomial function of t. Since there are four unknown constraints, it is required to use a polynomial function with four independent coefficient. Hence a cubic trajectory is considered 
+\begin{equation} \label{eq12}
+    q(t) = a_0 + a_1t + a_2t^2 + a_3t^3
+\end{equation}
+Then the velocity of the cubic trajectory becomes
+\begin{equation} \label{eq13}
+    \dot{q}(t) = a_1 + 2a_2t+ 3 a_3t^2
+\end{equation}
+Combining eq. (\ref{eq12}) and (\ref{eq13}) with eq. (\ref{eq10}) and (\ref{eq11}) returns four equations with four unknowns
+\begin{equation} \label{14}
+    \begin{split}
+        q_0 &= a_0 + a_1t_0 + a_2t_0^2 + a_3t_0^3 \\
+        v_0 & = a_1 + 2a_2t+ 3 a_3t^2 \\
+        q_f &= a_0 + a_1t_f + a_2t_f^2 + a_3t_f^3 \\
+        v_f & = a_1 + 2a_2t_f+ 3 a_3t_f^2
+    \end{split}
+\end{equation}
+Suppose taking $t_0 = 0$ and $t_f = 1$ second with velocity constraints as $v_0 = 0$ and $v_f = 0$. Then the eq. (\ref{14}) can be written in matrix form. \\
+\begin{center}
+    \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+ 1 & 1& 1& 1 \\
+0&1 &2 &3
+\end{bmatrix} \begin{bmatrix}
+a_0 \\
+a_1 \\
+a_2 \\
+a_3 
+\end{bmatrix} = \begin{bmatrix}
+q_0 \\
+0\\
+q_f \\
+0
+\end{bmatrix}
+\end{center}
+Then solving for the letter $a_i$ by linear algebra and this letters yields to 
+\begin{equation} \label{15}
+    \begin{split}
+        a_0 = q_0 \\
+        a_1 = 0 \\
+        a_2 = 3(q_f - q_0 ) \\
+        a_3 = -2(q_f - q_0)
+    \end{split}
+\end{equation}
+The eq. (\ref{eq12}) into eq. (\ref{15}) to get the cubic polynomial function. The required cubic polynomial function with the supposed constraints is therefore
+\begin{equation}
+    q_i(t) = q_0 + 3(q_f - q_0)t^2 - 2(q_f - q_0)t^3
+\end{equation}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{sections/assets/cubic.png}
+    \caption{Angle profile for cubic polynomial trajectory}
+    \label{fig2}
+\end{figure}
+Fig. (\ref{fig2}) shows the trajectory with $q_0 = 10^\circ$ and $q_f = -30^\circ$.
+
 \subsubsection{Mobile platform}
 \label{subsubsec:unicycle}
 The model used in this case is the unicycle model, due to the differential steering. 
