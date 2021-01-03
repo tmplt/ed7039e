@@ -400,7 +400,7 @@ The robot arm can rotate in the xy-plane around the \(z_0\) axis which can be se
 \label{Tab:distance_table}
 \end{table}
 \subsubsection{Forward kinematics}
-To be able to describe where in the world the gripper claw is, a problem often refereed to as the forward kinematics problem \parencite{Spong2004} had to be solved. This was used with a series of homogeneous transformations each representing a change in position and/or orientation relative to what is usually referred to as a frame. The first homogeneous transformation was from the level of the floor to the top of the robot platform, with a distance \(d_0\) which can be seen as a pure translation in the z-direction and can be described as equation \ref{T01} as according to \parencite{Spong2004}.
+To be able to describe where in the world the gripper claw is, a problem often refereed to as the forward kinematics problem \parencite{Spong2004} had to be solved. This was used with a series of homogeneous transformations each representing a change in position and/or orientation relative to what is usually referred to as a frame. The first homogeneous transformation was from the level of the floor to the top of the robot platform, with a distance \(d_0\) which can be seen as a pure translation in the z-direction and can be described as Eq.~\eq\ref{T01} as according to \parencite{Spong2004}.
 \begin{equation}
     T_{01} = 
     \begin{bmatrix}
@@ -411,7 +411,7 @@ To be able to describe where in the world the gripper claw is, a problem often r
     \end{bmatrix}
     \label{T01}
 \end{equation}
-then a transformation between the rotational center of the robot to where link \(d_2\) is connected to the base of the robot, which can be expressed as a pure translation in the x-direction. This can be seen in equation \ref{T12}
+then a transformation between the rotational center of the robot to where link \(d_2\) is connected to the base of the robot, which can be expressed as a pure translation in the x-direction. This can be seen in Eq.~\eq\ref{T12}
 \begin{equation}
     T_{12} = 
     \begin{bmatrix}
@@ -422,7 +422,7 @@ then a transformation between the rotational center of the robot to where link \
     \end{bmatrix}
     \label{T12}
 \end{equation}
-followed by a transformation from the beginning of link \(d_2\) to the center of wheel0. This was done by first making a pure rotation around the z-axis with a angle beta, after which a pure translation in the z-direction with a distance \(d_2\cdot sin(\pi-alpha)\) was made, followed by a translation in the x-direction with a distance \(d_2\cdot cos(\pi - alpha)\) as can be seen in equation \ref{T23}
+followed by a transformation from the beginning of link \(d_2\) to the center of wheel0. This was done by first making a pure rotation around the z-axis with a angle beta, after which a pure translation in the z-direction with a distance \(d_2\cdot sin(\pi-alpha)\) was made, followed by a translation in the x-direction with a distance \(d_2\cdot cos(\pi - alpha)\) as can be seen in Eq.~\eq\ref{T23}
 \begin{equation}
     T_{23} = 
     \begin{bmatrix}
@@ -447,7 +447,7 @@ followed by a transformation from the beginning of link \(d_2\) to the center of
     \end{bmatrix}
     \label{T23}
 \end{equation}
-this was followed by a translation in the z-direction of the distance \(d_3\) between the center of wheel0 to the center of wheel1, see equation \ref{T34}
+this was followed by a translation in the z-direction of the distance \(d_3\) between the center of wheel0 to the center of wheel1, see Eq.~\eq\ref{T34}
 \begin{equation}
     T_{34} = 
     \begin{bmatrix}
@@ -458,7 +458,7 @@ this was followed by a translation in the z-direction of the distance \(d_3\) be
     \end{bmatrix}
     \label{T34}
 \end{equation}
-after which a rotation of the coordinate frame in the center of wheel1 was made by an angle -theta around the y-axis and then a translation in the x-direction of the frame in wheel1 by a distance \(d_5 + d6\), see equation \ref{T46}
+after which a rotation of the coordinate frame in the center of wheel1 was made by an angle -theta around the y-axis and then a translation in the x-direction of the frame in wheel1 by a distance \(d_5 + d6\), see Eq.~\eq\ref{T46}
 \begin{equation}
     T_{46} =
     \begin{bmatrix}
@@ -476,7 +476,7 @@ after which a rotation of the coordinate frame in the center of wheel1 was made 
     \end{bmatrix}
     \label{T46}
 \end{equation}
-due to the mechanics of the robot model the gripper claw is always pointing straight downwards independent of the angle theta, therefore the coordinate system in the middle if the medium motor connected to link \(d_5\) was rotated back with a positive angle theta before it was translated a distance \(-d_7\) in the z-direction as can be seen in equation \ref{T67}
+due to the mechanics of the robot model the gripper claw is always pointing straight downwards independent of the angle theta, therefore the coordinate system in the middle if the medium motor connected to link \(d_5\) was rotated back with a positive angle theta before it was translated a distance \(-d_7\) in the z-direction as can be seen in Eq.~\eq\ref{T67}
 \begin{equation}
     T_{67} =
     \begin{bmatrix}
@@ -494,13 +494,13 @@ due to the mechanics of the robot model the gripper claw is always pointing stra
     \end{bmatrix}
     \label{T67}
 \end{equation}
-the expression of where the gripper claw can be then expressed as in equation \ref{T_tot} where both it's position and orientation relative to the robot platform is described.
+the expression of where the gripper claw can be then expressed as in Eq.~\eq\ref{T_tot} where both it's position and orientation relative to the robot platform is described.
 \begin{equation}
     T = T01\cdot T12\cdot T23 \cdot T34 \cdot T46 \cdot T67
     \label{T_tot}
 \end{equation}
 \subsubsection{Inverse kinematics}
-After being able to describe the position and orientation of the gripper it was necessary to have a way of calculating the desired angles theta and beta of the arm to get the gripper claw to a desired position. This problem is often referred to as the inverse kinematics problem. For this robot the angle theta was directly determined by the height of the desired gripper claw position which was calculated according to equation \ref{inv_theta_calc_1} to \ref{inv_theta_calc_5} and the distances \(h_1\) to \(h_3\) can be seen in Fig.~\ref{inv_theta_img}
+After being able to describe the position and orientation of the gripper it was necessary to have a way of calculating the desired angles theta and beta of the arm to get the gripper claw to a desired position. This problem is often referred to as the inverse kinematics problem. For this robot the angle theta was directly determined by the height of the desired gripper claw position which was calculated according to Eq.~\eq\ref{inv_theta_calc_1} to \ref{inv_theta_calc_5} and the distances \(h_1\) to \(h_3\) can be seen in Fig.~\ref{inv_theta_img}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Arm_model_inv_theta.png}
@@ -524,12 +524,12 @@ and from Fig.~\ref{inv_theta_img} it can be seen that
     h_3 = d_7
     \label{inv_theta_calc_4}
 \end{equation}
-substituting \(h_1\) to \(h_3\) with expressions from equations  \ref{inv_theta_calc_2} to  \ref{inv_theta_calc_4} the final expression for the angle theta can be solved for in the way that can be seen in equation \ref{inv_theta_calc_5}
+substituting \(h_1\) to \(h_3\) with expressions from Eq.~\eq\ref{inv_theta_calc_2} to  \eq\ref{inv_theta_calc_4} the final expression for the angle theta can be solved for in the way that can be seen in Eq.~\eq\ref{inv_theta_calc_5}
 \begin{equation}
     theta = sin^{-1}(\frac{Z_g - d_2 \cdot sin(alpha) + d7}{(d_5 + d_6)})
     \label{inv_theta_calc_5}
 \end{equation}
-Since the arm could rotate horizontally it could reach points on a circle, see Fig.~\ref{inv_beta_radius_img}, around itself where the radius of that circle, with the rotational center of the robot being the center of the circle, depended on the angle theta in a way that is described in equation \ref{beta_radius_eq}.
+Since the arm could rotate horizontally it could reach points on a circle, see Fig.~\ref{inv_beta_radius_img}, around itself where the radius of that circle, with the rotational center of the robot being the center of the circle, depended on the angle theta in a way that is described in Eq.~\eq\ref{beta_radius_eq}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{inv_beta_radius.png}
@@ -540,7 +540,7 @@ Since the arm could rotate horizontally it could reach points on a circle, see F
     r = (d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1
     \label{beta_radius_eq}
 \end{equation}
-calculations of x and y positions on a circle can be seen in equations \ref{circle_x} and \ref{circle_y}
+calculations of x and y positions on a circle can be seen in Eq.~\eq\ref{circle_x} and \eq\ref{circle_y}
 \begin{equation}
     x = r\cdot cos(beta)
     \label{circle_x}
@@ -549,7 +549,7 @@ calculations of x and y positions on a circle can be seen in equations \ref{circ
     y = r\cdot sin(beta)
     \label{circle_y}
 \end{equation}
-substituting r to the expression from equation \ref{beta_radius_eq} the calculations of the x and y positions on the circle around the robot can be seen in equations \ref{circle_x_robot} and \ref{circle_y_robot}
+substituting r to the expression from Eq.~\eq\ref{beta_radius_eq} the calculations of the x and y positions on the circle around the robot can be seen in Eq.~\eq\ref{circle_x_robot} and \ref{circle_y_robot}
 \begin{equation}
     x = ((d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1)\cdot cos(beta)
     \label{circle_x_robot}
@@ -558,7 +558,7 @@ substituting r to the expression from equation \ref{beta_radius_eq} the calculat
     y = ((d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1)\cdot sin(beta)
     \label{circle_y_robot}
 \end{equation}
-solving for beta in equations \ref{circle_x_robot} and \ref{circle_y_robot} the following expressions was achieved 
+solving for beta Eq.~\eq\ref{circle_x_robot} and Eq.~\eq\ref{circle_y_robot} the following expressions was achieved 
 \begin{equation}
     beta = cos^{-1}(\frac{x}{(d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1})
     \label{Beta_x_robot}
@@ -568,7 +568,7 @@ solving for beta in equations \ref{circle_x_robot} and \ref{circle_y_robot} the 
     \label{Beta_y_robot}
 \end{equation}
 these two expressions both have a denominator which is equal to zero for an angle \(theta = \pm \frac{\pi}{2}\), two angles that the robot can never reach due to the way the Lego hardware is put together.
-From equations \ref{Beta_x_robot} and \ref{Beta_y_robot} it is clear that only the desired x or the y position was needed to calculate beta, in this project the x positions were used.
+From Eq.~\eq\ref{Beta_x_robot} and Eq.~\eq\ref{Beta_y_robot} it is clear that only the desired x or the y position was needed to calculate beta, in this project the x positions were used.
 \subsubsection{Resolution}
 As mentioned before the motors used in the robot arm was two Lego EV3 servo motor large for making the arm move vertically and horizontally and one Lego EV3 servo motor medium inside the gripper to pick up boxes on the miniature industry platform. Both the Large and the medium motors had a resolution of 1 degree, meaning the motors gives 360 readings on one revolution. Also on the robot the cogwheel attached to the motor controlling vertical movement on the arm, see wheel0 in Fig.~\ref{Arm_model}, was connected to another cogwheel, see wheel1 in Fig.
 ~\ref{Arm_model}, which had 5 times as many teeth giving 5 times higher resolution for the arm itself than the motor in vertical movement. In the same way the cogwheel attached to the motor controlling horizontal movement of the arm was connected to another cogwheel with 3 times as many teeth giving 3 times higher resolution for the arm relative to the motor in horizontal movement.
@@ -577,12 +577,12 @@ There is no memory in the motors which makes the robot ''unaware'' of the origin
 \subsection{Robot software}
 Two BrickPi3 motor shields were used to drive the motors and sensors on the robot. A complete library for controlling lego motors and sensors connected to the motor shields were developed by the manufacturers of the BrickPi3 together with the shields and was used to control the motors. Additionally P, PI and PID controllers was developed in this project to compare functions in the BrickPi3 library for controlling the motors and the movement on the arm.
 \subsubsection{P controller}
-A P controller, or proportional controller, is a feedback control structure where the output error is fed back to the motors to make them act proportional to the error. In the P controller made for controlling the movement on the robot arm an angular error was expressed, see equation \ref{ang_err}
+A P controller, or proportional controller, is a feedback control structure where the output error is fed back to the motors to make them act proportional to the error. In the P controller made for controlling the movement on the robot arm an angular error was expressed, see Eq.~\eq\ref{ang_err}
 \begin{equation}
     e_{\theta} = \theta_{desired} - \theta
     \label{ang_err}
 \end{equation}
-where \(\theta\) is the current angular position of the arm and \(\theta_{desired}\) is the goal angle. The angular error was then fed back to the motors to make them act on it is a way that can be seen in equation \ref{P_control}
+where \(\theta\) is the current angular position of the arm and \(\theta_{desired}\) is the goal angle. The angular error was then fed back to the motors to make them act on it is a way that can be seen in Eq.~\eq\ref{P_control}
 \begin{equation}
     P = K_p\cdot e_{\theta}
     \label{P_control}
@@ -590,12 +590,12 @@ where \(\theta\) is the current angular position of the arm and \(\theta_{desire
 where P is motor speed, proportional to the angular error and \(K_p\) is a proportional gain which determines how aggressive the controller should be.
 
 \subsubsection{PI controller}
-A PI controller or proportional integral controller is a proportional controller to which a term which integrates the error over time is added. The integration was done in a discrete fashion where, in every loop of the robot arm code running, the new calculated error was added to a integral error term, see equation \ref{integral_term}
+A PI controller or proportional integral controller is a proportional controller to which a term which integrates the error over time is added. The integration was done in a discrete fashion where, in every loop of the robot arm code running, the new calculated error was added to a integral error term, see Eq.~\eq\ref{integral_term}
 \begin{equation}
     e_{integral} = e_{integral} + e_{\theta}
     \label{integral_term}
 \end{equation}
-where \(e_{integral}\) is the discrete approximation of the integrated error, \(e_{\theta}\) is the same as in equation \ref{ang_err}. This error was adding up over time and the feedback to the motors can be seen in equation \ref{PI_control}
+where \(e_{integral}\) is the discrete approximation of the integrated error, \(e_{\theta}\) is the same as in Eq.~\eq\ref{ang_err}. This error was adding up over time and the feedback to the motors can be seen in Eq.~\eq\ref{PI_control}
 \begin{equation}
     P = K_p\cdot e_{\theta} + K_i\cdot T_s\cdot e_{integral}
     \label{PI_control}
@@ -603,18 +603,18 @@ where \(e_{integral}\) is the discrete approximation of the integrated error, \(
 where P is the motor speed, \(T_s\) is the sampling period of the code to make the integral term normalized in a sense, and \(K_i\) is the integral gain which determines how much the motors should act on the integral error.
 
 \subsubsection{PID controller}
-A PID or proportional integral derivative controller is a control structure where both a proportional, integral, and a derivative term is added. The differentiation was also done in a discrete fashion and was approximated as in equation \ref{derivative_term}
+A PID or proportional integral derivative controller is a control structure where both a proportional, integral, and a derivative term is added. The differentiation was also done in a discrete fashion and was approximated as in Eq.~\eq\ref{derivative_term}
 \begin{equation}
     e_{diff} = e_{old} - e_{\theta}
     \label{derivative_term}
 \end{equation}
-where \(e_{diff}\) is the discrete approximation of the differentiated error, \(e_{old}\) is the old error from the previous loop of the code and \(e_{\theta}\) is the same as in equation \ref{ang_err}. The feedback to the motors was done according to equation \ref{PID_control}
+where \(e_{diff}\) is the discrete approximation of the differentiated error, \(e_{old}\) is the old error from the previous loop of the code and \(e_{\theta}\) is the same as in Eq.~\eq\ref{ang_err}. The feedback to the motors was done according to Eq.~\eq\ref{PID_control}
 \begin{equation}
     P = K_p\cdot e_{\theta} + K_i\cdot e_{integral} + K_p\cdot e_{diff}
     \label{PID_control}
 \end{equation}
 \subsubsection{Tuning of the controllers}
-The tuning of the controllers was made with a Ziegler Nichols approach \parencite{FeedbackControl}, since a development of a dynamic model of the arm was not completed. The Ziegler Nichols tuning method required two measured parameters to be found. First the Oscillation gain which is the gain of a proportional controller \(K_p\) for which the output of the system acting on a step response is undamped oscillations. This was found by making the robot arm act on a step response several times while changing the value of the proportional gain \(K_p\). The second measured parameter is the oscillation time \(T_{osc}\), e.g the time it takes for the system to make one undamped oscillation period. This was found by looking at a plotted graph of the undamped oscillations and counting the measured values in one period. The calculations of the oscillation time could then be done as shown in equation \ref{osc_time}
+The tuning of the controllers was made with a Ziegler Nichols approach \parencite{FeedbackControl}, since a development of a dynamic model of the arm was not completed. The Ziegler Nichols tuning method required two measured parameters to be found. First the Oscillation gain which is the gain of a proportional controller \(K_p\) for which the output of the system acting on a step response is undamped oscillations. This was found by making the robot arm act on a step response several times while changing the value of the proportional gain \(K_p\). The second measured parameter is the oscillation time \(T_{osc}\), e.g the time it takes for the system to make one undamped oscillation period. This was found by looking at a plotted graph of the undamped oscillations and counting the measured values in one period. The calculations of the oscillation time could then be done as shown in Eq.~\eq\ref{osc_time}
 \begin{equation}
     T_{osc} = n\cdot T_s
     \label{osc_time}
