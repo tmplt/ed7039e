@@ -100,36 +100,36 @@ Because the above defined problem domain lacks any time component (as would be t
 This greatly lessens the requirement of the system model and software implementation.
 
 \subsection{Arrowhead framework}
-The three mandatory core systems when running Arrowhead framework are; Service Registry, Orchestrator and Authorization. 
-The Gateway and Gatekeeper is needed when communicating with other clouds (inter-cloud). 
+The three mandatory core systems when running Arrowhead framework are; Service Registry, Orchestrator and Authorization.
+The Gateway and Gatekeeper is needed when communicating with other clouds (inter-cloud).
 All information in this section is from \url{https://github.com/eclipse-arrowhead/core-java-spring}.
 
 \subsubsection{Service Registry}
 
-The Service Registry holds the services and IP address and port to where the services is located. The information is stored in a SQL database. 
-Service Registry have three methods, register, unregister and query. The query method translates system name into information about physical endpoint; IP address and port. 
+The Service Registry holds the services and IP address and port to where the services is located. The information is stored in a SQL database.
+Service Registry have three methods, register, unregister and query. The query method translates system name into information about physical endpoint; IP address and port.
 
 \subsubsection{Authorization}
-The Authorization system have two methods. 
-Authorization control are controlling which clients are allowed to consume a service. This is controlled through intra- and inter-cloud rules. The information is stored in a SQL database. 
-The other method is token generation which is used for accessing services within cloud. 
+The Authorization system have two methods.
+Authorization control are controlling which clients are allowed to consume a service. This is controlled through intra- and inter-cloud rules. The information is stored in a SQL database.
+The other method is token generation which is used for accessing services within cloud.
 
 \subsubsection{Orchestrator}
 The Orchestrator have two methods.
-When a application requsts a service, the orchestrator will look up if the application system is allowed to access that service. 
-If allowed it will send back the IP address and port. 
-The other methods is used when the IP address and port are changed for a service. 
-The Orchestrator will send the new information for the services which are connected. 
+When a application requsts a service, the orchestrator will look up if the application system is allowed to access that service.
+If allowed it will send back the IP address and port.
+The other methods is used when the IP address and port are changed for a service.
+The Orchestrator will send the new information for the services which are connected.
 
-There are two types of orchestration; dynamic orchestration and store orchestrator. 
-Dynamic orchestrator uses the application system name and authorization properites to find the providers. 
-Store orchestration uses the application systems's id to search the orchestration store database for providers. 
+There are two types of orchestration; dynamic orchestration and store orchestrator.
+Dynamic orchestrator uses the application system name and authorization properites to find the providers.
+Store orchestration uses the application systems's id to search the orchestration store database for providers.
 
 \subsubsection{Gatekeeper}
-The Gatekeeper have two methods; Global Service Discovery (GSD) and Inter-Cloud Negotiation (ICN).  
-GSD is looking via Relay systems for other clouds and looks for a provider which are serving a specific service. 
-After GSD the ICN process is used for establishing a way of collaboration between clouds. 
+The Gatekeeper have two methods; Global Service Discovery (GSD) and Inter-Cloud Negotiation (ICN).
+GSD is looking via Relay systems for other clouds and looks for a provider which are serving a specific service.
+After GSD the ICN process is used for establishing a way of collaboration between clouds.
 
 \subsubsection{Gateway}
-The Gateway system have two methods; connecting to a consumer and connection to a provider. 
-The two methods is used during the ICN process to establish a new datapath. 
+The Gateway system have two methods; connecting to a consumer and connection to a provider.
+The two methods is used during the ICN process to establish a new datapath.

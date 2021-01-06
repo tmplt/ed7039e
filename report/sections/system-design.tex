@@ -59,10 +59,10 @@ The PID parameters were chosen to get low settling time, low overshoot and fast 
     \end{split}
 \end{equation}
 The simulation is made in discrete time domain with a sampling frequency 10 Hz.
-\begin{figure}[ht]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{sections/assets/pid_motor.png}
-    \caption{PID controller for the LEGO EV3 motor to rotate 10 degrees}
+    \includegraphics[width=\linewidth]{sections/assets/pid_motor.png}
+    \caption{PID controller for the LEGO EV3 motor to rotate 10 degrees.}
     \label{fig1}
 \end{figure}
 \end{description}
@@ -133,13 +133,13 @@ The eq. (\ref{eq12}) into eq. (\ref{15}) to get the cubic polynomial function. T
 \begin{equation}
     q_i(t) = q_0 + 3(q_f - q_0)t^2 - 2(q_f - q_0)t^3
 \end{equation}
-\begin{figure}[ht]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{sections/assets/cubic.png}
+    \includegraphics[width=\linewidth]{sections/assets/cubic.png}
     \caption{Angle profile for cubic polynomial trajectory.}
     \label{fig2}
 \end{figure}
-Fig. (\ref{fig2}) shows the trajectory with $q_0 = 10^\circ$ and $q_f = -30^\circ$.
+Fig.~\ref{fig2} shows the trajectory with $q_0 = 10^\circ$ and $q_f = -30^\circ$.
 
 
 \subsubsection{Mobile platform}
@@ -151,7 +151,7 @@ With this feature it is also possible to change the orientation of the mobile pl
 I.e. the robot is able to spin while the right-hand side wheels have the same velocity as the left-hand side wheels, in opposite direction.
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{sections/assets/car-unicycle.png}
+\includegraphics[width=\linewidth]{sections/assets/car-unicycle.png}
 \caption{Unicycle model of a car-like robot.
 $v_L$ and $v_R$ represent the left- and right-hand side wheels' velocities respectively.
 The robot follows a path around the instantaneous center of rotation (ICR) where $R_L$ and $R_R$ are the distances from left and right wheels to ICR respectively and $w$ is the distance between them.}
@@ -184,7 +184,7 @@ v = \frac{v_R + v_L}{2}
 \end{equation}
 Before the implementation, it is required to to find a discrete equivalent for the systems dynamics.
 By being able to count the number of encoder ticks on each servo and some approximation it is possible to estimate the position of the robot.
-In this approximative method we assume that the driven path in-between the two sampling points is a straight line. 
+In this approximative method we assume that the driven path in-between the two sampling points is a straight line.
 The length of the driven path for each wheel can be computed using the following formula:
 
 \begin{equation}
@@ -197,7 +197,7 @@ In our case the numeric values are:
     r =& 0.021\, [m]\\
     N =& 360\, [\frac{tick}{2\,\pi}]
 \end{eqnarray*}
-In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively. 
+In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively.
 $D_c$ is the notation we use for the length of the driven path for the body and is similar to Eq.~\eqref{eq:av_velocity}:
 
 \begin{equation}
@@ -214,7 +214,7 @@ The discretized equations of motion is given by:
 \end{eqnarray}\label{eq:Disc_EOM}
 Where $W$ is the width of the robot, i.e. the distance between the two wheels.
 The limitation of this approximative method is the sampling rate relative the average velocity of the body.
-The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together. 
+The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together.
 E.g. if the average velocity is very high and the sampling rate is very low, the straight line will not be a good approximation for the driven arc shaped path.
 To make this approximation more accurate it is required to divide the driven path in to more points.
 This accuracy can be improved by having higher sampling rate or lower average velocity.
@@ -233,7 +233,7 @@ As the unicycle model describes the systems dynamics.
 The position of the robot $(x, y, \theta)$ is dependent on the two wheel velocities. Which in turn has dependencies to the average velocity $V$ and the angular velocity $\omega$. These relations are presented in Eq.~\eqref{eq:ThetaDot} -- Eq.~\eqref{eq:av_velocity}.
 \begin{figure*}[h]
 \centering
-\includegraphics[width=\textwidth]{sections/assets/omegaCtrlr.png}
+\includegraphics[width=\linewidth]{sections/assets/omegaCtrlr.png}
 \caption{Overview of the systems block diagram where the angular velocity $\omega$ is controlled by a PID controller.}
 \label{fig:overview}
 \end{figure*}
@@ -301,9 +301,9 @@ G_{c}(s) = \frac{K_p}{s + K_p}
 
 This system will have a pole at $-K_p$.
 Any positive proportional gain will results in a stable pole and which in turn leads to a stable system.
-\begin{figure*}[ht]
+\begin{figure*}[h]
 \centering
-\includegraphics[width=\textwidth]{sections/assets/Theta_PID.PNG}
+\includegraphics[width=\linewidth]{sections/assets/Theta_PID.PNG}
 \caption{The complete control block for the angular position in discrete time domain.}
 \label{fig:PID1}
 \end{figure*}
@@ -320,9 +320,9 @@ $\theta$ will always be in $(-\pi,\pi]$ span.
 Due to the physical limits the servos have, two saturation blocks are required.
 These blocks are shown in Fig.~\ref{fig:PID1} and the assumption for their limits are $(-10,10)$~[cm/s].
 This assumption is done to make the simulation more alike the real application.
-\begin{figure}[ht]
+\begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{sections/assets/Theta_pi_stepresponse.png}
+\includegraphics[width=\linewidth]{sections/assets/Theta_pi_stepresponse.png}
 \caption{The step response for $\theta$ where the proportional gain $K_p = 4$ and the reference value is $\pi$.}
 \label{fig:Theta_Step}
 \end{figure}
@@ -351,7 +351,7 @@ Now by defining the distance as an error to a PID controller for the average vel
 In this case a P controller, a controller which has only a proportional gain, is enough.
 \begin{figure*}[h]
 \centering
-\includegraphics[width=\textwidth]{sections/assets/V_PID.PNG}
+\includegraphics[width=\linewidth]{sections/assets/V_PID.PNG}
 \caption{Overview of the complete systems block diagram for the spatial position control. Fig.~\ref{fig:PID1} is an overview of the ``Steering'' block and Eq.~\eqref{eq:cart2polar} is the mathematical definition for the block function ``Cartesian- to Polar-coordinates Converter''.}
 \label{fig:V_PID}
 \end{figure*}
@@ -360,13 +360,13 @@ Here comes some of the results for the spacial position control simulation. In t
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{sections/assets/traj.png}
+\includegraphics[width=\linewidth]{sections/assets/traj.png}
 \caption{The driven trajectory.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{sections/assets/WV.png}
+\includegraphics[width=\linewidth]{sections/assets/WV.png}
 \caption{The wheels' velocities during the drive time.}
 \end{figure}
 
