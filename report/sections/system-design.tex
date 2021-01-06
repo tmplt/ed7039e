@@ -221,7 +221,7 @@ v = \frac{v_R + v_L}{2}
 \end{equation}
 Before the implementation, it is required to to find a discrete equivalent for the systems dynamics.
 By being able to count the number of encoder ticks on each servo and some approximation it is possible to estimate the position of the robot.
-In this approximativ method we assume that the driven path in-between the two sampling points is a straight line.
+In this approximative method we assume that the driven path in-between the two sampling points is a straight line. 
 The length of the driven path for each wheel can be computed using the following formula:
 
 \begin{equation}
@@ -234,8 +234,8 @@ In our case the numeric values are:
     r =& 0.021\, [m]\\
     N =& 360\, [\frac{tick}{2\,\pi}]
 \end{eqnarray*}
-In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively.
-$D_c$ is the notation we use for the length of the driven path for the body and is similar to \eqref{eq:av_velocity}:
+In this report we will use the notations $D_r$ and $D_l$ for the length of the driven path for the right- and left- hand side wheels respectively. 
+$D_c$ is the notation we use for the length of the driven path for the body and is similar to Eq.~\eqref{eq:av_velocity}:
 
 \begin{equation}
     D_c = \frac{D_r + D_l}{2}
@@ -250,8 +250,8 @@ The discretized equations of motion is given by:
 \end{aligned}
 \end{eqnarray}\label{eq:Disc_EOM}
 Where $W$ is the width of the robot, i.e. the distance between the two wheels.
-The limitation of this approximativ method is the sampling rate relative the average velocity of the body.
-The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together.
+The limitation of this approximative method is the sampling rate relative the average velocity of the body.
+The arc shaped driven path is being approximated by dividing the curve in to several points and recreate a polygonal path using line segments to connect this points together. 
 E.g. if the average velocity is very high and the sampling rate is very low, the straight line will not be a good approximation for the driven arc shaped path.
 To make this approximation more accurate it is required to divide the driven path in to more points.
 This accuracy can be improved by having higher sampling rate or lower average velocity.
@@ -262,7 +262,7 @@ This accuracy can be improved by having higher sampling rate or lower average ve
 % Simulte the models from the previous section and show that it will work.
 % Motivate regulation approach.
 \subsubsection{Mobile platform}
-A simulation profile is made to make sure of the unicycle mode in sub section \ref{subsubsec:unicycle} is the suitable model for this application.
+A simulation profile is made to make sure of the unicycle mode in sub section ~\ref{subsubsec:unicycle} is the suitable model for this application.
 The simulation is made in discrete time domain with the sampling frequency of $10$~Hz.
 This is done in the described way due to the robot is going to operate in discrete time.
 The sampling frequency is assumed to be low and that is because the designed controllers are going to be able to work fine for higher samplings frequencies but that is not guaranteed for vise-versa.
@@ -370,7 +370,7 @@ As it shown this is a stable system, it has no steady state error, no oscillatio
 In this part of the mobile platforms movement it is important to be able to control the spacial position $(x, y)$.
 As shown in the kinematic equations Eq.~\eqref{eq:MotionEq} the positions are dependent on both the angular velocity $\omega$ and the average velocity $v$.
 A design of a controller for the average velocity is required to make it possible to control the spacial position.
-Take note of the two input \texttt{AverageVelocity}, \texttt{Desired\_Theta} and the two output \texttt{X}, \texttt{Y} in figure(\ref{fig:PID1}).
+Take note of the two input \texttt{AverageVelocity}, \texttt{Desired\_Theta} and the two output \texttt{X}, \texttt{Y} in Fig.~\ref{fig:PID1}.
 
 By redefining the spatial error from a Cartesian coordinate system to a polar coordinate system it is possible to design a controller for average velocity.
 In this case the error will be defined as following:

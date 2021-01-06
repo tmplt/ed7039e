@@ -46,7 +46,7 @@ particularly that of data acquisition and processing.
 \subsubsection{NixOS}
 % Introduce NixOS and what is gives us
 In this project it was decided that NixOS should be used as the operating system on which to run our software.
-NixOS is a Linux distibutiton (henceforth referred to as a ``distro'') based upon the Nix package manager (and the terms will be used interchangibly henceforth) that aims to be
+NixOS is a Linux distribution (henceforth referred to as a ``distro'') based upon the Nix package manager (and the terms will be used interchangeably henceforth) that aims to be
 \begin{inline-enum}
 \item reproducible:
   ``packages [are built] in isolation from each other. [\ldots] they are reproducible and don't have any undeclared dependencies.''\footnote{A positive side-effect of this feature is the complete mitigation of ``dependency hell'': a term relating to a set of problems that commonly arise if multiple versions of a dependency are installed on a system.};
@@ -62,7 +62,7 @@ NixOS is a Linux distibutiton (henceforth referred to as a ``distro'') based upo
 Effectively, NixOS allows its user to functionally declare their system in a single (or multiple) expressions ---
 that is: Nix enables the user to describe the software components of a system in a common manner and how the components relate to one another.
 The realization of these expressions can be seen in the repository's \texttt{*.nix} files.
-Of particular interest is \texttt{mmc-image.nix}: evaluating this expression generates a bootable image readily flashed onto a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, memory card.} that contains the full softare stack and operation instuctions of the project's robot system.
+Of particular interest is \texttt{mmc-image.nix}: evaluating this expression generates a bootable image readily flashed onto a MultiMediaCard (MMC)\footnote{Commonly referred to as: SD card, memory card.} that contains the full software stack and operation instructions of the project's robot system.
 With the combination of git, the custom software is not only checked into version control, but so are all dependencies and the complete system behavior.
 
 % How does it differ from a conventional disto?
@@ -77,7 +77,7 @@ The usage of NixOS theoretically \textit{forces} its user to adhere to such prec
 % What are the negatives of NixOS?
 NixOS is no silver bullet, however.
 Because of its design, whenever something is to be implemented on NixOS it must be done properly the first time.
-Its non-adherence to the Filesystem Hierarchy Standard (FHS)\footnote{the existance and FHS-defined usage of \texttt{/usr}, \texttt{/lib}, \texttt{/var}, and other Unix-standard system directories.} breaks both the build and execution process of many programs.
+Its non-adherence to the Filesystem Hierarchy Standard (FHS)\footnote{the existence and FHS-defined usage of \texttt{/usr}, \texttt{/lib}, \texttt{/var}, and other Unix-standard system directories.} breaks both the build and execution process of many programs.
 Unless a program is portably written, it must be patched before it can be used on NixOS where all system files exist under a common prefix (\texttt{/nix/store}) which is required to enable the features enumerated in the previous paragraphs.
 
 % Hardware issues
@@ -92,12 +92,12 @@ Fortunately, some work has already been done (and is still being done) by the Ni
 By applying a so called device-tree overlay on the Linux kernel (and thus describing how an otherwise unknown peripheral may be utilized) SPI was successfully enabled,
 which was required to actuate the robot's motors.
 Other required components could be utilized by help of the Raspberry Pi's USB port (fortunately a generic peripheral).
-Had it been decided to use a distro officially supposted by the Raspberry Pi,
+Had it been decided to use a distro officially supported by the Raspberry Pi,
 all of these peripherals would simply work out of the box,
 but that would result in a loss of the features previously enumerated.
 
 % What about the RPi kernels?
-Some non-generic kernels are offered by NixOS that imply support for Raspberry Pis, but offer none in practise.
+Some non-generic kernels are offered by NixOS that imply support for Raspberry Pis, but offer none in practice.
 The reason for these kernels' availability is presently unknown.
 Inspecting the expressions that define these kernels however, it is found that they apply some non-generic procedures to enable a proper boot sequence of the hardware.
 It may be the case that these were added without any consideration to full peripheral support.
@@ -112,8 +112,8 @@ remaining peripherals can instead be utilized by help of dedicated hardware that
 % What external services do we offer?
 To ease the prototyping efforts on the Raspberry Pi a convenience system service was drafted up with help of Nix:
 by declaring an expression that contains the login credentials to the university's wireless network (eduroam),
-and a system service that automatically establishes a reverse SSH proxy to a project-controlled server with a static IP adress,
-the network limitations of eduroam\footnote{Particularly that of network adress translation (NAT), where a server behind NAT may not be accessed from the outside unless some control of the firewall is at hand, which we did not have.} were mostly side-stepped.
+and a system service that automatically establishes a reverse SSH proxy to a project-controlled server with a static IP address,
+the network limitations of eduroam\footnote{Particularly that of network address translation (NAT), where a server behind NAT may not be accessed from the outside unless some control of the firewall is at hand, which we did not have.} were mostly side-stepped.
 
 % And this resulted in what?
 Effectively, this reverse proxy allowed any project member to access the Raspberry Pi via SSH from anywhere with an Internet connection,
@@ -130,7 +130,7 @@ This project uses Decawave (or more specifically: a DWM1001 development board) f
 The development board constitutes of a ultra wide-band module, the DWM1001C, an accelerometer,
 and a Raspberry Pi-compatible GPIO-header.
 By help of a set of ``anchors''\footnote{An anchor is another development board configured for static installation at a known coordinate, used for position calculation. A non-static device with unknown coordinates (as is used in our system) is known as a tag.} a ``tag'' is capable of determining its position relative to the connected anchors by calculating the time-of-flight of messages sent to and from the anchors with satisfactory accuracy.
-Thus, by using the development board's (henceforth reffesed to as a/the ``DWM'') USB-interface,
+Thus, by using the development board's (henceforth referred to as a/the ``DWM'') USB-interface,
 position and acceleration data is queried and used to determine the relative position of the robot in the mimicked factory.
 
 % Describe the TLV API we wanted to use.
@@ -139,11 +139,11 @@ One of the modes is a type-length-value (TLV) API which is very suitable for aut
 to extract data using this mode, one need only write three bytes on the form \texttt{\textbf{MSB}}, \texttt{\textbf{MSB-1}}, \texttt{\textbf{MSB-2}}, \texttt{\textbf{...}} where:
 \begin{description}
 \item[\texttt{MSB}] is the \textit{type} of data one wants to send. \texttt{0x40} is specified to call a function via the API.
-\item[\texttt{MSB-1}] is the value \textit{value} one wants to sent. \texttt{0x02} is speficied (for example) to call a function asking for the DWM position.
+\item[\texttt{MSB-1}] is the value \textit{value} one wants to sent. \texttt{0x02} is specified (for example) to call a function asking for the DWM position.
 \item[\texttt{MSB-2}] is the length of the data one wants to send. Function \texttt{0x02} takes no payload, so \texttt{0x00} is specified here.
 \item[\texttt{...}] would be a payload of length \texttt{\textbf{MSB-2}} had the function type taken a payload of non-zero size.
 \end{description}
-One sequece of these bytes constitute a TLV ``frame''.
+One sequence of these bytes constitute a TLV ``frame''.
 
 % Explain the TLV frames, and how nice they are to work with.
 After this frame has been written over the serial connection two TLV frames are received in response:
@@ -151,22 +151,22 @@ the first (of length 3 bytes) denotes whether the function call was successful a
 If the first frame says success, the next two bytes are read from which is derived what kind of data the remaining incoming bytes should be interpreted as,
 and how many more should be read.
 Implementation-wise, always knowing how much data to read allows for performant I/O\footnote{input/output operations: many of which require calling system functions; this is a relatively costly operation.} and easier error handling.
-It also allows easy construction of subsequent system messages (see sections~\ref{sec:ROS} and \ref{sec:LCM}), because they are just a single \texttt{memcpy(3)}\footnote{\texttt{memcpy} - copy memory area: a common (and performant) operation where a given amount of bytes are copied from a source adress to a destination adress.} away as the byte stream can be trivially represented as a \texttt{struct} following the API documentation.
+It also allows easy construction of subsequent system messages (see sections~\ref{sec:ROS} and \ref{sec:LCM}), because they are just a single \texttt{memcpy(3)}\footnote{\texttt{memcpy} - copy memory area: a common (and performant) operation where a given amount of bytes are copied from a source address to a destination address.} away as the byte stream can be trivially represented as a \texttt{struct} following the API documentation.
 
 % No access to acceleration data using the TLV API; generic shell required.
 Unfortunately, the TLV API does not expose a function for reading the accelerometer data which is required to estimate the direction of our robot.
-A command is, however, readibly available via the interactive shell mode.
+A command is, however, readily available via the interactive shell mode.
 This mode instead replies in a human-readable format, but without telling the caller how many bytes are to be read beforehand, nor in what way to interpret the data read.
 Fortunately, when the shell is ready to process new input, it writes a ``\texttt{dwm>}'' shell prompt;
 bytes can simply be read until this string is encountered.
 This ultimately boils down to more I/O operations and a parsing procedure upon data reception, and operation that is slower than a mere \texttt{memcpy},
-but is nevertheless readibly available via a proper call to the \texttt{scanf(3)} family of functions.
+but is nevertheless readily available via a proper call to the \texttt{scanf(3)} family of functions.
 
 An alternative approach where both the TLV API and the shell mode was used was tested but ultimately scrapped:
 the time to transition from the TLV API to the shell mode took approximately $1$~s, which broke the robot system's $10$~Hz requirement.
 
 \textit{Why} accelerometer data can be queried in one mode but not the other is presently unknown.
-It is surmised that the existance of the shell mode is for debugging purposes only (because of its human readable format --- and its insistance of using different methods of formatting for similar data types) and that accelerometer data is omitted from the TLV API because it is used by the internal localization functions to detect when the hardware is stationary,
+It is surmised that the existence of the shell mode is for debugging purposes only (because of its human readable format --- and its insistence of using different methods of formatting for similar data types) and that accelerometer data is omitted from the TLV API because it is used by the internal localization functions to detect when the hardware is stationary,
 or because the developers simply did not foresee this kind of utilization,
 or both.
 
@@ -177,7 +177,7 @@ $(x, y, z, q)$, where
 \item[$q$] is the quality factor: a measure of how sure the device is of the coordinates.
 \end{description}
 
-Of note is that the decive cannot approximate its position unless it can connect to at least three anchors.
+Of note is that the device cannot approximate its position unless it can connect to at least three anchors.
 Additionally, the quality factor, $q$, is higher when connected to four anchors, but follow no other pattern;
 the DWM manual contain no formula for its derivation and questions posed by other users of the hardware on official forums have been met with inconclusive answers from the vendor.
 $q$ can thus not be used as a fully qualitative factor of $(x, y, z)$, but more as an indicator if the coordinates are ``good'' of ``bad''.
@@ -185,7 +185,7 @@ Alternatively as a simple indicator whether the DWM is connected to three or fou
 
 Because of the three-anchor dependency, a system state where less than three anchors are available must be considered:
 what should be done when the robot does not know where it is located?
-How can anchor communication be estabished?
+How can anchor communication be established?
 
 Additionally, the received when asking for the acceleration is a tuple of $(x, y, z)$, where
 \begin{description}
@@ -219,7 +219,7 @@ There are a few issues with this approach:
 \item \verb|-k| is an alias for \verb|--insecure|;
   the recommended approach is thus to not verify the server certificate ---
   this allows a bad actor to feed the caller malicious code if they have access to their DNS or the target domain.
-\item A \texttt{curl | bash} is bad practise for installation purposes as it commonly installs files that are disconnected from the system's package manager,
+\item A \texttt{curl | bash} is bad practice for installation purposes as it commonly installs files that are disconnected from the system's package manager,
   thus putting the file system in a ``dirty'' state.
 \item A \texttt{curl | bash} can be detected server-side and thus can conditionally feed a user malicious code.
   A dowload of the code first may thus pass a manual inspection before execution. \parencite{curl-bash}
@@ -257,7 +257,7 @@ and the many readily available solutions to problems we were likely to stumble u
 However, ROS is only officially supported on very specific versions of Ubuntu (at this time of writing),
 a distro we were not using and a distro that had a very different design philosophies from NixOS;
 using ROS on NixOS would thus require a Nix expression to be written that correctly packages the software.
-At this point, it was surmised that ROS made several assumption about the global system state that had to be adressed during packaging.
+At this point, it was surmised that ROS made several assumption about the global system state that had to be addressed during packaging.
 This reason alone would likely require a lot of prototyping time for a simple proof-of-concept execution.
 A consultation from another effort to port ROS to an unofficial repository showed that a full desktop installation is constituted of up to 460 packages.\footnote{See \href{https://github.com/ros-noetic-arch}{https://github.com/ros-noetic-arch}, which packages RobotOS to Arch Linux, a distro that is not officially supported by the RobotOS project. Each repository corresponds to a ROS package.}
 It was thus decided to find an alternative to RobotOS due to time constrains.
@@ -274,7 +274,7 @@ the final \texttt{lcm} attribute in \texttt{nix/derivations.nix} can be summariz
 
 % Support for C and Python which we have decided to use thus far.
 % The core component of ROS we wanted was the message-passing (IPC) component, which this library provides for ANY POSIX-compliant system.
-Thus, becasue LCM:
+Thus, because LCM:
 \begin{inline-enum}
 \item enables us to trivially utilize IPC with different message types;
 \item has bindings for C and Python; and
@@ -634,7 +634,7 @@ The same operating speed was chosen for both the right and left track of the mob
 \subsection{Software nodes}
 % What is a software node?
 The usage of LCM allows us to define ``software nodes'' which were briefly explained in section~\ref{sec:ROS}.
-A software node is a small stand-alone executable program, written in any language that useally has a single purpose in the system the project implements.
+A software node is a small stand-alone executable program, written in any language that usually has a single purpose in the system the project implements.
 For example, one node in the system reads data from the DWM;
 another approximates its position using a Kalman filter;
 another actuates the motors to pick up the object the system aims to displace; etc.
@@ -646,7 +646,7 @@ and processes it.
 
 % How do the structure of nodes help?
 This structure have allowed us to write a set of smaller programs which are usually easier to implement and debug across multiple project members,
-instead of maintaining a monolithic program that does everything, which are useally harder to both implement and debug,
+instead of maintaining a monolithic program that does everything, which are usually harder to both implement and debug,
 especially when multiple project members need to contribute.
 
 
@@ -660,7 +660,7 @@ Each node in the project follow the naming scheme of \texttt{lcm-<type>-<desc>.<
 \item[\texttt{<desc>}] is a list of words interspaced by a \texttt{-} that provide a short description of the node's purpose.
 \item[\texttt{<ext>}] is the source file extension. It describes how the node should be built before it can be executed.
   For example, if the extension is \texttt{c} then the node was written and C and needs to be compiled and linked with a C compiler before the resulting binary can be executed.
-  If the extention instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed,
+  If the extension instead is \texttt{py} then the node was written in Python, and nothing must be done before the script can be executed,
   except for satisfying the script's dependencies.
 \end{description}
 
@@ -715,8 +715,8 @@ All system nodes (and the source files under \texttt{src} which define them) are
 \item[DWM node (\texttt{lcm-source-dwm.c})]
 This node is responsible for extracting the position and acceleration data from the DWM.
 Upon execution it opens opens a serial communication to the DWM, enters the shell mode and allocates a buffer into which received data is read into.
-Afterwards it enters a loop within which the shell command \texttt{av} is continously called.
-While spinning in this loop, the node keeps the time and ensures that the command \texttt{apg} is called with a frequenzy of $10$~Hz.
+Afterwards it enters a loop within which the shell command \texttt{av} is continuously called.
+While spinning in this loop, the node keeps the time and ensures that the command \texttt{apg} is called with a frequency of $10$~Hz.
 After the execution of each command:
 \begin{enumerate}
   \item the response is read into the buffer;
@@ -742,9 +742,9 @@ After the execution of each command:
 \item[Kalman filter node (\texttt{lcm-int-dwm-filter.py})]
 
 \item[System state node (\texttt{lcm-int-system-state.py})]
- takes the filtered DMW data and the the motor encoders data and estimate the new position, as described in \eqref{eq:Disc_EOM}.
+This node takes the filtered DMW data and the the motor encoders data and estimate the new position, as described in \eqref{eq:Disc_EOM}.
 By knowing the old positions, the new positions and the elapsed time (sampling time) it is also possible to estimate the velocities. 
-The $x$ and $y$ velocities are required for kalman filter to be able to make better estimations for the spacial position.
+The $x$ and $y$ velocities are required for Kalman filter to be able to make better estimations for the spacial position.
 This node also estimate the angle of attack and its derivative, i.e. the angular velocity.
 
 
@@ -756,7 +756,7 @@ This node also estimate the angle of attack and its derivative, i.e. the angular
   If it is found that the system is too far away, the line-found event is ignored and logged to \texttt{stderr} for debugging purposes.
 
 \item[DWM mode node (\texttt{lcm-DWM-drive.py})]
- is the node where the current position $(x, y, \theta)$ and the desired position are the inputs.
+This is the node where the current position $(x, y, \theta)$ and the desired position are the inputs.
 By having this inputs it is possible to calculate the angular and spacial errors for the movement, as described in \eqref{eq:cart2polar}
 Two simple PID controllers are designed to make sure this errors go to zero, as shown in fig\ref{fig:PID1} and fig\ref{fig:V_PID}.
 The robot has arrived to the desired position when the errors are zeros.
@@ -772,7 +772,7 @@ Some debugging nodes are also defined, but are external from the system-internal
 \item[Message spoofer (\texttt{lcm-debug-spoof-message.py})]
   While developing nodes it is useful to ensure that it responds to LCM messages in the expected manner.
   Instead of writing an ad-hoc node that sends whatever messages that need to be tested,
-  this node allows the developer send a message of any type by just speficying the correct parameters.
+  this node allows the developer send a message of any type by just specifying the correct parameters.
 
   % Describe how the node works? Inspects the LCM-generated Python module.
 
