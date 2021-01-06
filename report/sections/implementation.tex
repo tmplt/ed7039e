@@ -282,20 +282,20 @@ Thus, becasue LCM:
 \end{inline-enum}
 it was decided that the project's robot system would be implemented with help of it in place of ROS.
 
-\subsection{Robot Hardware}
+\subsection{Robot hardware}
 The robot designated the task of moving the object on the industry platform is built from the Lego Mindstorms EV3 core set package. The design of the robot is based from the Robot arm model from Legos EV3 core set instructions, but is modified with continuous tracks on the base of the robot, longer arm and some reinforcement to make the robot oscillate less when moving. Instead of using the included EV3 Intelligent Brick, a Raspberry Pi 3 together with two BrickPi3 motor shields, see section \ref{brickpi 3}, was used to control the robot. The motors for moving the arm was the EV3 large servomotors, and a EV3 servo motor medium was used for the gripping mechanism.
 
 
-\newpage
+
 \subsection {Mobile Platform and Trailer}
 \subsubsection{Mobile Platform}
-A simplified model of the mobile platform can be seen in figures \ref{Mobile_platform_paint} and \ref{Band_platform_coordinates}. The power from each motor is transmitted by a beam to three interconnected gears which in turn are inscircled by a rubber band. This configuration  creates two continues tracks powered by one motor each. Due to the fact that each continues track is built in parallel to the platform, the robot is limited to a movement defined by differential drive. As a consequence, the torque in each motor needs to be changed from its initial value in order for the robot to make a turn and change direction from its initial path. 
+A simplified model of the mobile platform can be seen in Fig.~\ref{Mobile_platform_paint} and Fig.~\ref{Band_platform_coordinates}. The power from each motor is transmitted by a beam to three interconnected gears which in turn are inscircled by a rubber band. This configuration  creates two continues tracks powered by one motor each. Due to the fact that each continues track is built in parallel to the platform, the robot is limited to a movement defined by differential drive. As a consequence, the torque in each motor needs to be changed from its initial value in order for the robot to make a turn and change direction from its initial path. 
 
 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 15 cm]{Mobile_platform_paint_text3_horiz.PNG}
+    \includegraphics[width = \textwidth]{Mobile_platform_paint_text3_horiz.PNG}
     \caption{The Mobile Platform seen from above.}
     \label{Mobile_platform_paint_}
 \end{figure}
@@ -303,17 +303,17 @@ A simplified model of the mobile platform can be seen in figures \ref{Mobile_pla
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 15 cm]{Band_platform_coordinates.PNG}
+    \includegraphics[width =\textwidth]{Band_platform_coordinates.PNG}
     \caption{The Mobile Platform seen from the side of one track.}
     \label{Band_platform_coordinates}
 \end{figure}
 
 \subsubsection{Trailer}
-In order to get power to each motor servo and the Raspberry PI, two battery packs with 8 batteries in each were used. Since these battery packs together with the Raspberry Pi and the two BrickPi motorshields were to large to place on the mobile platform, a trailer was built and mounted behind the platform with the devices stacked on it. The trailer can be seen attached to the mobile platform in figure \ref{Trailer}.
+In order to get power to each motor servo and the Raspberry PI, two battery packs with 8 batteries in each were used. Since these battery packs together with the Raspberry Pi and the two BrickPi motorshields were to large to place on the mobile platform, a trailer was built and mounted behind the platform with the devices stacked on it. The trailer can be seen attached to the mobile platform in Fig.~\ref{Trailer}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 15 cm]{Trailer.PNG}
+    \includegraphics[width =\textwidth]{Trailer.PNG}
     \caption{The Mobile Platform seen from the side of one track.}
     \label{Trailer}
 \end{figure}
@@ -326,7 +326,7 @@ The docking sequence of the robots movement was implemented using a line followe
 Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F232H chip from FTDI and has has one port each for a usb c and stemma qt male connectors. The board is also equipped with 16 GPIO pins and also has the ability to speak with many protocols including SPI, ITC, serial UART, JTAG and others. In the project, this board was used to transfer GPIO singals from individual sensor on a sensor array to the Raspberry Pi computer. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 13 cm]{FT232H.jpg}
+    \includegraphics[width =\textwidth]{FT232H.jpg}
     \caption{FT232H Breakout.}
     \label{FT232H}
 \end{figure}
@@ -335,14 +335,14 @@ Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F2
 The Sensor array used in this project was a QTRX-MD-16A Reflectance array from Pololu. Each sensor on the sensor array is made from a photo transistor and paired with an IR-led which powers on and keeps emitting light while the sensor array module is powered on. The signal from the photo transistor is transmitted as an analog voltage from the sensor array. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 13 cm]{Sensor_array.jpg}
+    \includegraphics[width =\textwidth]{Sensor_array.jpg}
     \caption{QTRX-MD-16A.}
     \label{Sensor_array}
 \end{figure}
 \subsubsection{Implementation of Routine}
-As mentioned earlier, the signal from the sensor array was transmitted through the breakout board to the Rapberry Pi, this signal included the state of each photo transistor. The state of each transistor is being displayed as TRUE if the black line is underneath it and FALSE if the transistor only detects a white surface underneath. Since a pre-owned sensor array was used, only 4 functioning photo transistor/LED pairs that were close to each other were available, limiting the line following procedure to 4 reference points. More reference points may have proven to be more optimal in the case whit sharp angles and faster speeds. However the fact that the line only triggers 2 or less reference points at each time, made us determine that the sensor array was good enough for the given task.  \newline
+As mentioned earlier, the signal from the sensor array was transmitted through the breakout board to the Rapberry Pi, this signal included the state of each photo transistor. The state of each transistor is being displayed as TRUE if the black line is underneath it and FALSE if the transistor only detects a white surface underneath. Since a pre-owned sensor array was used, only 4 functioning photo transistor/LED pairs that were close to each other were available, limiting the line following procedure to 4 reference points. More reference points may have proven to be more optimal in the case whit sharp angles and faster speeds. However the fact that the line only triggers 2 or less reference points at each time, made us determine that the sensor array was good enough for the given task.
 
-The position of the line underneath the sensor array was determined by setting a weight on each photo transistor. The weights of each sensor corresponded to its position from the leftmost position in the robot's forward direction to the rightmost position, giving the weight of the first sensor the value of 1 and the weight of the fourth sensor the value of 4. By summing all weights from the transistors that detected the line and dividing this value with the number of transistors that detected the line, a mean value of the active weights can be derived, see figure \ref{Line_Position}. M is the mean value of the weights of transistors that detected the line. The value of each Sn is 1 if the transistor detecteda line underneath it or 0 if a white surface was detected.
+The position of the line underneath the sensor array was determined by setting a weight on each photo transistor. The weights of each sensor corresponded to its position from the leftmost position in the robot's forward direction to the rightmost position, giving the weight of the first sensor the value of 1 and the weight of the fourth sensor the value of 4. By summing all weights from the transistors that detected the line and dividing this value with the number of transistors that detected the line, a mean value of the active weights can be derived, see Fig.~\ref{Line_Position}. M is the mean value of the weights of transistors that detected the line. The value of each Sn is 1 if the transistor detecteda line underneath it or 0 if a white surface was detected.
 \begin{equation}
     M=\frac{1*S1+2*S2+3*S3+4*S4}{S1+S2+S3+S4}
     \label{Line_Position} 
@@ -354,11 +354,11 @@ When the line is perpendicular to the mobile platform and underneath the two mid
     \label{Error_Position} 
 \end{equation}
 
-An example of the how the error is calculated using equation \ref{Line_Position} and \ref{Error_Position} together with data from the diodes can be seen in figure \ref{Line_Error_ex}
+An example of the how the error is calculated using Eq.~\eq\ref{Line_Position} and \ref{Error_Position} together with data from the diodes can be seen in Fig.~\ref{Line_Error_ex}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 13 cm]{Line_Error_ex.PNG}
+    \includegraphics[width =\textwidth]{Line_Error_ex.PNG}
     \caption{Calculation of the error in the case where the two phototransistors on the right are detecting the line}
     \label{Line_Error_ex}
 \end{figure}
@@ -798,7 +798,7 @@ Some debugging nodes are also defined, but are external from the system-internal
 	\label{fig:arrowhead_intercloud}
 \end{figure}
 
-Figure \ref{fig:arrowhead_intercloud} shows the inter-cloud communcation and communication to the Arrowhead node.  
+Fig.~\ref{fig:arrowhead_intercloud} shows the inter-cloud communcation and communication to the Arrowhead node.  
 The Station Consumer sends a POST request for the ``place'' service and also sends a json with the position.  
 The provider is then sending a GET request depending on the service and the position to the arrowhead node.  
 When Arrowhead node receives the request, it will publish a message which other nodes are getting if they are subscribed to that channel.
@@ -839,7 +839,7 @@ The provider are using the client-library-python and is written in Python.
 The purpose of the consumer is to consume services which are offered by a provider in Arrowhead Service Registry. 
 The consumer needs to manually be added as a system to the Service Registry and have intra- or inter-cloud rules for the services it want to consume.
   
-The consumer in the project were used for debuging and testing the provider. The sequence diagram in figure \ref{fig:arrowhead_intercloud} shows the real system and the communication between. The Station Consumer is instead communicate with the provider. 
+The consumer in the project were used for debuging and testing the provider. The sequence diagram in Fig.~\ref{fig:arrowhead_intercloud} shows the real system and the communication between. The Station Consumer is instead communicate with the provider. 
 The consumer is using self signed certificates in the https connection which is the same as the provider. 
 
 The consumer are using the client-library-python and is written in Python.
