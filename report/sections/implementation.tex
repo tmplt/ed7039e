@@ -140,7 +140,7 @@ One of the modes is a type-length-value (TLV) API which is very suitable for aut
 to extract data using this mode, one need only write three bytes on the form \texttt{\textbf{MSB}}, \texttt{\textbf{MSB-1}}, \texttt{\textbf{MSB-2}}, \texttt{\textbf{...}} where:
 \begin{description}
 \item[\texttt{MSB}] is the \textit{type} of data one wants to send. \texttt{0x40} is specified to call a function via the API.
-\item[\texttt{MSB-1}] is the value \textit{value} one wants to sent. \texttt{0x02} is specified (for example) to call a function asking for the DWM position.
+\item[\texttt{MSB-1}] is the \textit{value} one wants to sent. \texttt{0x02} is specified (for example) to call a function asking for the DWM position.
 \item[\texttt{MSB-2}] is the length of the data one wants to send. Function \texttt{0x02} takes no payload, so \texttt{0x00} is specified here.
 \item[\texttt{...}] would be a payload of length \texttt{\textbf{MSB-2}} had the function type taken a payload of non-zero size.
 \end{description}
@@ -296,15 +296,15 @@ A simplified model of the mobile platform can be seen in Fig.~\ref{Mobile_platfo
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/Mobile_platform_paint_text3_horiz.PNG}
+    \includegraphics[width=\linewidth]{sections/assets/Mobile_platform_paint_text3_horiz.PNG}
     \caption{The Mobile Platform seen from above.}
-    \label{Mobile_platform_paint_}
+    \label{Mobile_platform_paint}
 \end{figure}
 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width =\textwidth]{sections/assets/Band_platform_coordinates.PNG}
+    \includegraphics[width =\linewidth]{sections/assets/Band_platform_coordinates.PNG}
     \caption{The Mobile Platform seen from the side of one track.}
     \label{Band_platform_coordinates}
 \end{figure}
@@ -314,7 +314,7 @@ In order to get power to each motor servo and the Raspberry Pi, two battery pack
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width =\textwidth]{sections/assets/Trailer.PNG}
+    \includegraphics[width =\linewidth]{sections/assets/Trailer.PNG}
     \caption{The Mobile Platform seen from the side of one track.}
     \label{Trailer}
 \end{figure}
@@ -327,7 +327,7 @@ The docking sequence of the robots movement was implemented using a line followe
 Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F232H chip from FTDI and has has one port each for a usb c and stemma qt male connectors. The board is also equipped with 16 GPIO pins and also has the ability to speak with many protocols including SPI, ITC, serial UART, JTAG and others. In the project, this board was used to transfer GPIO singals from individual sensor on a sensor array to the Raspberry Pi computer.
 \begin{figure}[h]
     \centering
-    \includegraphics[width =\textwidth]{sections/assets/FT232H.jpg}
+    \includegraphics[width =\linewidth]{sections/assets/FT232H.jpg}
     \caption{FT232H Breakout.}
     \label{FT232H}
 \end{figure}
@@ -336,7 +336,7 @@ Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F2
 The Sensor array used in this project was a QTRX-MD-16A Reflectance array from Pololu. Each sensor on the sensor array is made from a photo transistor and paired with an IR-led which powers on and keeps emitting light while the sensor array module is powered on. The signal from the photo transistor is transmitted as an analog voltage from the sensor array.
 \begin{figure}[h]
     \centering
-    \includegraphics[width =\textwidth]{sections/assets/Sensor_array.jpg}
+    \includegraphics[width =\linewidth]{sections/assets/Sensor_array.jpg}
     \caption{QTRX-MD-16A.}
     \label{Sensor_array}
 \end{figure}
@@ -359,7 +359,7 @@ An example of the how the error is calculated using Eq.~\eqref{Line_Position} an
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width =\textwidth]{sections/assets/Line_Error_ex.PNG}
+    \includegraphics[width =\linewidth]{sections/assets/Line_Error_ex.PNG}
     \caption{Calculation of the error in the case where the two phototransistors on the right are detecting the line}
     \label{Line_Error_ex}
 \end{figure}
@@ -369,15 +369,15 @@ By creating a controller with the purpose of minimizing the error, the robot wil
 
 \subsection{Robot arm}
 A simplified model of the robot arm can be seen in Fig.~\ref{Arm_model} where the measured distances from \(d_1\) to \(d_7\) and the vertical angle Theta can be seen. in Fig.~\ref{arm_overview} an overview of the robot model can be seen showing how the angle beta was specified.
-\begin{figure}[h]
+\begin{figure*}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/Arm_model.png}
+    \includegraphics[width=\linewidth]{sections/assets/Arm_model.png}
     \caption{Arm model side view.}
     \label{Arm_model}
-\end{figure}
+\end{figure*}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/Arm_overview.png}
+    \includegraphics[width=\linewidth]{sections/assets/Arm_overview.png}
     \caption{Arm model overview.}
     \label{arm_overview}
 \end{figure}
@@ -504,7 +504,7 @@ the expression of where the gripper claw can be then expressed as in Eq.~\eqref{
 After being able to describe the position and orientation of the gripper it was necessary to have a way of calculating the desired angles theta and beta of the arm to get the gripper claw to a desired position. This problem is often referred to as the inverse kinematics problem. For this robot the angle theta was directly determined by the height of the desired gripper claw position which was calculated according to Eq.~\eqref{inv_theta_calc_1} to \ref{inv_theta_calc_5} and the distances \(h_1\) to \(h_3\) can be seen in Fig.~\ref{inv_theta_img}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/Arm_model_inv_theta.png}
+    \includegraphics[width=\linewidth]{sections/assets/Arm_model_inv_theta.png}
     \caption{distances \(h_1\) to \(h_3\) on arm model.}
     \label{inv_theta_img}
 \end{figure}
@@ -533,7 +533,7 @@ substituting \(h_1\) to \(h_3\) with expressions from Eq.~\eqref{inv_theta_calc_
 Since the arm could rotate horizontally it could reach points on a circle, see Fig.~\ref{inv_beta_radius_img}, around itself where the radius of that circle, with the rotational center of the robot being the center of the circle, depended on the angle theta in a way that is described in Eq.~\eqref{beta_radius_eq}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/inv_beta_radius.png}
+    \includegraphics[width=\linewidth]{sections/assets/inv_beta_radius.png}
     \caption{distances \(h_1\) to \(h_3\) on arm model.}
     \label{inv_beta_radius_img}
 \end{figure}
@@ -627,7 +627,7 @@ The same operating speed was chosen for both the right and left track of the mob
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{sections/assets/Control_system1.PNG}
+    \includegraphics[width=\linewidth]{sections/assets/Control_system1.PNG}
     \caption{Block diagram of the PID controller constructed for the line following procedure}
     \label{Control_system1}
 \end{figure}
@@ -788,12 +788,12 @@ Some debugging nodes are also defined, but are external from the system-internal
 
 \subsection{Arrowhead clients}
 
-\begin{figure}[h!]
+\begin{figure*}[h]
 	\centering
-	\includegraphics[scale=0.3]{sections/assets/arrowhead_sequence_diagram.png}
+	\includegraphics[width=\linewidth]{sections/assets/arrowhead_sequence_diagram.png}
 	\caption{The communication between clouds and the arrowhead node.}
 	\label{fig:arrowhead_intercloud}
-\end{figure}
+\end{figure*}
 
 Fig.~\ref{fig:arrowhead_intercloud} shows the inter-cloud communcation and communication to the Arrowhead node.
 The Station Consumer sends a POST request for the ``place'' service and also sends a json with the position.
