@@ -287,7 +287,7 @@ The robot designated the task of moving the object on the industry platform is b
 
 
 
-\subsection {Mobile Platform and Trailer}
+\subsection {Mobile platform and trailer}
 \subsubsection{Mobile Platform}
 A simplified model of the mobile platform can be seen in Fig.~\ref{Mobile_platform_paint} and Fig.~\ref{Band_platform_coordinates}. The power from each motor is transmitted by a beam to three interconnected gears which in turn are enscircled by a rubber band. This configuration  creates two continues tracks powered by one motor each. Due to the fact that each continuous track is built in parallel to the platform, the robot is limited to a movement defined by differential drive. As a consequence, the torque in each motor needs to be changed from its initial value in order for the robot to make a turn and change direction from its initial path. 
 
@@ -318,11 +318,11 @@ In order to get power to each motor servo and the Raspberry Pi, two battery pack
     \label{Trailer}
 \end{figure}
 
-\subsection{Line Follower}
+\subsection{Line follower}
 
 The docking sequence of the robots movement was implemented using a line follower. A QTRX reflectance sensor from Pololu was used together with a black line to guide the robot close to the factory and to stop it with a perpendicular angle to the factory. During the project, there occurred a connection issue between the Raspberry Pi and the sensor array due to the fact that  NixOS could not handle the incoming data. This issue was resolved by buying an additional breakout board which, in turn, had its own GPIO pins and at the same time could be connected with the Raspberry Pi 3 through another medium, in this case via a usb-cable. The breakout board used in this project was the Adafruit FT232H Breakout.
 
-\subsubsection{Adafruit FT232H Breakout}
+\subsubsection{Adafruit FT232H breakout}
 Adafruit FT232H Breakout is a breakout board from Adafruit which contains the F232H chip from FTDI and has has one port each for a usb c and stemma qt male connectors. The board is also equipped with 16 GPIO pins and also has the ability to speak with many protocols including SPI, ITC, serial UART, JTAG and others. In the project, this board was used to transfer GPIO singals from individual sensor on a sensor array to the Raspberry Pi computer. 
 \begin{figure}[H]
     \centering
@@ -339,7 +339,7 @@ The Sensor array used in this project was a QTRX-MD-16A Reflectance array from P
     \caption{QTRX-MD-16A.}
     \label{Sensor_array}
 \end{figure}
-\subsubsection{Implementation of Routine}
+\subsubsection{Implementation of routine}
 As mentioned earlier, the signal from the sensor array was transmitted through the breakout board to the Rapberry Pi, this signal included the state of each photo transistor. The state of each transistor is being displayed as TRUE if the black line is underneath it and FALSE if the transistor only detects a white surface underneath. Since a pre-owned sensor array was used, only 4 functioning photo transistor/LED pairs that were close to each other were available, limiting the line following procedure to 4 reference points. More reference points may have proven to be more optimal in the case whit sharp angles and faster speeds. However the fact that the line only triggers 2 or less reference points at each time, made us determine that the sensor array was good enough for the given task.
 
 The position of the line underneath the sensor array was determined by setting a weight on each photo transistor. The weights of each sensor corresponded to its position from the leftmost position in the robot's forward direction to the rightmost position, giving the weight of the first sensor the value of 1 and the weight of the fourth sensor the value of 4. By summing all weights from the transistors that detected the line and dividing this value with the number of transistors that detected the line, a mean value of the active weights can be derived, see Fig.~\ref{Line_Position}. M is the mean value of the weights of transistors that detected the line. The value of each Sn is 1 if the transistor detecteda line underneath it or 0 if a white surface was detected.
@@ -621,7 +621,7 @@ The tuning of the controllers was made with a Ziegler Nichols approach \parencit
 \end{equation}
 where \(T_{osc}\) is the oscillation time, n is the number of measured values in one undamped oscillation period from the output of the step response and \(T_s\) is the sampling period of the robot.
 
-\subsubsection{Controller for Line Following}
+\subsubsection{Controller for line following}
 The same operating speed was chosen for both the right and left track of the mobile platform, the speed of each track would not change from the operating speed as long as Error calculated in eq. \ref{Error_Position} would remain zero. If the position of the line underneath the sensor array changed, the error would grow and the speed of both tracks would change. An architecture for the controller which minimizes the error could be observed in fig.
 
 \begin{figure}[H]
