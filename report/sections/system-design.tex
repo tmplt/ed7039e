@@ -1,46 +1,9 @@
 \section{System model and simulations}
 This section thoroughly covers the models and simulations of the two subsystems that constitute the mechatronical system:
 the mobile platform and the arm which is attached to the platform.
-The software used in this project is covered in section~\ref{sec:implementation}.
+The software used in this project is covered in section~\ref{sec:impl}.
 
 \subsection{Model}
-
-The system is modeled in two parts: the moving base and the\ldots
-% TODO: describe the moving base, and the attachment, whatever it ends up being.
-% Include physical models.
-
-
-% Describe the states of the system.
-We argue for the following five states of the system:
-\begin{inline-enum}
-\item waiting for a command;
-\item moving to a destination;
-\item following a navigation-line;
-\item picking an object up; and
-\item dropping an object off.
-\end{inline-enum}
-The relation between these five states are visually described in the state machine of Fig~\ref{fig:state_machine}.
-\begin{figure*}[ht]
-  \centering
-  \begin{tikzpicture}
-    \node[state, initial, accepting] (wait) {waiting for \\ command};
-    \node[state, right of=wait] (move) {moving to \\ destination};
-    \node[state, below of=move] (follow) {following \\ line};
-    \node[state, right of=follow] (pickup) {picking \\ up object};
-    \node[state, left of=follow] (dropoff) {dropping \\ off object};
-
-    \path[->] (wait) edge node{Arrowhead \\ signal} (move)
-    (move) edge[sloped] node{line detected \\} (follow)
-    (follow) edge[sloped] node{station detection \\ (system w/o object)} (pickup)
-    (follow) edge[sloped] node{station detection \\ (system w/ object)} (dropoff)
-    (pickup) edge[sloped] node{object picked up \\} (move)
-    (dropoff) edge[sloped] node{object dropped \\} (wait)
-    ;
-  \end{tikzpicture}
-  \caption{High-level state machine of the system.}
-  \label{fig:state_machine}
-\end{figure*}
-
 \subsubsection{Motor}
 \begin{description}
 \item[PID contoller for the LEGO EV3 motor]
