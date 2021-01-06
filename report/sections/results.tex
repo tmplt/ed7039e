@@ -6,14 +6,14 @@ Different controllers that was made for the motion control of the robot arm was 
 \subsubsection{P controllers}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_P_controller.png}
+\includegraphics[width=\textwidth]{assets/Vertical_P_controller.png}
 \caption{Evolution of vertical angular error from \(40^{\circ}\) step with P-controller.}
 \label{vert_P}
 \end{figure}
 Both rise time and settling time of the vertical P controller is 0.4 seconds.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_P_controller.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_P_controller.png}
 \caption{Evolution of horizontal angular error from \(60^{\circ}\) step with P-controller.}
 \label{vert_P}
 \end{figure}
@@ -22,14 +22,14 @@ Rise time of horizontal P controller is 0.6 seconds and settling time is 1.6 sec
 \subsubsection{PI controllers}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_PI_controller.png}
+\includegraphics[width=\textwidth]{assets/Vertical_PI_controller.png}
 \caption{Evolution of vertical angular error from \(40^{\circ}\) step with PI-controller.}
 \label{vert_P}
 \end{figure}
 The rise time of the vertical PI controller is 0.4 seconds and the settling time is 7.1 seconds.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_PI_controller.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_PI_controller.png}
 \caption{Evolution of horizontal angular error from \(60^{\circ}\) step with PI-controller.}
 \label{vert_P}
 \end{figure}
@@ -38,14 +38,14 @@ Rise time of horizontal PI controller is 0.6 seconds and settling time is 10.8 s
 \subsubsection{PD controllers}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_PD_controller.png}
+\includegraphics[width=\textwidth]{assets/Vertical_PD_controller.png}
 \caption{Evolution of vertical angular error from \(40^{\circ}\) step with PD-controller.}
 \label{vert_P}
 \end{figure}
 The rise time of the vertical PD controller is 0.4 seconds and the settling time is 1.7 seconds.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_PD_controller.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_PD_controller.png}
 \caption{Evolution of horizontal angular error from \(60^{\circ}\) step with PD-controller.}
 \label{vert_P}
 \end{figure}
@@ -54,14 +54,14 @@ Rise time of horizontal PI controller is 0.6 seconds and settling time is 0.9 se
 \subsubsection{PID controllers}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_PID_controller.png}
+\includegraphics[width=\textwidth]{assets/Vertical_PID_controller.png}
 \caption{Evolution of vertical angular error from \(40^{\circ}\) step with PID-controller.}
 \label{vert_P}
 \end{figure}
 The rise time of the vertical PD controller is between 0.4 and 0.5 seconds and the settling time is 4.7 seconds.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_PID_controller.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_PID_controller.png}
 \caption{Evolution of horizontal angular error from \(60^{\circ}\) step with PID-controller.}
 \label{vert_P}
 \end{figure}
@@ -70,14 +70,14 @@ Rise time of horizontal PI controller is between 0.5 and 0.6 seconds and settlin
 \subsubsection{BrickPi3 library for controlling robot arm movement}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_built_in_functions.png}
+\includegraphics[width=\textwidth]{assets/Vertical_built_in_functions.png}
 \caption{Evolution of vertical angular error from \(40^{\circ}\) step with BrickPi3 library motor functions.}
 \label{vert_P}
 \end{figure}
 The rise time of the vertical PD controller is between 0.8 seconds and the settling time is 0.9 seconds.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_built_in_funtion.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_built_in_funtion.png}
 \caption{Evolution of horizontal angular error from \(60^{\circ}\) step with BrickPi3 library motor functions.}
 \label{vert_P}
 \end{figure}
@@ -87,13 +87,13 @@ Rise time of horizontal PI controller is between 0.8 seconds and settling time i
 The controllers mentioned above was tuned with a Ziegler Nichols approach and two plots of undamped oscillations for vertical and horizontal arm movements are shown in Fig~\ref{vert_osc} and Fig~\ref{Hor_osc}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Vertical_undamped_oscillation.png}
+\includegraphics[width=\textwidth]{assets/Vertical_undamped_oscillation.png}
 \caption{Close to undamped oscillations from \(40^{\circ}\) step with P-controller.}
 \label{vert_osc}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Horizontal_undamped_oscillation.png}
+\includegraphics[width=\textwidth]{assets/Horizontal_undamped_oscillation.png}
 \caption{Close to undamped oscillations from \(60^{\circ}\) step with P-controller.}
 \label{Hor_osc}
 \end{figure}
@@ -105,7 +105,7 @@ Different types of controllers were made for the line following sequence.  A ste
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Step Response.jpg}
+    \includegraphics[width=\textwidth]{assets/Step Response.jpg}
     \caption{View of the line on which the step response was tested}
     \label{Step Response}
 \end{figure}
@@ -115,7 +115,7 @@ It was determined that the best P controller had the value of 40 on its Kp term.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Kp40.jpg}
+    \includegraphics[width=\textwidth]{assets/Kp40.jpg}
     \caption{The error can be seen on the y-axis while the x axis represents the iteration of the loop.}
     \label{Kp40}
 \end{figure}
@@ -125,7 +125,7 @@ It was determined that the best PD controller had the value of 40 on its Kp term
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Kp40_10Kd.jpg}
+    \includegraphics[width=\textwidth]{assets/Kp40_10Kd.jpg}
     \caption{The error can be seen on the y-axis while the x axis represents the iteration of the loop.}
     \label{Kp40_10Kd}
 \end{figure}
