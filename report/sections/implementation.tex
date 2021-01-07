@@ -423,6 +423,7 @@ then a transformation between the rotational center of the robot to where link \
 \end{equation}
 followed by a transformation from the beginning of link \(d_2\) to the center of wheel0. This was done by first making a pure rotation around the z-axis with a angle beta, after which a pure translation in the z-direction with a distance \(d_2\cdot sin(\pi-alpha)\) was made, followed by a translation in the x-direction with a distance \(d_2\cdot cos(\pi - alpha)\) as can be seen in Eq.~\eqref{T23}
 \begin{equation}
+\resizebox{0.5\hsize}{!}{
     T_{23} =
     \begin{bmatrix}
     cos(beta)&-sin(beta)&0&0\\
@@ -444,6 +445,8 @@ followed by a transformation from the beginning of link \(d_2\) to the center of
     0&0&1&0\\
     0&0&0&1\\
     \end{bmatrix}
+    $
+    }
     \label{T23}
 \end{equation}
 this was followed by a translation in the z-direction of the distance \(d_3\) between the center of wheel0 to the center of wheel1, see Eq.~\eqref{T34}
@@ -460,6 +463,7 @@ this was followed by a translation in the z-direction of the distance \(d_3\) be
 after which a rotation of the coordinate frame in the center of wheel1 was made by an angle -theta around the y-axis and then a translation in the x-direction of the frame in wheel1 by a distance \(d_5 + d6\), see Eq.~\eqref{T46}
 \begin{equation}
     T_{46} =
+    \resizebox{0.8\hsize}{!}{
     \begin{bmatrix}
     cos(-theta)&0&sin(-theta)&0\\
     0&1&0&0\\
@@ -473,10 +477,13 @@ after which a rotation of the coordinate frame in the center of wheel1 was made 
     0&0&1&0\\
     0&0&0&1\\
     \end{bmatrix}
+    $
+    }
     \label{T46}
 \end{equation}
 due to the mechanics of the robot model the gripper claw is always pointing straight downwards independent of the angle theta, therefore the coordinate system in the middle if the medium motor connected to link \(d_5\) was rotated back with a positive angle theta before it was translated a distance \(-d_7\) in the z-direction as can be seen in Eq.~\eqref{T67}
 \begin{equation}
+\resizebox{0.8\hsize}{!}{
     T_{67} =
     \begin{bmatrix}
     cos(theta)&0&sin(theta)&0\\
@@ -491,6 +498,8 @@ due to the mechanics of the robot model the gripper claw is always pointing stra
     0&0&1&-d7\\
     0&0&0&1\\
     \end{bmatrix}
+    $
+    }
     \label{T67}
 \end{equation}
 the expression of where the gripper claw can be then expressed as in Eq.~\eqref{T_tot} where both it's position and orientation relative to the robot platform is described.
@@ -550,20 +559,32 @@ calculations of x and y positions on a circle can be seen in Eq.~\eqref{circle_x
 \end{equation}
 substituting r to the expression from Eq.~\eqref{beta_radius_eq} the calculations of the x and y positions on the circle around the robot can be seen in Eq.~\eqref{circle_x_robot} and \ref{circle_y_robot}
 \begin{equation}
+\resizebox{0.8\hsize}{!}{
     x = ((d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1)\cdot cos(beta)
+    $
+    }
     \label{circle_x_robot}
 \end{equation}
 \begin{equation}
+\resizebox{0.8\hsize}{!}{
     y = ((d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1)\cdot sin(beta)
+    $
+    }
     \label{circle_y_robot}
 \end{equation}
 solving for beta Eq.~\eqref{circle_x_robot} and Eq.~\eqref{circle_y_robot} the following expressions was achieved
 \begin{equation}
+\resizebox{0.8\hsize}{!}{
     beta = cos^{-1}(\frac{x}{(d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1})
+    $
+    }
     \label{Beta_x_robot}
 \end{equation}
 \begin{equation}
+\resizebox{0.8\hsize}{!}{
     beta = sin^{-1}(\frac{y}{(d_5 + d_6)\cdot cos(theta) - d_2\cdot cos(alpha) + d_1})
+    $
+    }
     \label{Beta_y_robot}
 \end{equation}
 these two expressions both have a denominator which is equal to zero for an angle \(theta = \pm \frac{\pi}{2}\), two angles that the robot can never reach due to the way the Lego hardware is put together.
