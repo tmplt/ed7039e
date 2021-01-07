@@ -1,9 +1,11 @@
 \section{Results}
 
 \subsection{Performance of arm movement controllers}
+\label{sec:simon11}
 Different controllers that was made for the motion control of the robot arm was compared when acting on a \(40^{\circ}\) angular error step response for vertical motion and \(60^{\circ}\) angular error step response for horizontal motion. In the following subsections graphs are presented where the evolution of the error is plotted against time for each controller. Rise time and settling time is shown for each test where rise time is the time measured at the error reaching \(5\%\) of the step value and settling time is measured at the error settling at \(2\%\) of the step value.
 
 \subsubsection{P controllers}
+\label{sec:simon12}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{sections/assets/Vertical_P_controller.png}
@@ -20,6 +22,7 @@ Both rise time and settling time of the vertical P controller is 0.4 seconds.
 Rise time of horizontal P controller is 0.6 seconds and settling time is 1.6 seconds
 
 \subsubsection{PI controllers}
+\label{sec:simon13}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{sections/assets/Vertical_PI_controller.png}
@@ -36,6 +39,7 @@ The rise time of the vertical PI controller is 0.4 seconds and the settling time
 Rise time of horizontal PI controller is 0.6 seconds and settling time is 10.8 seconds.
 
 \subsubsection{PD controllers}
+\label{sec:simon14}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{sections/assets/Vertical_PD_controller.png}
@@ -52,6 +56,7 @@ The rise time of the vertical PD controller is 0.4 seconds and the settling time
 Rise time of horizontal PI controller is 0.6 seconds and settling time is 0.9 seconds.
 
 \subsubsection{PID controllers}
+\label{sec:simon15}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{sections/assets/Vertical_PID_controller.png}
@@ -68,6 +73,7 @@ The rise time of the vertical PD controller is between 0.4 and 0.5 seconds and t
 Rise time of horizontal PI controller is between 0.5 and 0.6 seconds and settling time is 5.4 seconds.
 
 \subsubsection{BrickPi3 library for controlling robot arm movement}
+\label{sec:simon16}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{sections/assets/Vertical_built_in_functions.png}
@@ -84,6 +90,7 @@ The rise time of the vertical PD controller is between 0.8 seconds and the settl
 Rise time of horizontal PI controller is between 0.8 seconds and settling time is 1 second.
 
 \subsection{Ziegler Nichols tuning results}
+\label{sec:simon17}
 The controllers mentioned above was tuned with a Ziegler Nichols approach and two plots of undamped oscillations for vertical and horizontal arm movements are shown in  Fig~\ref{vert_osc} and Fig~\ref{Hor_osc}.
 \begin{figure}[h]
 \centering
