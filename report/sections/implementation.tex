@@ -282,6 +282,7 @@ Thus, because LCM:
 it was decided that the project's robot system would be implemented with help of it in place of ROS.
 
 \subsection{Robot hardware}
+\label{sec:simon1}
 The robot designated the task of moving the object on the industry platform is built from the Lego Mindstorms EV3 core set package. The design of the robot is based from the Robot arm model from Legos EV3 core set instructions, but is modified with continuous tracks on the base of the robot, longer arm and some reinforcement to make the robot oscillate less when moving. Instead of using the included EV3 Intelligent Brick, a Raspberry Pi 3 together with two BrickPi3 motor shields, see section \ref{brickpi 3}, was used to control the robot. The motors for moving the arm was the EV3 large servomotors, and a EV3 servo motor medium was used for the gripping mechanism.
 
 
@@ -366,6 +367,7 @@ An example of the how the error is calculated using Eq.~\eqref{Line_Position} an
 By creating a controller with the purpose of minimizing the error, the robot will be controlled to follow the line.
 
 \subsection{Robot arm}
+\label{sec:simon2}
 A simplified model of the robot arm can be seen in Fig.~\ref{Arm_model} where the measured distances from \(d_1\) to \(d_7\) and the vertical angle Theta can be seen. in Fig.~\ref{arm_overview} an overview of the robot model can be seen showing how the angle beta was specified.
 \begin{figure*}[h]
     \centering
@@ -399,6 +401,7 @@ The robot arm can rotate in the xy-plane around the \(z_0\) axis which can be se
 \label{Tab:distance_table}
 \end{table}
 \subsubsection{Forward kinematics}
+\label{sec:simon3}
 To be able to describe where in the world the gripper claw is, a problem often refereed to as the forward kinematics problem \parencite{Spong2004} had to be solved. This was used with a series of homogeneous transformations each representing a change in position and/or orientation relative to what is usually referred to as a frame. The first homogeneous transformation was from the level of the floor to the top of the robot platform, with a distance \(d_0\) which can be seen as a pure translation in the z-direction and can be described as Eq.~\eqref{T01} as according to \parencite{Spong2004}.
 \begin{equation}
     T_{01} =
@@ -508,6 +511,7 @@ the expression of where the gripper claw can be then expressed as in Eq.~\eqref{
     \label{T_tot}
 \end{equation}
 \subsubsection{Inverse kinematics}
+\label{sec:simon4}
 After being able to describe the position and orientation of the gripper it was necessary to have a way of calculating the desired angles theta and beta of the arm to get the gripper claw to a desired position. This problem is often referred to as the inverse kinematics problem. For this robot the angle theta was directly determined by the height of the desired gripper claw position which was calculated according to Eq.~\eqref{inv_theta_calc_1} to \ref{inv_theta_calc_5} and the distances \(h_1\) to \(h_3\) can be seen in Fig.~\ref{inv_theta_img}
 \begin{figure}[h]
     \centering
@@ -590,13 +594,16 @@ solving for beta Eq.~\eqref{circle_x_robot} and Eq.~\eqref{circle_y_robot} the f
 these two expressions both have a denominator which is equal to zero for an angle \(theta = \pm \frac{\pi}{2}\), two angles that the robot can never reach due to the way the Lego hardware is put together.
 From Eq.~\eqref{Beta_x_robot} and Eq.~\eqref{Beta_y_robot} it is clear that only the desired x or the y position was needed to calculate beta, in this project the x positions were used.
 \subsubsection{Resolution}
+\label{sec:simon5}
 As mentioned before the motors used in the robot arm was two Lego EV3 servo motor large for making the arm move vertically and horizontally and one Lego EV3 servo motor medium inside the gripper to pick up boxes on the miniature industry platform. Both the Large and the medium motors had a resolution of 1 degree, meaning the motors gives 360 readings on one revolution. Also on the robot the cogwheel attached to the motor controlling vertical movement on the arm, see wheel0 in Fig.~\ref{Arm_model}, was connected to another cogwheel, see wheel1 in Fig.
 ~\ref{Arm_model}, which had 5 times as many teeth giving 5 times higher resolution for the arm itself than the motor in vertical movement. In the same way the cogwheel attached to the motor controlling horizontal movement of the arm was connected to another cogwheel with 3 times as many teeth giving 3 times higher resolution for the arm relative to the motor in horizontal movement.
 \subsubsection{Initialization}
+\label{sec:simon6}
 There is no memory in the motors which makes the robot unaware of the original orientation of the arm on boot. Therefore an initialization process was made for the robot using two Lego EV3 touch sensors. On boot the robot moved the arm with constant angular speed, in the beta direction, until a lego piece, moving with the arm, pressed one of the touch sensors at \(beta = -90^{\circ}\) then it stopped moving in that direction. In the same way the robot moved the arm in the positive theta direction until another lego piece getting closer to the other touch sensor with an increasing beta angle, pressed the second touch sensor at \(theta = 36^{\circ}\). then it stopped in that direction. At the point when both touch sensors was pressed and the arm had stopped moving in both directions the position of the arm was known.
 \subsection{Robot software}
 Two BrickPi3 motor shields were used to drive the motors and sensors on the robot. A complete library for controlling lego motors and sensors connected to the motor shields were developed by the manufacturers of the BrickPi3 together with the shields and was used to control the motors. Additionally P, PI and PID controllers was developed in this project to compare functions in the BrickPi3 library for controlling the motors and the movement on the arm.
 \subsubsection{P controller}
+\label{sec:simon7}
 A P controller, or proportional controller, is a feedback control structure where the output error is fed back to the motors to make them act proportional to the error. In the P controller made for controlling the movement on the robot arm an angular error was expressed, see Eq.~\eqref{ang_err}
 \begin{equation}
     e_{\theta} = \theta_{desired} - \theta
@@ -610,6 +617,7 @@ where \(\theta\) is the current angular position of the arm and \(\theta_{desire
 where P is motor speed, proportional to the angular error and \(K_p\) is a proportional gain which determines how aggressive the controller should be.
 
 \subsubsection{PI controller}
+\label{sec:simon8}
 A PI controller or proportional integral controller is a proportional controller to which a term which integrates the error over time is added. The integration was done in a discrete fashion where, in every loop of the robot arm code running, the new calculated error was added to a integral error term, see Eq.~\eqref{integral_term}
 \begin{equation}
     e_{integral} = e_{integral} + e_{\theta}
@@ -623,6 +631,7 @@ where \(e_{integral}\) is the discrete approximation of the integrated error, \(
 where P is the motor speed, \(T_s\) is the sampling period of the code to make the integral term normalized in a sense, and \(K_i\) is the integral gain which determines how much the motors should act on the integral error.
 
 \subsubsection{PID controller}
+\label{sec:simon9}
 A PID or proportional integral derivative controller is a control structure where both a proportional, integral, and a derivative term is added. The differentiation was also done in a discrete fashion and was approximated as in Eq.~\eqref{derivative_term}
 \begin{equation}
     e_{diff} = e_{old} - e_{\theta}
@@ -634,6 +643,7 @@ where \(e_{diff}\) is the discrete approximation of the differentiated error, \(
     \label{PID_control}
 \end{equation}
 \subsubsection{Tuning of the controllers}
+\label{sec:simon10}
 The tuning of the controllers was made with a Ziegler Nichols approach \parencite{FeedbackControl}, since a development of a dynamic model of the arm was not completed. The Ziegler Nichols tuning method required two measured parameters to be found. First the Oscillation gain which is the gain of a proportional controller \(K_p\) for which the output of the system acting on a step response is undamped oscillations. This was found by making the robot arm act on a step response several times while changing the value of the proportional gain \(K_p\). The second measured parameter is the oscillation time \(T_{osc}\), e.g the time it takes for the system to make one undamped oscillation period. This was found by looking at a plotted graph of the undamped oscillations and counting the measured values in one period. The calculations of the oscillation time could then be done as shown in Eq.~\eqref{osc_time}
 \begin{equation}
     T_{osc} = n\cdot T_s
