@@ -601,6 +601,7 @@ As mentioned before the motors used in the robot arm was two Lego EV3 servo moto
 \label{sec:simon6}
 There is no memory in the motors which makes the robot unaware of the original orientation of the arm on boot. Therefore an initialization process was made for the robot using two Lego EV3 touch sensors. On boot the robot moved the arm with constant angular speed, in the beta direction, until a lego piece, moving with the arm, pressed one of the touch sensors at \(beta = -90^{\circ}\) then it stopped moving in that direction. In the same way the robot moved the arm in the positive theta direction until another lego piece getting closer to the other touch sensor with an increasing beta angle, pressed the second touch sensor at \(theta = 36^{\circ}\). then it stopped in that direction. At the point when both touch sensors was pressed and the arm had stopped moving in both directions the position of the arm was known.
 \subsection{Robot software}
+\label{sec:simon19}
 Two BrickPi3 motor shields were used to drive the motors and sensors on the robot. A complete library for controlling lego motors and sensors connected to the motor shields were developed by the manufacturers of the BrickPi3 together with the shields and was used to control the motors. Additionally P, PI and PID controllers was developed in this project to compare functions in the BrickPi3 library for controlling the motors and the movement on the arm.
 \subsubsection{P controller}
 \label{sec:simon7}
