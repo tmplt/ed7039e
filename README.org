@@ -1,18 +1,15 @@
 * ED7039E - *Project in Industrial Computer Systems/Electronical Systems & Control Technology*
-This repository will eventually constitute the full model, any and all
-simulations related to, and implementation of the project for the
-D7039E and E7032E courses taken at Luleå Technical University during
-the first and second semester of 2020-21.
+This repository constitutes the full model, any and all simulations
+related to, and implementation of the project for the D7039E and E7032E
+courses taken at Luleå Technical University during the first and second
+semester of 2020-21.
 
 The project is to model, simulate, and implement a robot that, via
 communication over the [[https://www.arrowhead.eu/arrowheadframework][Arrowhead framework]], automatically picks up a
 processed object at the end of a conveyor belt and moves it elsewhere.
-The deadline for this project is December 1st, 2020.
 
-Throughout the development of this project, the report under =report/=
-will continuously be updated. The report can be build by running
-=./report.nix=. The path to the compiled report will be printed and
-will also be symbolically linked under =result=.
+The project report can be build by running =./report.nix=. [[https://github.com/tmplt/ed7039e/releases/download/project-end/report.pdf][A pre-built
+version can also be downloaded directly]].
 
 ** Building and project setup
 *** Install Nix
